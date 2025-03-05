@@ -864,6 +864,7 @@ export default function YamlEditor() {
     let parentIndent = -1
     const currentPath = []
     let inArrayContext = false
+    let contextType = "unknown"
 
     // First pass: find the parent section
     for (let i = 0; i < lines.length; i++) {
@@ -892,15 +893,50 @@ export default function YamlEditor() {
           // If we've found the full path, we're done with the first pass
           if (currentPath.length === pathSegments.length) {
             parentLineNumber = i
+
+            // Determine the context type
+            const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : ""
+            if (nextLine.startsWith("-")) {
+              contextType = "array"
+              inArrayContext = true
+            } else if (nextLine.includes(":") && !nextLine.endsWith(":")) {
+              contextType = "key-value"
+            } else if (nextLine.endsWith(":")) {
+              contextType = "object"
+            }
+
             break
           }
         }
-      }
+      } else if (isArrayItem(line)) {
+        // Check if we're in an array context
+        if (currentPath.length > 0 && currentPath.length === pathSegments.length - 1) {
+          // We're in an array context
+          inArrayContext = true
+          contextType = "array"
 
-      // Check for array items if we're looking for an array
-      if (currentPath.length > 0 && currentPath.length === pathSegments.length - 1 && isArrayItem(line)) {
-        // We're in an array context
-        inArrayContext = true
+          // If this is the specific array item we're looking for
+          if (isArrayParent) {
+            const arrayIndex = Number.parseInt(isArrayParent[2])
+            let itemCount = 0
+
+            // Count array items to find our target
+            for (let j = currentPath[currentPath.length - 1] + 1; j <= i; j++) {
+              const itemLine = lines[j].trim()
+              if (itemLine.startsWith("-")) {
+                if (itemCount === arrayIndex) {
+                  parentLineNumber = j
+                  break
+                }
+                itemCount++
+              }
+            }
+
+            if (parentLineNumber !== -1) {
+              break
+            }
+          }
+        }
       }
     }
 
@@ -939,6 +975,7 @@ export default function YamlEditor() {
       // Check if we're in an array context
       if (isArrayItem(line) && indent === parentIndent + 2) {
         inArrayContext = true
+        contextType = "array"
       }
     }
 
@@ -959,87 +996,104 @@ export default function YamlEditor() {
       properIndent: properIndent,
       isArrayContext: inArrayContext,
       parentLineNumber: parentLineNumber,
+      contextType: contextType,
     }
   }, [])
 
   // Add a new item template to a section
   const addNewItem = useCallback(
     (type, name, parent) => {
-      if (!editorRef.current || !monacoRef.current) return;
-  
-      const insertPoint = findInsertionPoint(parent);
-      if (!insertPoint) return;
-  
-      const { lineNumber, properIndent, isArrayContext } = insertPoint;
-  
+      if (!editorRef.current || !monacoRef.current) return
+
+      const insertPoint = findInsertionPoint(parent)
+      if (!insertPoint) return
+
+      const { lineNumber, properIndent, isArrayContext, parentLineNumber, contextType } = insertPoint
+
       // Prepare the new content with proper indentation
-      let newContent = "";
-  
-      // Determine the type of content to add based on context and type
-      if (type === "key-value") {
-        newContent = KEY_VALUE_TEMPLATE.replace("{key}", name).replace("{value}", "value");
-      } else if (["technology", "strategy", "region"].includes(type) || isArrayContext) {
-        newContent = `- ${name}`;
+      let newContent = ""
+
+      // Determine the type of content to add based on context
+      if (type === "key-value" && contextType !== "array") {
+        // Simple key-value pair
+        newContent = KEY_VALUE_TEMPLATE.replace("{key}", name).replace("{value}", "value")
+      } else if (
+        contextType === "array" ||
+        type === "technology" ||
+        type === "strategy" ||
+        type === "region" ||
+        isArrayContext
+      ) {
+        // Array item
+        newContent = `- ${name}`
       } else if (type === "department") {
-        newContent = TEMPLATES.department.replace("{name}", name);
-      } else {
-        newContent = TEMPLATES[type] ? TEMPLATES[type].replace("{name}", name) : `${name}: value`;
+        // Department object
+        newContent = TEMPLATES.department.replace("{name}", name)
+      } else if (contextType === "object") {
+        // Object with nested structure
+        newContent = `${
+          // Object with nested structure
+          (newContent = `${name}:\n${" ".repeat(properIndent + 2)}key: value`)
+        } else {
+        // Default to template if available, otherwise key-value
+        newContent = TEMPLATES[type] ? TEMPLATES[type].replace("{name}", name) : \`${name}: value`
       }
-  
-      // Add proper indentation
-      const indentation = " ".repeat(properIndent);
+
+      // Add proper indentation to each line
+      const indentation = " ".repeat(properIndent)
       newContent = newContent
         .split("\n")
         .map((line) => indentation + line)
-        .join("\n");
-  
+        .join("\n")
+
       // Insert the new content
-      const position = { lineNumber, column: 1 };
+      const position = { lineNumber, column: 1 }
       editorRef.current.executeEdits("", [
         {
-          range: new monacoRef.current.Range(
-            position.lineNumber,
-            1,
-            position.lineNumber,
-            1
-          ),
+          range: {
+            startLineNumber: position.lineNumber,
+            startColumn: position.column,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column,
+          },
           text: newContent + "\n",
         },
-      ]);
-  
+      ])
+
       // Highlight the new addition
-      const endLine = position.lineNumber + newContent.split("\n").length;
-      const decorations = editorRef.current.deltaDecorations([], [
-        {
-          range: new monacoRef.current.Range(position.lineNumber, 1, endLine, 1),
-          options: { inlineClassName: "newAddition", isWholeLine: true },
-        },
-      ]);
-  
-      // Remove highlight after 3 seconds
+      const endLine = position.lineNumber + newContent.split("\n").length
+      const decorations = editorRef.current.deltaDecorations(
+        [],
+        [
+          {
+            range: new monacoRef.current.Range(position.lineNumber, 1, endLine, 1),
+            options: { inlineClassName: "newAddition", isWholeLine: true },
+          },
+        ],
+      )
+
+      // Remove the highlight after 3 seconds
       setTimeout(() => {
-        editorRef.current.deltaDecorations(decorations, []);
-      }, 3000);
-  
+        editorRef.current.deltaDecorations(decorations, [])
+      }, 3000)
+
       // Navigate to the newly added template
-      editorRef.current.revealLineInCenter(position.lineNumber);
-      editorRef.current.setPosition(position);
-      editorRef.current.focus();
-  
-      // Reset state
-      setIsAddingNewItem(false);
-      setNewItemName("");
-      setNewItemType(null);
-      setNewItemParent(null);
-  
+      editorRef.current.revealLineInCenter(position.lineNumber)
+      editorRef.current.setPosition(position)
+      editorRef.current.focus()
+
+      setIsAddingNewItem(false)
+      setNewItemName("")
+      setNewItemType(null)
+      setNewItemParent(null)
+
       // Revalidate YAML after adding new content
       setTimeout(() => {
-        validateYaml(editorRef.current.getValue());
-      }, 100);
+        validateYaml(editorRef.current.getValue())
+      }, 100)
     },
-    [findInsertionPoint, validateYaml]
-  );
-  
+    [findInsertionPoint, validateYaml],
+  )
 
   // Add a new key-value pair
   const addKeyValuePair = useCallback(
@@ -1157,15 +1211,22 @@ export default function YamlEditor() {
                         className="ml-auto h-6 w-6"
                         onClick={(e) => {
                           e.stopPropagation()
-                          setNewItemType(
-                            key === "technologies"
+                          // Determine the appropriate item type based on the context
+                          const itemType = Array.isArray(value)
+                            ? key === "technologies"
                               ? "technology"
                               : key === "strategies"
                                 ? "strategy"
                                 : key === "regions"
                                   ? "region"
-                                  : "key-value",
-                          )
+                                  : "array-item"
+                            : key === "departments"
+                              ? "department"
+                              : typeof value === "object"
+                                ? "object"
+                                : "key-value"
+
+                          setNewItemType(itemType)
                           setNewItemParent(currentPath)
                           setIsAddingNewItem(true)
                         }}
@@ -1514,7 +1575,7 @@ export default function YamlEditor() {
     [editorLineMap, parsedYaml, findSectionRange],
   )
 
-  // Add a function to highlight the tree when a section is selected in the editor
+  // Enhanced function to highlight the tree when a section is selected in the editor
   const highlightTreeForEditorSelection = useCallback(
     (position) => {
       if (!editorRef.current || !position) return
@@ -1526,13 +1587,33 @@ export default function YamlEditor() {
       const parts = path.split(".")
       let currentPath = ""
 
+      // Make sure all parent sections are expanded
       for (const part of parts) {
-        currentPath = currentPath ? `${currentPath}.${part}` : part
-        setExpandedSections((prev) => new Set([...prev, currentPath]))
+        if (part.includes("[")) {
+          // Handle array notation
+          const arrayPart = part.split("[")[0]
+          currentPath = currentPath ? `${currentPath}.${arrayPart}` : arrayPart
+          setExpandedSections((prev) => new Set([...prev, currentPath]))
+
+          // Add the full path with array index
+          currentPath = currentPath ? `${currentPath}.${part}` : part
+        } else {
+          currentPath = currentPath ? `${currentPath}.${part}` : part
+          setExpandedSections((prev) => new Set([...prev, currentPath]))
+        }
       }
 
       // Set the selected section
       setSelectedSection(path)
+
+      // Force the sidebar to be open when selecting items in the editor
+      const sidebarElement = document.querySelector("[data-sidebar]")
+      if (sidebarElement && sidebarElement.getAttribute("data-state") !== "open") {
+        const triggerButton = document.querySelector("[data-sidebar-trigger]")
+        if (triggerButton) {
+          triggerButton.click()
+        }
+      }
     },
     [findPathForPosition],
   )
@@ -1680,7 +1761,7 @@ export default function YamlEditor() {
             <SidebarContent className="overflow-auto">{renderYamlTree(parsedYaml)}</SidebarContent>
           </Sidebar>
         </ResizablePanel>
-
+  
         <ResizablePanel defaultSize={75}>
           <SidebarInset className="flex flex-col flex-1">
             <div className="flex items-center h-14 px-4 border-b">
@@ -1698,7 +1779,7 @@ export default function YamlEditor() {
                     <TooltipContent>Format YAML document</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+  
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1718,7 +1799,7 @@ export default function YamlEditor() {
                     <TooltipContent>Validate YAML syntax</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+  
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1730,7 +1811,7 @@ export default function YamlEditor() {
                     <TooltipContent>Copy YAML to clipboard</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+  
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1744,7 +1825,7 @@ export default function YamlEditor() {
                 </TooltipProvider>
               </div>
             </div>
-
+  
             <div className="flex-1 relative">
               {parseError && (
                 <Alert variant="destructive" className="absolute top-2 right-2 z-10 max-w-md">
@@ -1752,7 +1833,7 @@ export default function YamlEditor() {
                   <AlertDescription>{parseError}</AlertDescription>
                 </Alert>
               )}
-
+  
               <div className="h-full">
                 <Editor
                   height="calc(100vh - 56px)"
@@ -1841,7 +1922,7 @@ export default function YamlEditor() {
           </SidebarInset>
         </ResizablePanel>
       </ResizablePanelGroup>
-
+  
       {/* Simple Add Item Dialog */}
       <Dialog open={isAddingNewItem} onOpenChange={setIsAddingNewItem}>
         <DialogContent>

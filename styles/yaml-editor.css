@@ -24,9 +24,9 @@
   }
   
   [data-sidebar-menu-button][data-active="true"] {
-    background-color: hsl(var(--accent) / 0.3);
-    font-weight: 500;
-    color: hsl(var(--primary));
+    background-color: hsl(var(--primary) / 0.2) !important;
+    color: hsl(var(--primary)) !important;
+    font-weight: 500 !important;
   }
   
   [data-sidebar-group-label] {
@@ -38,8 +38,9 @@
   }
   
   [data-sidebar-group-label][data-active="true"] {
-    background-color: hsl(var(--accent) / 0.3);
-    font-weight: 500;
+    background-color: hsl(var(--primary) / 0.2) !important;
+    color: hsl(var(--primary)) !important;
+    font-weight: 500 !important;
   }
   
   /* Ensure tree items don't collapse on hover */
@@ -49,6 +50,11 @@
   
   /* Ensure expanded sections stay expanded */
   [data-sidebar-group][data-expanded="true"] [data-sidebar-group-content] {
+    display: block !important;
+  }
+  
+  /* Add styles to ensure the tree navigation stays open when items are selected */
+  [data-sidebar][data-state="open"] {
     display: block !important;
   }
   
