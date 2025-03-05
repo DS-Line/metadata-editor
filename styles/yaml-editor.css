@@ -1,0 +1,68 @@
+/* YAML Editor specific styles */
+.yaml-error-highlight {
+    background-color: rgba(255, 0, 0, 0.2);
+    border-bottom: 1px wavy red;
+  }
+  
+  .yaml-error-glyph {
+    background-color: red;
+    border-radius: 50%;
+    margin-left: 5px;
+  }
+  
+  .yaml-section-highlight {
+    background-color: rgba(100, 100, 255, 0.2);
+  }
+  
+  /* Tree navigation styles */
+  [data-sidebar-menu-button] {
+    transition: background-color 0.2s ease;
+  }
+  
+  [data-sidebar-menu-button]:hover {
+    background-color: hsl(var(--accent) / 0.15);
+  }
+  
+  [data-sidebar-menu-button][data-active="true"] {
+    background-color: hsl(var(--accent) / 0.3);
+    font-weight: 500;
+    color: hsl(var(--primary));
+  }
+  
+  [data-sidebar-group-label] {
+    transition: background-color 0.2s ease;
+  }
+  
+  [data-sidebar-group-label]:hover {
+    background-color: hsl(var(--accent) / 0.15);
+  }
+  
+  [data-sidebar-group-label][data-active="true"] {
+    background-color: hsl(var(--accent) / 0.3);
+    font-weight: 500;
+  }
+  
+  /* Ensure tree items don't collapse on hover */
+  [data-sidebar-group]:hover [data-sidebar-group-content] {
+    display: block !important;
+  }
+  
+  /* Ensure expanded sections stay expanded */
+  [data-sidebar-group][data-expanded="true"] [data-sidebar-group-content] {
+    display: block !important;
+  }
+  
+  /* Improve editor selection highlighting */
+  .monaco-editor .selected-text {
+    background-color: hsl(var(--primary) / 0.3) !important;
+  }
+  
+  /* Improve undo/redo visual feedback */
+  .monaco-editor .undo-stop-corner {
+    background-color: hsl(var(--primary) / 0.5);
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+  }
+  
+  
