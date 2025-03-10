@@ -2074,9 +2074,9 @@ export default function YamlEditor(): JSX.Element {
                 {isFullScreen && renderEditorToolbar()}
 
                 {parseError && (
-                  <Alert variant="destructive" className="absolute top-2 right-2 z-10 max-w-md">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{parseError}</AlertDescription>
+                  <Alert variant="destructive" className="w-50 absolute top-4 right-2 z-10 ">
+                    <AlertCircle height={20} width={20} className="pb-1"/>
+                    <AlertDescription className=" pt-1 font-bold ">{parseError}</AlertDescription>
                   </Alert>
                 )}
 
