@@ -1520,7 +1520,7 @@ export default function YamlEditor(): JSX.Element {
     .yaml-structure {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100dvh - 256px);
   overflow: hidden;
 }
 
@@ -1535,10 +1535,33 @@ export default function YamlEditor(): JSX.Element {
 
 .yaml-structure-content {
   flex-grow: 1;
-    max-height: calc(100vh - 256px); /* Adjust height dynamically */
+    max-height: calc(100dvh - 256px); /* Adjust height dynamically */
 
   overflow-y: auto;
 }
+  
+  .editor-container {
+  display: flex;
+  flex-direction: column;
+    max-height: calc(100dvh - 256px); /* Adjust height dynamically */
+}
+      .editor-container-full {
+  display: flex;
+  flex-direction: column;
+    max-height: 100%  /* Adjust height dynamically */
+}
+
+.status-bar {
+  height: 32px; /* Fixed height */
+  flex-shrink: 0; /* Prevents collapsing */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f3f4f6;
+  padding: 0 10px;
+  border-top: 1px solid #ccc;
+}
+
 
     `
     document.head.appendChild(styleElement)
@@ -2112,7 +2135,9 @@ export default function YamlEditor(): JSX.Element {
   }
 
   return (
-    <div className={cn(isFullScreen ? "fullscreen-editor" : "h-screen w-full")}>
+    <div
+      className={cn(isFullScreen ? "fullscreen-editor" : "h-[80dvh] w-full")}
+    >
       <ResizablePanelGroup direction="horizontal" className="h-full">
         {!isFullScreen && (
           <ResizablePanel
@@ -2297,92 +2322,87 @@ export default function YamlEditor(): JSX.Element {
               {parseError && (
                 <Alert
                   variant="destructive"
-                  className="absolute top-2 right-2 z-10 max-w-md"
+                  className="w-60 absolute top-4 right-2 z-10 max-h-20 flex flex-wrap break-all"
                 >
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{parseError}</AlertDescription>
+                  <AlertCircle height={20} width={20} className="pb-1" />
+                  <AlertDescription className=" pt-1 font-bold max-w-56">
+                    {parseError}
+                  </AlertDescription>
                 </Alert>
               )}
 
-              <div className="flex-1">
-                <Editor
-                  height={
-                    isFullScreen ? "calc(100vh - 84px)" : "calc(100vh - 84px)"
-                  }
-                  defaultLanguage="yaml"
-                  defaultValue={yamlData}
-                  theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
-                  onMount={handleEditorDidMount}
-                  options={{
-                    minimap: { enabled: showMinimap },
-                    lineNumbers: "on",
-                    scrollBeyondLastLine: false,
-                    automaticLayout: true,
-                    tabSize: 2,
-                    wordWrap: wordWrap,
-                    wrappingIndent: "deepIndent",
-                    formatOnPaste: true,
-                    formatOnType: true,
-                    autoIndent: "full",
-                    folding: true,
-                    foldingStrategy: "indentation",
-                    renderIndentGuides: true,
+              <div
+                className={cn(
+                  isFullScreen ? "editor-container-full" : "editor-container",
+                  "flex flex-col h-full"
+                )}
+              >
+                <div className="flex-1">
+                  <Editor
+                    height="100%" // Let the parent handle height
+                    defaultLanguage="yaml"
+                    defaultValue={yamlData}
+                    theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
+                    onMount={handleEditorDidMount}
+                    options={{
+                      minimap: { enabled: showMinimap },
+                      lineNumbers: "on",
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true,
+                      tabSize: 2,
+                      wordWrap: wordWrap,
+                      wrappingIndent: "deepIndent",
+                      formatOnPaste: true,
+                      formatOnType: true,
+                      autoIndent: "full",
+                      folding: true,
+                      foldingStrategy: "indentation",
+                      renderIndentGuides: true,
+                      renderLineHighlight: "all",
+                      renderWhitespace: "boundary",
+                      suggestOnTriggerCharacters: true,
+                      quickSuggestions: true,
+                      acceptSuggestionOnEnter: "on",
+                      cursorBlinking: "smooth",
+                      cursorSmoothCaretAnimation: "on",
+                      smoothScrolling: true,
+                      contextmenu: true,
+                      mouseWheelZoom: true,
+                      bracketPairColorization: { enabled: true },
+                      guides: { bracketPairs: true, indentation: true },
+                      glyphMargin: true,
+                      fixedOverflowWidgets: true,
+                      selectOnLineNumbers: true,
+                      lightbulb: { enabled: true },
+                      colorDecorators: true,
+                      semanticHighlighting: { enabled: true },
+                      linkedEditing: true,
+                      codeLens: true,
+                      fontLigatures: true,
+                      fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
+                      fontSize: 14,
+                      lineHeight: 22,
+                      padding: { top: 10, bottom: 10 },
+                      scrollbar: {
+                        verticalScrollbarSize: 12,
+                        horizontalScrollbarSize: 12,
+                        verticalSliderSize: 12,
+                        horizontalSliderSize: 12,
+                        verticalHasArrows: false,
+                        horizontalHasArrows: false,
+                        arrowSize: 15,
+                        useShadows: true,
+                      },
+                      find: { addExtraSpaceOnTop: false },
+                    }}
+                  />
+                </div>
 
-                    renderLineHighlight: "all",
-                    renderWhitespace: "boundary",
-                    suggestOnTriggerCharacters: true,
-                    quickSuggestions: true,
-                    acceptSuggestionOnEnter: "on",
-                    cursorBlinking: "smooth",
-                    cursorSmoothCaretAnimation: "on",
-                    smoothScrolling: true,
-                    contextmenu: true,
-                    mouseWheelZoom: true,
-                    bracketPairColorization: {
-                      enabled: true,
-                    },
-                    guides: {
-                      bracketPairs: true,
-                      indentation: true,
-                    },
-                    glyphMargin: true,
-                    fixedOverflowWidgets: true,
-                    selectOnLineNumbers: true,
-                    lightbulb: {
-                      enabled: true,
-                    },
-                    colorDecorators: true,
-                    semanticHighlighting: {
-                      enabled: true,
-                    },
-                    linkedEditing: true,
-                    codeLens: true,
-                    fontLigatures: true,
-                    fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
-                    fontSize: 14,
-                    lineHeight: 22,
-                    padding: {
-                      top: 10,
-                      bottom: 10,
-                    },
-                    scrollbar: {
-                      verticalScrollbarSize: 12,
-                      horizontalScrollbarSize: 12,
-                      verticalSliderSize: 12,
-                      horizontalSliderSize: 12,
-                      verticalHasArrows: false,
-                      horizontalHasArrows: false,
-                      arrowSize: 15,
-                      useShadows: true,
-                    },
-                    find: {
-                      addExtraSpaceOnTop: false,
-                    },
-                  }}
-                />
+                {/* Status Bar - Fixed at the Bottom */}
+                <div className="status-bar bg-gray-100 text-sm p-2 border-t">
+                  {renderStatusBar()}
+                </div>
               </div>
-
-              {renderStatusBar()}
 
               {!isEditorReady && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80">
