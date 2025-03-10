@@ -1,49 +1,67 @@
 "use client"
 
-import React from "react"
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type JSX,
+} from "react"
 
-import { useMemo, useRef, useState, useEffect, useCallback, type JSX } from "react"
 import Editor, { type OnMount } from "@monaco-editor/react"
+import {
+  AlertCircle,
+  BarChart3,
+  Briefcase,
+  ChevronDown,
+  ChevronRight,
+  Code,
+  Copy,
+  Database,
+  Download,
+  File,
+  FileCode,
+  FileJson,
+  FileText,
+  Folder,
+  FolderOpen,
+  Globe,
+  Keyboard,
+  Layers,
+  LucideIcon,
+  Map,
+  Maximize2,
+  Minimize2,
+  Moon,
+  Settings,
+  Sun,
+  TypeIcon as type,
+  Users,
+  WrapTextIcon as Wrap,
+} from "lucide-react"
+import type * as monaco from "monaco-editor"
+import { useTheme } from "next-themes"
 import { parse, stringify } from "yaml"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  AlertCircle,
-  ChevronDown,
-  ChevronRight,
-  FileCode,
-  Database,
-  Layers,
-  BarChart3,
-  File,
-  Folder,
-  FolderOpen,
-  FileText,
-  Settings,
-  Users,
-  Code,
-  Globe,
-  Briefcase,
-  Copy,
-  Download,
-  Maximize2,
-  Minimize2,
-  Sun,
-  Moon,
-  WrapTextIcon as Wrap,
-  Map,
-  FileJson,
-  Keyboard,
-  type LucideIcon,
-} from "lucide-react"
-import { cn } from "./ui/utils"
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
-import { useTheme } from "next-themes"
 import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import type * as monaco from "monaco-editor"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
+import { cn } from "./ui/utils"
 
 // Sample YAML data (truncated for brevity)
 const yamlData = `
@@ -146,7 +164,9 @@ export default function YamlEditor(): JSX.Element {
   const [parsedYaml, setParsedYaml] = useState<Record<string, any>>({})
   const [parseError, setParseError] = useState<string | null>(null)
   const [selectedSection, setSelectedSection] = useState<string | null>(null)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set()
+  )
   const [activeDecorations, setActiveDecorations] = useState<string[]>([])
   const [isEditorReady, setIsEditorReady] = useState<boolean>(false)
   const [editorLineMap, setEditorLineMap] = useState<EditorLineMap>({})
@@ -162,7 +182,9 @@ export default function YamlEditor(): JSX.Element {
     fileSize: "0 KB",
     selectionLength: 0,
   })
-  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState<boolean>(false)
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] =
+    useState<boolean>(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
 
   // Enhanced YAML validation function
   const validateYaml = useCallback((yamlString: string) => {
@@ -193,7 +215,8 @@ export default function YamlEditor(): JSX.Element {
 
       return { valid: true, parsed }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Invalid YAML"
+      const errorMessage =
+        error instanceof Error ? error.message : "Invalid YAML"
       let formattedError = errorMessage
 
       const lineMatch = errorMessage.match(/line (\d+)/)
@@ -216,7 +239,7 @@ export default function YamlEditor(): JSX.Element {
                   hoverMessage: { value: errorMessage },
                 },
               },
-            ],
+            ]
           )
 
           setTimeout(() => {
@@ -232,77 +255,89 @@ export default function YamlEditor(): JSX.Element {
   }, [])
 
   // Build a map of line numbers to YAML paths
-  const buildEditorLineMap = useCallback((yamlString: string, parsedYaml: Record<string, any>) => {
-    const lines = yamlString.split("\n")
-    const lineMap: EditorLineMap = {}
+  const buildEditorLineMap = useCallback(
+    (yamlString: string, parsedYaml: Record<string, any>) => {
+      const lines = yamlString.split("\n")
+      const lineMap: EditorLineMap = {}
 
-    const buildMap = (obj: Record<string, any>, path = "", lineStart = 0): number => {
-      if (!obj || typeof obj !== "object") return lineStart
+      const buildMap = (
+        obj: Record<string, any>,
+        path = "",
+        lineStart = 0
+      ): number => {
+        if (!obj || typeof obj !== "object") return lineStart
 
-      let currentLine = lineStart
+        let currentLine = lineStart
 
-      while (
-        currentLine < lines.length &&
-        (lines[currentLine].trim() === "" || lines[currentLine].trim().startsWith("#"))
-      ) {
-        currentLine++
-      }
-
-      for (const [key, value] of Object.entries(obj)) {
-        const currentPath = path ? `${path}.${key}` : key
-
-        let keyLine = -1
-        for (let i = currentLine; i < lines.length; i++) {
-          const line = lines[i].trim()
-          if (line === "" || line.startsWith("#")) continue
-
-          if (line.startsWith(`${key}:`)) {
-            keyLine = i
-            break
-          }
+        while (
+          currentLine < lines.length &&
+          (lines[currentLine].trim() === "" ||
+            lines[currentLine].trim().startsWith("#"))
+        ) {
+          currentLine++
         }
 
-        if (keyLine !== -1) {
-          lineMap[keyLine + 1] = currentPath
+        for (const [key, value] of Object.entries(obj)) {
+          const currentPath = path ? `${path}.${key}` : key
 
-          if (typeof value === "object" && value !== null) {
-            if (Array.isArray(value)) {
-              let arrayLine = keyLine + 1
-              for (let i = 0; i < value.length; i++) {
-                while (arrayLine < lines.length) {
-                  const line = lines[arrayLine].trim()
-                  if (line === "" || line.startsWith("#")) {
-                    arrayLine++
-                    continue
-                  }
+          let keyLine = -1
+          for (let i = currentLine; i < lines.length; i++) {
+            const line = lines[i].trim()
+            if (line === "" || line.startsWith("#")) continue
 
-                  if (line.startsWith("-")) {
-                    lineMap[arrayLine + 1] = `${currentPath}[${i}]`
+            if (line.startsWith(`${key}:`)) {
+              keyLine = i
+              break
+            }
+          }
 
-                    if (typeof value[i] === "object" && value[i] !== null) {
-                      arrayLine = buildMap(value[i], `${currentPath}[${i}]`, arrayLine + 1)
-                    } else {
+          if (keyLine !== -1) {
+            lineMap[keyLine + 1] = currentPath
+
+            if (typeof value === "object" && value !== null) {
+              if (Array.isArray(value)) {
+                let arrayLine = keyLine + 1
+                for (let i = 0; i < value.length; i++) {
+                  while (arrayLine < lines.length) {
+                    const line = lines[arrayLine].trim()
+                    if (line === "" || line.startsWith("#")) {
                       arrayLine++
+                      continue
                     }
-                    break
-                  }
 
-                  arrayLine++
+                    if (line.startsWith("-")) {
+                      lineMap[arrayLine + 1] = `${currentPath}[${i}]`
+
+                      if (typeof value[i] === "object" && value[i] !== null) {
+                        arrayLine = buildMap(
+                          value[i],
+                          `${currentPath}[${i}]`,
+                          arrayLine + 1
+                        )
+                      } else {
+                        arrayLine++
+                      }
+                      break
+                    }
+
+                    arrayLine++
+                  }
                 }
+              } else {
+                buildMap(value, currentPath, keyLine + 1)
               }
-            } else {
-              buildMap(value, currentPath, keyLine + 1)
             }
           }
         }
+
+        return currentLine
       }
 
-      return currentLine
-    }
-
-    buildMap(parsedYaml)
-    setEditorLineMap(lineMap)
-  }, [])
+      buildMap(parsedYaml)
+      setEditorLineMap(lineMap)
+    },
+    []
+  )
 
   // Format YAML document
   const formatYamlDocument = useCallback(() => {
@@ -324,7 +359,11 @@ export default function YamlEditor(): JSX.Element {
 
       validateYaml(formatted)
     } catch (error) {
-      setParseError(`Error formatting YAML: ${error instanceof Error ? error.message : String(error)}`)
+      setParseError(
+        `Error formatting YAML: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
     }
   }, [validateYaml])
 
@@ -337,7 +376,8 @@ export default function YamlEditor(): JSX.Element {
       .writeText(content)
       .then(() => {
         const tempAlert = document.createElement("div")
-        tempAlert.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
+        tempAlert.className =
+          "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
         tempAlert.textContent = "YAML copied to clipboard!"
         document.body.appendChild(tempAlert)
 
@@ -393,7 +433,11 @@ export default function YamlEditor(): JSX.Element {
         URL.revokeObjectURL(url)
       }, 0)
     } catch (error) {
-      setParseError(`Error exporting to JSON: ${error instanceof Error ? error.message : String(error)}`)
+      setParseError(
+        `Error exporting to JSON: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
     }
   }, [])
 
@@ -430,6 +474,11 @@ export default function YamlEditor(): JSX.Element {
     }
   }, [wordWrap])
 
+  // Toggle sidebar
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((prev) => !prev)
+  }, [])
+
   // Toggle section expansion in the tree view
   const toggleSectionExpansion = useCallback((section: string) => {
     setExpandedSections((prev) => {
@@ -444,77 +493,119 @@ export default function YamlEditor(): JSX.Element {
   }, [])
 
   // Find the line number and range for a specific section in the YAML
-  const findSectionRange = useCallback((section: string, item?: string): SectionRange | null => {
-    if (!editorRef.current) return null
+  const findSectionRange = useCallback(
+    (section: string, item?: string): SectionRange | null => {
+      if (!editorRef.current) return null
 
-    const model = editorRef.current.getModel()
-    if (!model) return null
+      const model = editorRef.current.getModel()
+      if (!model) return null
 
-    const text = model.getValue()
-    const lines = text.split("\n")
+      const text = model.getValue()
+      const lines = text.split("\n")
 
-    const arrayMatch = section && section.match(/(.+)\[(\d+)\]$/)
-    if (arrayMatch) {
-      const arraySection = arrayMatch[1]
-      const arrayIndex = Number.parseInt(arrayMatch[2])
+      const arrayMatch = section && section.match(/(.+)\[(\d+)\]$/)
+      if (arrayMatch) {
+        const arraySection = arrayMatch[1]
+        const arrayIndex = Number.parseInt(arrayMatch[2])
 
-      const fullPath = arraySection.split(".")
-      let currentLevel = 0
-      let currentIndent = -1
-      let inTargetSection = false
-      let itemCount = 0
+        const fullPath = arraySection.split(".")
+        let currentLevel = 0
+        let currentIndent = -1
+        let inTargetSection = false
+        let itemCount = 0
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim()
-        if (line === "" || line.startsWith("#")) continue
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim()
+          if (line === "" || line.startsWith("#")) continue
 
-        const indent = lines[i].search(/\S/)
+          const indent = lines[i].search(/\S/)
 
-        if (indent <= currentIndent && currentLevel > 0) {
-          const keyAtIndent = line.split(":")[0].trim()
-          if (keyAtIndent !== fullPath[currentLevel]) {
-            if (indent <= currentIndent) {
-              currentLevel = Math.max(0, currentLevel - 1)
-              inTargetSection = false
-              if (indent < currentIndent) {
-                currentIndent = indent
+          if (indent <= currentIndent && currentLevel > 0) {
+            const keyAtIndent = line.split(":")[0].trim()
+            if (keyAtIndent !== fullPath[currentLevel]) {
+              if (indent <= currentIndent) {
+                currentLevel = Math.max(0, currentLevel - 1)
+                inTargetSection = false
+                if (indent < currentIndent) {
+                  currentIndent = indent
+                }
+              }
+            }
+          }
+
+          if (line.startsWith(fullPath[currentLevel] + ":")) {
+            currentIndent = indent
+            currentLevel++
+
+            if (currentLevel === fullPath.length) {
+              inTargetSection = true
+              itemCount = 0
+              continue
+            }
+          }
+
+          if (inTargetSection && line.startsWith("-")) {
+            if (itemCount === arrayIndex) {
+              return {
+                lineNumber: i + 1,
+                startLine: i + 1,
+                endLine: i + 1,
+                startColumn: 1,
+                endColumn: lines[i].length + 1,
+              }
+            }
+            itemCount++
+          }
+        }
+
+        return null
+      }
+
+      if (item) {
+        const fullPath = section + "." + item
+        const pathSegments = fullPath.split(".")
+
+        let currentLevel = 0
+        let currentIndent = -1
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim()
+          if (line === "" || line.startsWith("#")) continue
+
+          const indent = lines[i].search(/\S/)
+
+          if (indent <= currentIndent && currentLevel > 0) {
+            const keyAtIndent = line.split(":")[0].trim()
+            if (keyAtIndent !== pathSegments[currentLevel]) {
+              if (indent <= currentIndent) {
+                currentLevel = Math.max(0, currentLevel - 1)
+                if (indent < currentIndent) {
+                  currentIndent = indent
+                }
+              }
+            }
+          }
+
+          if (line.startsWith(pathSegments[currentLevel] + ":")) {
+            currentIndent = indent
+            currentLevel++
+
+            if (currentLevel === pathSegments.length) {
+              return {
+                lineNumber: i + 1,
+                startLine: i + 1,
+                endLine: i + 1,
+                startColumn: 1,
+                endColumn: lines[i].length + 1,
               }
             }
           }
         }
 
-        if (line.startsWith(fullPath[currentLevel] + ":")) {
-          currentIndent = indent
-          currentLevel++
-
-          if (currentLevel === fullPath.length) {
-            inTargetSection = true
-            itemCount = 0
-            continue
-          }
-        }
-
-        if (inTargetSection && line.startsWith("-")) {
-          if (itemCount === arrayIndex) {
-            return {
-              lineNumber: i + 1,
-              startLine: i + 1,
-              endLine: i + 1,
-              startColumn: 1,
-              endColumn: lines[i].length + 1,
-            }
-          }
-          itemCount++
-        }
+        return null
       }
 
-      return null
-    }
-
-    if (item) {
-      const fullPath = section + "." + item
-      const pathSegments = fullPath.split(".")
-
+      const pathSegments = section ? section.split(".") : []
       let currentLevel = 0
       let currentIndent = -1
 
@@ -536,82 +627,46 @@ export default function YamlEditor(): JSX.Element {
           }
         }
 
-        if (line.startsWith(pathSegments[currentLevel] + ":")) {
+        if (
+          pathSegments.length > 0 &&
+          line.startsWith(pathSegments[currentLevel] + ":")
+        ) {
           currentIndent = indent
           currentLevel++
 
           if (currentLevel === pathSegments.length) {
+            let endLine = i
+            const sectionIndent = indent
+
+            for (let j = i + 1; j < lines.length; j++) {
+              const nextLine = lines[j].trim()
+              if (nextLine !== "" && !nextLine.startsWith("#")) {
+                const nextIndent = lines[j].search(/\S/)
+                if (nextIndent <= sectionIndent) {
+                  endLine = j - 1
+                  break
+                }
+              }
+              if (j === lines.length - 1) {
+                endLine = j
+              }
+            }
+
             return {
               lineNumber: i + 1,
               startLine: i + 1,
-              endLine: i + 1,
+              endLine: endLine + 1,
               startColumn: 1,
-              endColumn: lines[i].length + 1,
+              endColumn: lines[endLine].length + 1,
             }
           }
         }
       }
 
       return null
-    }
-
-    const pathSegments = section ? section.split(".") : []
-    let currentLevel = 0
-    let currentIndent = -1
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim()
-      if (line === "" || line.startsWith("#")) continue
-
-      const indent = lines[i].search(/\S/)
-
-      if (indent <= currentIndent && currentLevel > 0) {
-        const keyAtIndent = line.split(":")[0].trim()
-        if (keyAtIndent !== pathSegments[currentLevel]) {
-          if (indent <= currentIndent) {
-            currentLevel = Math.max(0, currentLevel - 1)
-            if (indent < currentIndent) {
-              currentIndent = indent
-            }
-          }
-        }
-      }
-
-      if (pathSegments.length > 0 && line.startsWith(pathSegments[currentLevel] + ":")) {
-        currentIndent = indent
-        currentLevel++
-
-        if (currentLevel === pathSegments.length) {
-          let endLine = i
-          const sectionIndent = indent
-
-          for (let j = i + 1; j < lines.length; j++) {
-            const nextLine = lines[j].trim()
-            if (nextLine !== "" && !nextLine.startsWith("#")) {
-              const nextIndent = lines[j].search(/\S/)
-              if (nextIndent <= sectionIndent) {
-                endLine = j - 1
-                break
-              }
-            }
-            if (j === lines.length - 1) {
-              endLine = j
-            }
-          }
-
-          return {
-            lineNumber: i + 1,
-            startLine: i + 1,
-            endLine: endLine + 1,
-            startColumn: 1,
-            endColumn: lines[endLine].length + 1,
-          }
-        }
-      }
-    }
-
-    return null
-  }, [])
+    },
+    []
+  )
 
   // Find the exact path for a cursor position
   const findPathForPosition = useCallback(
@@ -652,7 +707,7 @@ export default function YamlEditor(): JSX.Element {
           const findArrayItemPath = (
             obj: Record<string, any>,
             targetValue: string,
-            currentPath = "",
+            currentPath = ""
           ): string | null => {
             if (!obj || typeof obj !== "object") return null
 
@@ -666,7 +721,11 @@ export default function YamlEditor(): JSX.Element {
                   }
 
                   if (typeof v[i] === "object" && v[i] !== null) {
-                    const result = findArrayItemPath(v[i], targetValue, `${newPath}[${i}]`)
+                    const result = findArrayItemPath(
+                      v[i],
+                      targetValue,
+                      `${newPath}[${i}]`
+                    )
                     if (result) return result
                   }
                 }
@@ -691,7 +750,7 @@ export default function YamlEditor(): JSX.Element {
         obj: Record<string, any>,
         targetKey: string,
         currentPath = "",
-        context: { lineNumber: number; indent: number } | null = null,
+        context: { lineNumber: number; indent: number } | null = null
       ): string | null => {
         if (!obj || typeof obj !== "object") return null
 
@@ -703,7 +762,10 @@ export default function YamlEditor(): JSX.Element {
           if (k === targetKey) {
             if (context) {
               const range = findSectionRange(newPath)
-              if (range && Math.abs(range.lineNumber - position.lineNumber) <= 1) {
+              if (
+                range &&
+                Math.abs(range.lineNumber - position.lineNumber) <= 1
+              ) {
                 return newPath
               }
             } else {
@@ -715,7 +777,12 @@ export default function YamlEditor(): JSX.Element {
             if (Array.isArray(v)) {
               for (let i = 0; i < v.length; i++) {
                 if (typeof v[i] === "object" && v[i] !== null) {
-                  const result = findPathToKey(v[i], targetKey, `${newPath}[${i}]`, context)
+                  const result = findPathToKey(
+                    v[i],
+                    targetKey,
+                    `${newPath}[${i}]`,
+                    context
+                  )
                   if (result) return result
                 }
               }
@@ -737,7 +804,7 @@ export default function YamlEditor(): JSX.Element {
 
       return findPathToKey(parsedYaml, key)
     },
-    [editorLineMap, parsedYaml, findSectionRange],
+    [editorLineMap, parsedYaml, findSectionRange]
   )
 
   // Scroll the sidebar to make the selected item visible
@@ -751,7 +818,10 @@ export default function YamlEditor(): JSX.Element {
           const sidebarRect = sidebarTreeRef.current.getBoundingClientRect()
 
           // Check if the element is outside the visible area of the sidebar
-          if (elementRect.top < sidebarRect.top || elementRect.bottom > sidebarRect.bottom) {
+          if (
+            elementRect.top < sidebarRect.top ||
+            elementRect.bottom > sidebarRect.bottom
+          ) {
             // Scroll the element into view with smooth behavior
             selectedElement.scrollIntoView({
               behavior: "smooth",
@@ -779,13 +849,18 @@ export default function YamlEditor(): JSX.Element {
         [],
         [
           {
-            range: new monacoRef.current.Range(range.startLine, 1, range.endLine, 1),
+            range: new monacoRef.current.Range(
+              range.startLine,
+              1,
+              range.endLine,
+              1
+            ),
             options: {
               className: "yaml-section-highlight",
               isWholeLine: true,
             },
           },
-        ],
+        ]
       )
 
       setActiveDecorations(decorations)
@@ -833,7 +908,9 @@ export default function YamlEditor(): JSX.Element {
           if (part.includes("[")) {
             const arrayPart = part.split("[")[0]
             // Add the array name to expanded sections
-            const arrayPath = currentPath ? `${currentPath}.${arrayPart}` : arrayPart
+            const arrayPath = currentPath
+              ? `${currentPath}.${arrayPart}`
+              : arrayPart
             setExpandedSections((prev) => new Set([...prev, arrayPath]))
 
             // Add the full path with array index
@@ -851,14 +928,12 @@ export default function YamlEditor(): JSX.Element {
 
       scrollSidebarToSelectedItem()
     },
-    [findSectionRange, activeDecorations, scrollSidebarToSelectedItem],
+    [findSectionRange, activeDecorations, scrollSidebarToSelectedItem]
   )
-
   // Improve the highlightTreeForEditorSelection function to better handle deeply nested items
   // and ensure the sidebar is properly opened
   // Replace the highlightTreeForEditorSelection function with this improved version
   // that properly expands all parent nodes in the navigation tree
-
   const highlightTreeForEditorSelection = useCallback(
     (position: Position | null) => {
       if (!editorRef.current || !position) return
@@ -886,7 +961,9 @@ export default function YamlEditor(): JSX.Element {
           if (segment.includes("[")) {
             // Add the path without the array index
             const baseName = segment.split("[")[0]
-            const baseSegment = currentPath ? `${currentPath}.${baseName}` : baseName
+            const baseSegment = currentPath
+              ? `${currentPath}.${baseName}`
+              : baseName
             pathsToExpand.add(baseSegment)
 
             // Add the full segment with array index
@@ -907,17 +984,9 @@ export default function YamlEditor(): JSX.Element {
       // Expand all parent paths
       expandParentPaths(path)
 
-      // Force the sidebar to open if it's closed
-      const sidebarElement = document.querySelector("[data-sidebar='sidebar']")
-      if (sidebarElement) {
-        const sidebarState = sidebarElement.getAttribute("data-state")
-        if (sidebarState === "collapsed") {
-          // Find and click the sidebar trigger button
-          const triggerButton = document.querySelector("[data-sidebar='trigger']")
-          if (triggerButton instanceof HTMLElement) {
-            triggerButton.click()
-          }
-        }
+      // Ensure sidebar is open
+      if (sidebarCollapsed) {
+        setSidebarCollapsed(false)
       }
 
       // Scroll to the selected item with a delay to ensure DOM updates
@@ -925,7 +994,10 @@ export default function YamlEditor(): JSX.Element {
         const selectedElement = document.querySelector(`[data-path="${path}"]`)
         if (selectedElement && sidebarTreeRef.current) {
           // First make sure the element is in view
-          selectedElement.scrollIntoView({ behavior: "smooth", block: "nearest" })
+          selectedElement.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          })
 
           // Then ensure it's fully visible by checking its position relative to the sidebar
           const sidebarRect = sidebarTreeRef.current.getBoundingClientRect()
@@ -936,15 +1008,22 @@ export default function YamlEditor(): JSX.Element {
 
           if (elementRect.bottom > sidebarRect.bottom) {
             // Element is below the visible area
-            sidebarTreeRef.current.scrollTop += elementRect.bottom - sidebarRect.bottom + padding
+            sidebarTreeRef.current.scrollTop +=
+              elementRect.bottom - sidebarRect.bottom + padding
           } else if (elementRect.top < sidebarRect.top) {
             // Element is above the visible area
-            sidebarTreeRef.current.scrollTop -= sidebarRect.top - elementRect.top + padding
+            sidebarTreeRef.current.scrollTop -=
+              sidebarRect.top - elementRect.top + padding
           }
         }
       }, 200) // Longer delay to ensure DOM updates
     },
-    [findPathForPosition, setExpandedSections, setSelectedSection],
+    [
+      findPathForPosition,
+      setExpandedSections,
+      setSelectedSection,
+      sidebarCollapsed,
+    ]
   )
 
   // Handle text selection in the editor
@@ -985,9 +1064,11 @@ export default function YamlEditor(): JSX.Element {
 
         if (Array.isArray(value)) {
           return (
-            <div key={currentPath}>
-              <label
-                className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground ${isActive ? "bg-primary/15 text-primary font-medium" : ""}`}
+            <div key={currentPath} className="mb-1">
+              <div
+                className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
+                  isActive ? "bg-primary/15 text-primary font-medium" : ""
+                }`}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -1004,32 +1085,52 @@ export default function YamlEditor(): JSX.Element {
                     toggleSectionExpansion(currentPath)
                   }}
                 >
-                  {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </div>
                 {getNodeIcon(key, level)}
-                <span className={cn("capitalize", isActive && "font-medium")}>{key}</span>
-              </label>
+                <span className={cn("capitalize", isActive && "font-medium")}>
+                  {key}
+                </span>
+              </div>
               {isExpanded && (
-                <div>
-                  <div>
+                <div className="pl-6">
+                  <ul className="space-y-1">
                     {value.map((item: any, index: number) => (
-                      <div key={`${currentPath}-${index}`}>
+                      <li key={`${currentPath}-${index}`}>
                         <div
-                          className={`flex items-center gap-2 pl-8 py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md`}
-                          onClick={() => navigateToSection(`${currentPath}[${index}]`)}
-                          // isActive={selectedSection === `${currentPath}[${index}]`}
+                          className={`flex items-center gap-2 pl-2 py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${
+                            selectedSection === `${currentPath}[${index}]`
+                              ? "bg-primary/15 text-primary font-medium"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            navigateToSection(`${currentPath}[${index}]`)
+                          }
+                          data-active={
+                            selectedSection === `${currentPath}[${index}]`
+                          }
                           data-path={`${currentPath}[${index}]`}
                         >
                           {getNodeIcon("item", level + 1)}
                           <span
-                            className={`truncate ${selectedSection === `${currentPath}[${index}]` ? "text-primary font-medium" : "text-muted-foreground"}`}
+                            className={`truncate ${
+                              selectedSection === `${currentPath}[${index}]`
+                                ? "text-primary font-medium"
+                                : "text-muted-foreground"
+                            }`}
                           >
-                            {typeof item === "string" ? item : `Item ${index + 1}`}
+                            {typeof item === "string"
+                              ? item
+                              : `Item ${index + 1}`}
                           </span>
                         </div>
-                      </div>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
             </div>
@@ -1038,9 +1139,11 @@ export default function YamlEditor(): JSX.Element {
 
         if (typeof value === "object" && value !== null) {
           return (
-            <div key={currentPath}>
+            <div key={currentPath} className="mb-1">
               <div
-                className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground ${isActive ? "bg-primary/15 text-primary font-medium" : ""}`}
+                className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
+                  isActive ? "bg-primary/15 text-primary font-medium" : ""
+                }`}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -1057,14 +1160,20 @@ export default function YamlEditor(): JSX.Element {
                     toggleSectionExpansion(currentPath)
                   }}
                 >
-                  {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </div>
                 {getNodeIcon(key, level)}
-                <span className={cn("capitalize", isActive && "font-medium")}>{key}</span>
+                <span className={cn("capitalize", isActive && "font-medium")}>
+                  {key}
+                </span>
               </div>
               {isExpanded && (
-                <div>
-                  <div>{renderYamlTree(value, currentPath, level + 1)}</div>
+                <div className="pl-6">
+                  {renderYamlTree(value, currentPath, level + 1)}
                 </div>
               )}
             </div>
@@ -1073,19 +1182,31 @@ export default function YamlEditor(): JSX.Element {
 
         // Handle primitive values (strings, numbers, etc.)
         return (
-          <div key={currentPath}>
+          <div key={currentPath} className="mb-1">
             <div
-              className={`flex items-center gap-2 ${level > 0 ? "pl-" + (level * 4) : ""} py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md`}
+              className={`flex items-center gap-2 ${
+                level > 0 ? "pl-" + level * 4 : ""
+              } py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer`}
               onClick={() => navigateToSection(path, key)}
-              // isActive={selectedSection === `${path}.${key}`}
+              data-active={selectedSection === `${path}.${key}`}
               data-path={`${path}.${key}`}
             >
               {getNodeIcon(key, level)}
-              <span className={`capitalize ${selectedSection === `${path}.${key}` ? "font-medium text-primary" : ""}`}>
+              <span
+                className={`capitalize ${
+                  selectedSection === `${path}.${key}`
+                    ? "font-medium text-primary"
+                    : ""
+                }`}
+              >
                 {key}:
               </span>
               <span
-                className={`truncate ${selectedSection === `${path}.${key}` ? "text-primary" : "text-muted-foreground"}`}
+                className={`truncate ${
+                  selectedSection === `${path}.${key}`
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
               >
                 {String(value)}
               </span>
@@ -1094,7 +1215,13 @@ export default function YamlEditor(): JSX.Element {
         )
       })
     },
-    [expandedSections, selectedSection, navigateToSection, toggleSectionExpansion, getNodeIcon],
+    [
+      expandedSections,
+      selectedSection,
+      navigateToSection,
+      toggleSectionExpansion,
+      getNodeIcon,
+    ]
   )
 
   // Get lines from editor
@@ -1107,7 +1234,11 @@ export default function YamlEditor(): JSX.Element {
 
   // Initialize expanded sections
   useEffect(() => {
-    if (parsedYaml && Object.keys(parsedYaml).length > 0 && expandedSections.size === 0) {
+    if (
+      parsedYaml &&
+      Object.keys(parsedYaml).length > 0 &&
+      expandedSections.size === 0
+    ) {
       const topLevelSections = new Set(Object.keys(parsedYaml))
       setExpandedSections(topLevelSections)
     }
@@ -1127,20 +1258,22 @@ export default function YamlEditor(): JSX.Element {
           const arrayName = arrayMatch[1]
           const arrayIndex = Number.parseInt(arrayMatch[2], 10)
 
-          if (!current[arrayName] || !Array.isArray(current[arrayName]) || arrayIndex >= current[arrayName].length) {
+          if (
+            !current[arrayName] ||
+            !Array.isArray(current[arrayName]) ||
+            arrayIndex >= current[arrayName].length
+          ) {
             return false
           }
           current = current[arrayName][arrayIndex]
         } else if (current && current[segment] === undefined) {
           return false
         } else {
-
-          if(current){
+          if (current) {
             current = current[segment]
+          } else {
+            return false
           }
-
-          return false
-          
         }
       }
       return true
@@ -1148,7 +1281,7 @@ export default function YamlEditor(): JSX.Element {
 
     setExpandedSections((prev) => {
       const newSet = new Set<string>()
-      for (const path of prev) {
+      for (const path of prev as any) {
         if (pathExists(path)) {
           newSet.add(path)
         }
@@ -1162,7 +1295,7 @@ export default function YamlEditor(): JSX.Element {
     const handleClickOutside = (e: MouseEvent) => {
       if (activeDecorations.length > 0 && editorRef.current) {
         const editorElement = editorRef.current.getDomNode()
-        const sidebarElement = document.querySelector(".sidebar")
+        const sidebarElement = document.querySelector(".yaml-structure")
         const dialogElement = document.querySelector(".dialog")
         const buttonElements = Array.from(document.querySelectorAll("button"))
 
@@ -1221,9 +1354,9 @@ export default function YamlEditor(): JSX.Element {
       handleEditorSelection()
 
       // Update selection length
-      const selection = editorRef.current.getSelection()
+      const selection = editorRef?.current?.getSelection()
       if (selection) {
-        const model = editorRef.current.getModel()
+        const model = editorRef?.current?.getModel()
         if (model) {
           const selectionText = model.getValueInRange(selection)
           setEditorStats((prev) => ({
@@ -1254,43 +1387,6 @@ export default function YamlEditor(): JSX.Element {
       }
       .yaml-section-highlight {
         background-color: rgba(100, 100, 255, 0.2);
-      }
-
-      [data-sidebar-menu-button] {
-        transition: all 0.2s ease;
-        border-radius: 0.25rem;
-      }
-
-      [data-sidebar-menu-button]:hover {
-        background-color: hsl(var(--accent) / 0.7);
-        color: hsl(var(--accent-foreground));
-      }
-
-      [data-sidebar-menu-button][data-active="true"] {
-        background-color: hsl(var(--primary) / 0.15);
-        color: hsl(var(--primary));
-        font-weight: 500;
-      }
-
-      [data-sidebar-group-label] {
-        transition: all 0.2s ease;
-        border-radius: 0.25rem;
-        margin-bottom: 2px;
-      }
-
-      [data-sidebar-group-label]:hover {
-        background-color: hsl(var(--accent) / 0.7);
-        color: hsl(var(--accent-foreground));
-      }
-
-      [data-sidebar-group-label][data-active="true"] {
-        background-color: hsl(var(--primary) / 0.15);
-        color: hsl(var(--primary));
-        font-weight: 500;
-      }
-
-      [data-sidebar-group-content] {
-        display: block !important;
       }
       
       .fullscreen-editor {
@@ -1420,6 +1516,27 @@ export default function YamlEditor(): JSX.Element {
         padding-right: 0.5rem;
         border-right: 1px solid hsl(var(--border));
       }
+
+      .yaml-structure {
+        height: 100%;
+        overflow-y: auto;
+        border-right: 1px solid hsl(var(--border));
+        background-color: hsl(var(--background));
+      }
+
+      .yaml-structure-header {
+        border-bottom: 1px solid hsl(var(--border));
+        padding: 1rem;
+      }
+
+      .yaml-structure-content {
+        padding: 1rem;
+      }
+
+      .yaml-structure-collapsed {
+        width: 0;
+        overflow: hidden;
+      }
     `
     document.head.appendChild(styleElement)
 
@@ -1456,13 +1573,24 @@ export default function YamlEditor(): JSX.Element {
         e.preventDefault()
         setShowKeyboardShortcuts(true)
       }
+      if (e.ctrlKey && e.key === "b") {
+        e.preventDefault()
+        toggleSidebar()
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown)
     return () => {
       document.removeEventListener("keydown", handleKeyDown)
     }
-  }, [formatYamlDocument, copyToClipboard, downloadYaml, toggleFullScreen, isFullScreen])
+  }, [
+    formatYamlDocument,
+    copyToClipboard,
+    downloadYaml,
+    toggleFullScreen,
+    isFullScreen,
+    toggleSidebar,
+  ])
 
   // Configure Monaco Editor for YAML
   const configureMonaco = useCallback(
@@ -1484,7 +1612,12 @@ export default function YamlEditor(): JSX.Element {
 
           const suggestions: monaco.languages.CompletionItem[] = []
 
-          const addSuggestion = (label: string, insertText: string, detail: string, documentation: string) => {
+          const addSuggestion = (
+            label: string,
+            insertText: string,
+            detail: string,
+            documentation: string
+          ) => {
             suggestions.push({
               label,
               kind: monaco.languages.CompletionItemKind.Property,
@@ -1502,7 +1635,10 @@ export default function YamlEditor(): JSX.Element {
 
           const yamlObject = parse(textUntilPosition)
 
-          const getSuggestionsForObject = (obj: any, currentPath: string[] = []) => {
+          const getSuggestionsForObject = (
+            obj: any,
+            currentPath: string[] = []
+          ) => {
             if (typeof obj === "object" && obj !== null) {
               for (const [key, value] of Object.entries(obj)) {
                 const newPath = [...currentPath, key]
@@ -1513,19 +1649,24 @@ export default function YamlEditor(): JSX.Element {
                       `${key}:`,
                       `${key}:\n${" ".repeat((indentLevel + 1) * 2)}- `,
                       `Add ${fullPath} array`,
-                      `Add a new item to the ${fullPath} array`,
+                      `Add a new item to the ${fullPath} array`
                     )
                   } else {
                     addSuggestion(
                       `${key}:`,
                       `${key}:\n${" ".repeat((indentLevel + 1) * 2)}`,
                       `Add ${fullPath} object`,
-                      `Add a new ${fullPath} object`,
+                      `Add a new ${fullPath} object`
                     )
                   }
                   getSuggestionsForObject(value, newPath)
                 } else {
-                  addSuggestion(`${key}:`, `${key}: `, `Add ${fullPath}`, `Add a new ${fullPath} property`)
+                  addSuggestion(
+                    `${key}:`,
+                    `${key}: `,
+                    `Add ${fullPath}`,
+                    `Add a new ${fullPath} property`
+                  )
                 }
               }
             }
@@ -1545,7 +1686,10 @@ export default function YamlEditor(): JSX.Element {
           if (!word) return null
 
           const lineContent = model.getLineContent(position.lineNumber)
-          const path = findPathForPosition({ lineNumber: position.lineNumber, column: position.column })
+          const path = findPathForPosition({
+            lineNumber: position.lineNumber,
+            column: position.column,
+          })
 
           if (!path) return null
 
@@ -1565,7 +1709,10 @@ export default function YamlEditor(): JSX.Element {
           const value = getValueAtPath(parsedYaml, path)
           const type = Array.isArray(value) ? "array" : typeof value
 
-          const hoverContent = [{ value: `**${word.word}**` }, { value: `Type: ${type}` }]
+          const hoverContent = [
+            { value: `**${word.word}**` },
+            { value: `Type: ${type}` },
+          ]
 
           if (type === "object") {
             const keys = Object.keys(value)
@@ -1638,7 +1785,7 @@ export default function YamlEditor(): JSX.Element {
     `
       document.head.appendChild(styleElement)
     },
-    [findPathForPosition, parsedYaml],
+    [findPathForPosition, parsedYaml]
   )
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -1698,15 +1845,23 @@ export default function YamlEditor(): JSX.Element {
       { key: "Ctrl + G", description: "Go to line" },
       { key: "Ctrl + /", description: "Toggle comment" },
       { key: "Ctrl + Space", description: "Trigger suggestions" },
+      { key: "Ctrl + B", description: "Toggle sidebar" },
     ]
 
     return (
       <>
-        <div className="keyboard-shortcuts-overlay" onClick={() => setShowKeyboardShortcuts(false)}></div>
+        <div
+          className="keyboard-shortcuts-overlay"
+          onClick={() => setShowKeyboardShortcuts(false)}
+        ></div>
         <div className="keyboard-shortcuts-modal">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Keyboard Shortcuts</h2>
-            <Button variant="ghost" size="sm" onClick={() => setShowKeyboardShortcuts(false)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowKeyboardShortcuts(false)}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -1732,7 +1887,9 @@ export default function YamlEditor(): JSX.Element {
                   {shortcut.key.split(" + ").map((key, keyIndex) => (
                     <React.Fragment key={keyIndex}>
                       <span className="keyboard-shortcut-key">{key}</span>
-                      {keyIndex < shortcut.key.split(" + ").length - 1 && <span className="mx-1">+</span>}
+                      {keyIndex < shortcut.key.split(" + ").length - 1 && (
+                        <span className="mx-1">+</span>
+                      )}
                     </React.Fragment>
                   ))}
                 </div>
@@ -1757,7 +1914,9 @@ export default function YamlEditor(): JSX.Element {
                   Format
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Format YAML document (Shift + Alt + F)</TooltipContent>
+              <TooltipContent>
+                Format YAML document (Shift + Alt + F)
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -1769,7 +1928,9 @@ export default function YamlEditor(): JSX.Element {
                   Copy
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Copy YAML to clipboard (Ctrl + Shift + C)</TooltipContent>
+              <TooltipContent>
+                Copy YAML to clipboard (Ctrl + Shift + C)
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -1809,7 +1970,9 @@ export default function YamlEditor(): JSX.Element {
                   {showMinimap ? "Hide Minimap" : "Show Minimap"}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{showMinimap ? "Hide code minimap" : "Show code minimap"}</TooltipContent>
+              <TooltipContent>
+                {showMinimap ? "Hide code minimap" : "Show code minimap"}
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -1821,7 +1984,9 @@ export default function YamlEditor(): JSX.Element {
                   {wordWrap === "on" ? "Disable Wrap" : "Enable Wrap"}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{wordWrap === "on" ? "Disable word wrap" : "Enable word wrap"}</TooltipContent>
+              <TooltipContent>
+                {wordWrap === "on" ? "Disable word wrap" : "Enable word wrap"}
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -1830,12 +1995,18 @@ export default function YamlEditor(): JSX.Element {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={() => setShowKeyboardShortcuts(true)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowKeyboardShortcuts(true)}
+                >
                   <Keyboard className="h-4 w-4 mr-1" />
                   Shortcuts
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Show keyboard shortcuts (Ctrl + K)</TooltipContent>
+              <TooltipContent>
+                Show keyboard shortcuts (Ctrl + K)
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -1863,14 +2034,21 @@ export default function YamlEditor(): JSX.Element {
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Switch to {theme === "dark" ? "light" : "dark"} mode</TooltipContent>
+              <TooltipContent>
+                Switch to {theme === "dark" ? "light" : "dark"} mode
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={toggleFullScreen} className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleFullScreen}
+                  className="flex items-center gap-2"
+                >
                   {isFullScreen ? (
                     <>
                       <Minimize2 className="h-4 w-4" />
@@ -1885,7 +2063,9 @@ export default function YamlEditor(): JSX.Element {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {isFullScreen ? "Exit fullscreen mode (Esc)" : "Enter fullscreen mode (F11)"}
+                {isFullScreen
+                  ? "Exit fullscreen mode (Esc)"
+                  : "Enter fullscreen mode (F11)"}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -1930,249 +2110,293 @@ export default function YamlEditor(): JSX.Element {
 
   return (
     <div className={cn(isFullScreen ? "fullscreen-editor" : "h-screen w-full")}>
-      <div>
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          {!isFullScreen && (
-            <ResizablePanel
-              defaultSize={sidebarSize}
-              minSize={15}
-              maxSize={40}
-              onResize={(size) => setSidebarSize(size)}
-            >
-              <div className="h-full border-r">
-                <div className="border-b p-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">YAML Structure</h2>
-                    <Badge variant="outline" className="ml-2 text-txt-color-600">
-                      {Object.keys(parsedYaml).length} items
-                    </Badge>
-                  </div>
-                </div>
-                <div className="overflow-auto" ref={sidebarTreeRef}>
-                  {renderYamlTree(parsedYaml)}
+      <ResizablePanelGroup direction="horizontal" className="h-full">
+        {!isFullScreen && (
+          <ResizablePanel
+            defaultSize={sidebarSize}
+            minSize={15}
+            maxSize={40}
+            onResize={(size) => setSidebarSize(size)}
+            className={sidebarCollapsed ? "yaml-structure-collapsed" : ""}
+          >
+            <div className="yaml-structure h-full" ref={sidebarTreeRef}>
+              <div className="yaml-structure-header sticky">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold">YAML Structure</h2>
+                  <Badge variant="outline" className="ml-2 text-black">
+                    {Object.keys(parsedYaml).length} items
+                  </Badge>
                 </div>
               </div>
-            </ResizablePanel>
-          )}
-
-          <ResizablePanel defaultSize={isFullScreen ? 100 : 100 - sidebarSize}>
-            <div className="flex flex-col flex-1">
-              {!isFullScreen && (
-                <div className="flex items-center h-14 px-4 border-b">
-                  <div />
-                  <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
-                  <div className="ml-auto flex gap-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={formatYamlDocument}>
-                            <FileCode className="h-4 w-4 mr-1" />
-                            Format
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Format YAML document (Shift + Alt + F)</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (editorRef.current) {
-                                validateYaml(editorRef.current.getValue())
-                              }
-                            }}
-                          >
-                            <AlertCircle className="h-4 w-4 mr-1" />
-                            Validate
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Validate YAML syntax</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={copyToClipboard}>
-                            <Copy className="h-4 w-4 mr-1" />
-                            Copy
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Copy YAML to clipboard (Ctrl + Shift + C)</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={downloadYaml}>
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Download YAML file (Ctrl + S)</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Settings className="h-4 w-4 mr-1" />
-                          <span className="hidden sm:inline">Settings</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={toggleFullScreen}>
-                          {isFullScreen ? (
-                            <>
-                              <Minimize2 className="h-4 w-4 mr-2" />
-                              Exit Fullscreen
-                            </>
-                          ) : (
-                            <>
-                              <Maximize2 className="h-4 w-4 mr-2" />
-                              Fullscreen Mode
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                          {theme === "dark" ? (
-                            <>
-                              <Sun className="h-4 w-4 mr-2" />
-                              Light Mode
-                            </>
-                          ) : (
-                            <>
-                              <Moon className="h-4 w-4 mr-2" />
-                              Dark Mode
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={toggleMinimap}>
-                          <Map className="h-4 w-4 mr-2" />
-                          {showMinimap ? "Hide Minimap" : "Show Minimap"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={toggleWordWrap}>
-                          <Wrap className="h-4 w-4 mr-2" />
-                          {wordWrap === "on" ? "Disable Word Wrap" : "Enable Word Wrap"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setShowKeyboardShortcuts(true)}>
-                          <Keyboard className="h-4 w-4 mr-2" />
-                          Keyboard Shortcuts
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex-1 relative flex flex-col">
-                {isFullScreen && renderEditorToolbar()}
-
-                {parseError && (
-                  <Alert variant="destructive" className="w-50 absolute top-4 right-2 z-10 ">
-                    <AlertCircle height={20} width={20} className="pb-1"/>
-                    <AlertDescription className=" pt-1 font-bold ">{parseError}</AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="flex-1">
-                  <Editor
-                    height={isFullScreen ? "calc(100vh - 84px)" : "calc(100dvh - 220px)"}
-                    defaultLanguage="yaml"
-                    defaultValue={yamlData}
-                    theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
-                    onMount={handleEditorDidMount}
-                    options={{
-                      minimap: { enabled: showMinimap },
-                      lineNumbers: "on",
-                      scrollBeyondLastLine: false,
-                      automaticLayout: true,
-                      tabSize: 2,
-                      wordWrap: wordWrap,
-                      wrappingIndent: "deepIndent",
-                      formatOnPaste: true,
-                      formatOnType: true,
-                      autoIndent: "full",
-                      folding: true,
-                      foldingStrategy: "indentation",
-                      renderIndentGuides: true,
-                      renderLineHighlight: "all",
-                      renderWhitespace: "boundary",
-                      suggestOnTriggerCharacters: true,
-                      quickSuggestions: true,
-                      acceptSuggestionOnEnter: "on",
-                      cursorBlinking: "smooth",
-                      cursorSmoothCaretAnimation: "on",
-                      smoothScrolling: true,
-                      contextmenu: true,
-                      mouseWheelZoom: true,
-                      bracketPairColorization: {
-                        enabled: true,
-                      },
-                      guides: {
-                        bracketPairs: true,
-                        indentation: true,
-                      },
-                      glyphMargin: true,
-                      fixedOverflowWidgets: true,
-                      selectOnLineNumbers: true,
-                      lightbulb: {
-                        enabled: true,
-                      },
-                      colorDecorators: true,
-                      semanticHighlighting: {
-                        enabled: true,
-                      },
-                      linkedEditing: true,
-                      codeLens: true,
-                      fontLigatures: true,
-                      fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
-                      fontSize: 14,
-                      lineHeight: 22,
-                      padding: {
-                        top: 10,
-                        bottom: 10,
-                      },
-                      scrollbar: {
-                        verticalScrollbarSize: 12,
-                        horizontalScrollbarSize: 12,
-                        verticalSliderSize: 12,
-                        horizontalSliderSize: 12,
-                        verticalHasArrows: false,
-                        horizontalHasArrows: false,
-                        arrowSize: 15,
-                        useShadows: true,
-                      },
-                      find: {
-                        addExtraSpaceOnTop: false,
-                      },
-                    }}
-                  />
-                </div>
-
-                {renderStatusBar()}
-
-                {!isEditorReady && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                      <p className="text-sm text-muted-foreground">Loading editor...</p>
-                    </div>
-                  </div>
-                )}
+              <div className="yaml-structure-content">
+                {renderYamlTree(parsedYaml)}
               </div>
             </div>
           </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
+        )}
+
+        <ResizablePanel defaultSize={isFullScreen ? 100 : 100 - sidebarSize}>
+          <div className="flex flex-col h-full">
+            {!isFullScreen && (
+              <div className="flex items-center h-14 px-4 border-b">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="h-7 w-7"
+                >
+                  <ChevronRight
+                    className={`h-4 w-4 transition-transform ${
+                      !sidebarCollapsed ? "rotate-180" : ""
+                    }`}
+                  />
+                  <span className="sr-only">Toggle Sidebar</span>
+                </Button>
+                <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
+                <div className="ml-auto flex gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={formatYamlDocument}
+                        >
+                          <FileCode className="h-4 w-4 mr-1" />
+                          Format
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Format YAML document (Shift + Alt + F)
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (editorRef.current) {
+                              validateYaml(editorRef.current.getValue())
+                            }
+                          }}
+                        >
+                          <AlertCircle className="h-4 w-4 mr-1" />
+                          Validate
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Validate YAML syntax</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={copyToClipboard}
+                        >
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copy
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Copy YAML to clipboard (Ctrl + Shift + C)
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={downloadYaml}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Download YAML file (Ctrl + S)
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Settings className="h-4 w-4 mr-1" />
+                        <span className="hidden sm:inline">Settings</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={toggleFullScreen}>
+                        {isFullScreen ? (
+                          <>
+                            <Minimize2 className="h-4 w-4 mr-2" />
+                            Exit Fullscreen
+                          </>
+                        ) : (
+                          <>
+                            <Maximize2 className="h-4 w-4 mr-2" />
+                            Fullscreen Mode
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          setTheme(theme === "dark" ? "light" : "dark")
+                        }
+                      >
+                        {theme === "dark" ? (
+                          <>
+                            <Sun className="h-4 w-4 mr-2" />
+                            Light Mode
+                          </>
+                        ) : (
+                          <>
+                            <Moon className="h-4 w-4 mr-2" />
+                            Dark Mode
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={toggleMinimap}>
+                        <Map className="h-4 w-4 mr-2" />
+                        {showMinimap ? "Hide Minimap" : "Show Minimap"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={toggleWordWrap}>
+                        <Wrap className="h-4 w-4 mr-2" />
+                        {wordWrap === "on"
+                          ? "Disable Word Wrap"
+                          : "Enable Word Wrap"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setShowKeyboardShortcuts(true)}
+                      >
+                        <Keyboard className="h-4 w-4 mr-2" />
+                        Keyboard Shortcuts
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 relative flex flex-col">
+              {isFullScreen && renderEditorToolbar()}
+
+              {parseError && (
+                <Alert
+                  variant="destructive"
+                  className="absolute top-2 right-2 z-10 max-w-md"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{parseError}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="flex-1">
+                <Editor
+                  height={
+                    isFullScreen ? "calc(100vh - 84px)" : "calc(100vh - 84px)"
+                  }
+                  defaultLanguage="yaml"
+                  defaultValue={yamlData}
+                  theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
+                  onMount={handleEditorDidMount}
+                  options={{
+                    minimap: { enabled: showMinimap },
+                    lineNumbers: "on",
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 2,
+                    wordWrap: wordWrap,
+                    wrappingIndent: "deepIndent",
+                    formatOnPaste: true,
+                    formatOnType: true,
+                    autoIndent: "full",
+                    folding: true,
+                    foldingStrategy: "indentation",
+                    renderIndentGuides: true,
+
+                    renderLineHighlight: "all",
+                    renderWhitespace: "boundary",
+                    suggestOnTriggerCharacters: true,
+                    quickSuggestions: true,
+                    acceptSuggestionOnEnter: "on",
+                    cursorBlinking: "smooth",
+                    cursorSmoothCaretAnimation: "on",
+                    smoothScrolling: true,
+                    contextmenu: true,
+                    mouseWheelZoom: true,
+                    bracketPairColorization: {
+                      enabled: true,
+                    },
+                    guides: {
+                      bracketPairs: true,
+                      indentation: true,
+                    },
+                    glyphMargin: true,
+                    fixedOverflowWidgets: true,
+                    selectOnLineNumbers: true,
+                    lightbulb: {
+                      enabled: true,
+                    },
+                    colorDecorators: true,
+                    semanticHighlighting: {
+                      enabled: true,
+                    },
+                    linkedEditing: true,
+                    codeLens: true,
+                    fontLigatures: true,
+                    fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
+                    fontSize: 14,
+                    lineHeight: 22,
+                    padding: {
+                      top: 10,
+                      bottom: 10,
+                    },
+                    scrollbar: {
+                      verticalScrollbarSize: 12,
+                      horizontalScrollbarSize: 12,
+                      verticalSliderSize: 12,
+                      horizontalSliderSize: 12,
+                      verticalHasArrows: false,
+                      horizontalHasArrows: false,
+                      arrowSize: 15,
+                      useShadows: true,
+                    },
+                    find: {
+                      addExtraSpaceOnTop: false,
+                    },
+                  }}
+                />
+              </div>
+
+              {renderStatusBar()}
+
+              {!isEditorReady && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                    <p className="text-sm text-muted-foreground">
+                      Loading editor...
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       {showKeyboardShortcuts && renderKeyboardShortcuts()}
     </div>
   )
 }
-
