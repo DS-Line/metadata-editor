@@ -73,7 +73,7 @@ export function useMonacoEditor({ initialValue, onChange }: UseMonacoEditorProps
                 const parsed = parse(textToValidate)
                 return { valid: true, parsed }
             } catch (error) {
-                const errorMessage = error.message || "Invalid YAML"
+                const errorMessage = error?.message || "Invalid YAML"
                 return { valid: false, error: errorMessage }
             }
         },
