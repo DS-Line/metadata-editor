@@ -1148,12 +1148,12 @@ export default function YamlEditor(): JSX.Element {
           return false
         } else {
 
-          if(current){
+          if (current) {
             current = current[segment]
           }
 
           return false
-          
+
         }
       }
       return true
@@ -1161,7 +1161,7 @@ export default function YamlEditor(): JSX.Element {
 
     setExpandedSections((prev) => {
       const newSet = new Set<string>()
-      for (const path of prev) {
+      for (const path of prev as any) {
         if (pathExists(path)) {
           newSet.add(path)
         }
@@ -1234,9 +1234,9 @@ export default function YamlEditor(): JSX.Element {
       handleEditorSelection()
 
       // Update selection length
-      const selection = editorRef.current.getSelection()
+      const selection = editorRef?.current?.getSelection()
       if (selection) {
-        const model = editorRef.current.getModel()
+        const model = editorRef?.current?.getModel()
         if (model) {
           const selectionText = model.getValueInRange(selection)
           setEditorStats((prev) => ({
@@ -2113,7 +2113,6 @@ export default function YamlEditor(): JSX.Element {
                       autoIndent: "full",
                       folding: true,
                       foldingStrategy: "indentation",
-                      renderIndentGuides: true,
                       renderLineHighlight: "all",
                       renderWhitespace: "boundary",
                       suggestOnTriggerCharacters: true,
@@ -2134,13 +2133,7 @@ export default function YamlEditor(): JSX.Element {
                       glyphMargin: true,
                       fixedOverflowWidgets: true,
                       selectOnLineNumbers: true,
-                      lightbulb: {
-                        enabled: true,
-                      },
                       colorDecorators: true,
-                      semanticHighlighting: {
-                        enabled: true,
-                      },
                       linkedEditing: true,
                       codeLens: true,
                       fontLigatures: true,
