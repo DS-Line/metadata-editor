@@ -5,20 +5,7 @@ import React from "react"
 import { useMemo, useRef, useState, useEffect, useCallback, type JSX } from "react"
 import Editor, { type OnMount } from "@monaco-editor/react"
 import { parse, stringify } from "yaml"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarHeader,
-  SidebarTrigger,
-  SidebarInset,
-} from "@/components/ui/sidebar"
+
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   AlertCircle,
@@ -49,10 +36,10 @@ import {
   Keyboard,
   type LucideIcon,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "./ui/utils"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
 import { useTheme } from "next-themes"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -998,8 +985,8 @@ export default function YamlEditor(): JSX.Element {
 
         if (Array.isArray(value)) {
           return (
-            <SidebarGroup key={currentPath}>
-              <SidebarGroupLabel
+            <div key={currentPath}>
+              <label
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground ${isActive ? "bg-primary/15 text-primary font-medium" : ""}`}
                 onClick={(e) => {
                   e.preventDefault()
@@ -1021,16 +1008,16 @@ export default function YamlEditor(): JSX.Element {
                 </div>
                 {getNodeIcon(key, level)}
                 <span className={cn("capitalize", isActive && "font-medium")}>{key}</span>
-              </SidebarGroupLabel>
+              </label>
               {isExpanded && (
-                <SidebarGroupContent>
-                  <SidebarMenu>
+                <div>
+                  <div>
                     {value.map((item: any, index: number) => (
-                      <SidebarMenuItem key={`${currentPath}-${index}`}>
-                        <SidebarMenuButton
+                      <div key={`${currentPath}-${index}`}>
+                        <div
                           className={`flex items-center gap-2 pl-8 py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md`}
                           onClick={() => navigateToSection(`${currentPath}[${index}]`)}
-                          isActive={selectedSection === `${currentPath}[${index}]`}
+                          // isActive={selectedSection === `${currentPath}[${index}]`}
                           data-path={`${currentPath}[${index}]`}
                         >
                           {getNodeIcon("item", level + 1)}
@@ -1039,20 +1026,20 @@ export default function YamlEditor(): JSX.Element {
                           >
                             {typeof item === "string" ? item : `Item ${index + 1}`}
                           </span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
+                        </div>
+                      </div>
                     ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
+                  </div>
+                </div>
               )}
-            </SidebarGroup>
+            </div>
           )
         }
 
         if (typeof value === "object" && value !== null) {
           return (
-            <SidebarGroup key={currentPath}>
-              <SidebarGroupLabel
+            <div key={currentPath}>
+              <div
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground ${isActive ? "bg-primary/15 text-primary font-medium" : ""}`}
                 onClick={(e) => {
                   e.preventDefault()
@@ -1074,23 +1061,23 @@ export default function YamlEditor(): JSX.Element {
                 </div>
                 {getNodeIcon(key, level)}
                 <span className={cn("capitalize", isActive && "font-medium")}>{key}</span>
-              </SidebarGroupLabel>
+              </div>
               {isExpanded && (
-                <SidebarGroupContent>
-                  <SidebarMenu>{renderYamlTree(value, currentPath, level + 1)}</SidebarMenu>
-                </SidebarGroupContent>
+                <div>
+                  <div>{renderYamlTree(value, currentPath, level + 1)}</div>
+                </div>
               )}
-            </SidebarGroup>
+            </div>
           )
         }
 
         // Handle primitive values (strings, numbers, etc.)
         return (
-          <SidebarMenuItem key={currentPath}>
-            <SidebarMenuButton
+          <div key={currentPath}>
+            <div
               className={`flex items-center gap-2 ${level > 0 ? "pl-" + (level * 4) : ""} py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md`}
               onClick={() => navigateToSection(path, key)}
-              isActive={selectedSection === `${path}.${key}`}
+              // isActive={selectedSection === `${path}.${key}`}
               data-path={`${path}.${key}`}
             >
               {getNodeIcon(key, level)}
@@ -1102,8 +1089,8 @@ export default function YamlEditor(): JSX.Element {
               >
                 {String(value)}
               </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+            </div>
+          </div>
         )
       })
     },
@@ -1943,7 +1930,7 @@ export default function YamlEditor(): JSX.Element {
 
   return (
     <div className={cn(isFullScreen ? "fullscreen-editor" : "h-screen w-full")}>
-      <SidebarProvider>
+      <div>
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {!isFullScreen && (
             <ResizablePanel
@@ -1952,27 +1939,27 @@ export default function YamlEditor(): JSX.Element {
               maxSize={40}
               onResize={(size) => setSidebarSize(size)}
             >
-              <Sidebar className="h-full border-r">
-                <SidebarHeader className="border-b p-4">
+              <div className="h-full border-r">
+                <div className="border-b p-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold">YAML Structure</h2>
-                    <Badge variant="outline" className="ml-2">
+                    <Badge variant="outline" className="ml-2 text-txt-color-600">
                       {Object.keys(parsedYaml).length} items
                     </Badge>
                   </div>
-                </SidebarHeader>
-                <SidebarContent className="overflow-auto" ref={sidebarTreeRef}>
+                </div>
+                <div className="overflow-auto" ref={sidebarTreeRef}>
                   {renderYamlTree(parsedYaml)}
-                </SidebarContent>
-              </Sidebar>
+                </div>
+              </div>
             </ResizablePanel>
           )}
 
           <ResizablePanel defaultSize={isFullScreen ? 100 : 100 - sidebarSize}>
-            <SidebarInset className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1">
               {!isFullScreen && (
                 <div className="flex items-center h-14 px-4 border-b">
-                  <SidebarTrigger />
+                  <div />
                   <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
                   <div className="ml-auto flex gap-2">
                     <TooltipProvider>
@@ -2095,7 +2082,7 @@ export default function YamlEditor(): JSX.Element {
 
                 <div className="flex-1">
                   <Editor
-                    height={isFullScreen ? "calc(100vh - 84px)" : "calc(100vh - 84px)"}
+                    height={isFullScreen ? "calc(100vh - 84px)" : "calc(100dvh - 220px)"}
                     defaultLanguage="yaml"
                     defaultValue={yamlData}
                     theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
@@ -2179,10 +2166,10 @@ export default function YamlEditor(): JSX.Element {
                   </div>
                 )}
               </div>
-            </SidebarInset>
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
-      </SidebarProvider>
+      </div>
 
       {showKeyboardShortcuts && renderKeyboardShortcuts()}
     </div>
