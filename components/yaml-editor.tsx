@@ -1144,10 +1144,16 @@ export default function YamlEditor(): JSX.Element {
             return false
           }
           current = current[arrayName][arrayIndex]
-        } else if (current[segment] === undefined) {
+        } else if (current && current[segment] === undefined) {
           return false
         } else {
-          current = current[segment]
+
+          if(current){
+            current = current[segment]
+          }
+
+          return false
+          
         }
       }
       return true
