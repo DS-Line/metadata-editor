@@ -1517,26 +1517,29 @@ export default function YamlEditor(): JSX.Element {
         border-right: 1px solid hsl(var(--border));
       }
 
-      .yaml-structure {
-        height: 100%;
-        overflow-y: auto;
-        border-right: 1px solid hsl(var(--border));
-        background-color: hsl(var(--background));
-      }
+    .yaml-structure {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
 
-      .yaml-structure-header {
-        border-bottom: 1px solid hsl(var(--border));
-        padding: 1rem;
-      }
+.yaml-structure-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white; /* Ensure background is set to avoid transparency */
+  padding: 8px;
+  border-bottom: 1px solid #ddd; /* Optional for separation */
+}
 
-      .yaml-structure-content {
-        padding: 1rem;
-      }
+.yaml-structure-content {
+  flex-grow: 1;
+    max-height: calc(100vh - 256px); /* Adjust height dynamically */
 
-      .yaml-structure-collapsed {
-        width: 0;
-        overflow: hidden;
-      }
+  overflow-y: auto;
+}
+
     `
     document.head.appendChild(styleElement)
 
