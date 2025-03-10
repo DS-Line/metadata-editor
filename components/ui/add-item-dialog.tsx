@@ -1,11 +1,24 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState, useEffect } from "react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface AddItemDialogProps {
   isOpen: boolean
@@ -53,7 +66,9 @@ export function AddItemDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New {itemType === "key-value" ? "Key-Value Pair" : "Item"}</DialogTitle>
+          <DialogTitle>
+            Add New {itemType === "key-value" ? "Key-Value Pair" : "Item"}
+          </DialogTitle>
         </DialogHeader>
 
         {/* Item Type Selector */}
@@ -62,7 +77,11 @@ export function AddItemDialog({
             <Label htmlFor="item-type" className="text-right">
               Type
             </Label>
-            <Select value={itemType} onValueChange={setItemType} disabled={!!newItemType}>
+            <Select
+              value={itemType}
+              onValueChange={setItemType}
+              disabled={!!newItemType}
+            >
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Select item type" />
               </SelectTrigger>
@@ -70,10 +89,18 @@ export function AddItemDialog({
                 <SelectItem value="key-value">Key-Value Pair</SelectItem>
                 <SelectItem value="array-item">Array Item</SelectItem>
                 <SelectItem value="object">Object</SelectItem>
-                {newItemType === "department" && <SelectItem value="department">Department</SelectItem>}
-                {newItemType === "technology" && <SelectItem value="technology">Technology</SelectItem>}
-                {newItemType === "strategy" && <SelectItem value="strategy">Strategy</SelectItem>}
-                {newItemType === "region" && <SelectItem value="region">Region</SelectItem>}
+                {newItemType === "department" && (
+                  <SelectItem value="department">Department</SelectItem>
+                )}
+                {newItemType === "technology" && (
+                  <SelectItem value="technology">Technology</SelectItem>
+                )}
+                {newItemType === "strategy" && (
+                  <SelectItem value="strategy">Strategy</SelectItem>
+                )}
+                {newItemType === "region" && (
+                  <SelectItem value="region">Region</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -88,7 +115,12 @@ export function AddItemDialog({
                 <Input
                   id="key"
                   value={newKeyValuePair.key}
-                  onChange={(e) => setNewKeyValuePair((prev) => ({ ...prev, key: e.target.value }))}
+                  onChange={(e) =>
+                    setNewKeyValuePair((prev) => ({
+                      ...prev,
+                      key: e.target.value,
+                    }))
+                  }
                   className="col-span-3"
                   autoFocus
                 />
@@ -100,7 +132,12 @@ export function AddItemDialog({
                 <Input
                   id="value"
                   value={newKeyValuePair.value}
-                  onChange={(e) => setNewKeyValuePair((prev) => ({ ...prev, value: e.target.value }))}
+                  onChange={(e) =>
+                    setNewKeyValuePair((prev) => ({
+                      ...prev,
+                      value: e.target.value,
+                    }))
+                  }
                   className="col-span-3"
                 />
               </div>
@@ -128,13 +165,18 @@ export function AddItemDialog({
           <Button
             onClick={() => {
               if (itemType === "key-value" && newItemParent) {
-                addKeyValuePair(newItemParent, newKeyValuePair.key, newKeyValuePair.value)
+                addKeyValuePair(
+                  newItemParent,
+                  newKeyValuePair.key,
+                  newKeyValuePair.value
+                )
               } else if (newItemParent) {
                 addNewItem(itemType, newItemName, newItemParent)
               }
             }}
             disabled={
-              (itemType === "key-value" && (!newKeyValuePair.key || !newKeyValuePair.value)) ||
+              (itemType === "key-value" &&
+                (!newKeyValuePair.key || !newKeyValuePair.value)) ||
               (itemType !== "key-value" && !newItemName)
             }
           >
@@ -145,4 +187,3 @@ export function AddItemDialog({
     </Dialog>
   )
 }
-

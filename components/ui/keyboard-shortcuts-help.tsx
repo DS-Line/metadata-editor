@@ -1,4 +1,5 @@
 import { Keyboard } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -8,13 +9,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 export function KeyboardShortcutsHelp() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Keyboard shortcuts">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          aria-label="Keyboard shortcuts"
+        >
           <Keyboard className="h-4 w-4" />
         </Button>
       </DialogTrigger>
@@ -22,7 +35,8 @@ export function KeyboardShortcutsHelp() {
         <DialogHeader>
           <DialogTitle>Keyboard Shortcuts</DialogTitle>
           <DialogDescription>
-            Use these keyboard shortcuts to work more efficiently with the YAML editor.
+            Use these keyboard shortcuts to work more efficiently with the YAML
+            editor.
           </DialogDescription>
         </DialogHeader>
         <Table>
@@ -93,4 +107,3 @@ export function KeyboardShortcutsHelp() {
     </Dialog>
   )
 }
-

@@ -1,12 +1,27 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 interface KeyboardShortcutsProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function KeyboardShortcuts({ isOpen, onOpenChange }: KeyboardShortcutsProps) {
+export function KeyboardShortcuts({
+  isOpen,
+  onOpenChange,
+}: KeyboardShortcutsProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -43,4 +58,3 @@ export function KeyboardShortcuts({ isOpen, onOpenChange }: KeyboardShortcutsPro
     </Dialog>
   )
 }
-
