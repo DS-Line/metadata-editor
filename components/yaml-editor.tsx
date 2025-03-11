@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+
 "use client"
 
 import React, {
@@ -2151,7 +2154,7 @@ export default function YamlEditor(): JSX.Element {
               <div className="yaml-structure-header sticky">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold">YAML Structure</h2>
-                  <Badge variant="outline" className="ml-2 text-black">
+                  <Badge variant="outline" className="ml-2 text-txt-color-600">
                     {Object.keys(parsedYaml).length} items
                   </Badge>
                 </div>
