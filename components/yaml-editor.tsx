@@ -987,9 +987,9 @@ export default function YamlEditor(): JSX.Element {
       expandParentPaths(path)
 
       // Ensure sidebar is open
-      if (sidebarCollapsed) {
-        setSidebarCollapsed(false)
-      }
+      // if (sidebarCollapsed) {
+      //   setSidebarCollapsed(false)
+      // }
 
       // Scroll to the selected item with a delay to ensure DOM updates
       setTimeout(() => {
@@ -1087,7 +1087,7 @@ export default function YamlEditor(): JSX.Element {
                     toggleSectionExpansion(currentPath)
                   }}
                 >
-                  {isExpanded ? (
+                  {sidebarCollapsed ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
@@ -1524,6 +1524,11 @@ export default function YamlEditor(): JSX.Element {
   flex-direction: column;
   height: calc(100dvh - 256px);
   overflow: hidden;
+}
+      .yaml-structure-collapsed {
+  display: flex;
+  flex-direction: column;
+    max-height: 100%  /* Adjust height dynamically */
 }
 
 .yaml-structure-header {
@@ -2141,7 +2146,7 @@ export default function YamlEditor(): JSX.Element {
       className={cn(isFullScreen ? "fullscreen-editor" : "h-[80dvh] w-full")}
     >
       <ResizablePanelGroup direction="horizontal" className="h-full">
-        {!isFullScreen && (
+        {(!isFullScreen && !sidebarCollapsed) && (
           <ResizablePanel
             defaultSize={sidebarSize}
             minSize={15}
@@ -2149,7 +2154,15 @@ export default function YamlEditor(): JSX.Element {
             onResize={(size) => setSidebarSize(size)}
             className={sidebarCollapsed ? "yaml-structure-collapsed" : ""}
           >
-            <div className="yaml-structure h-full" ref={sidebarTreeRef}>
+            <div
+              className={cn(
+                sidebarCollapsed
+                  ? "yaml-structure-collapsed"
+                  : "yaml-structure ",
+                "h-full"
+              )}
+              ref={sidebarTreeRef}
+            >
               <div className="yaml-structure-header sticky">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold">YAML Structure</h2>
@@ -2172,7 +2185,7 @@ export default function YamlEditor(): JSX.Element {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={toggleSidebar}
+                  onClick={()=>{setSidebarCollapsed(!sidebarCollapsed)}}
                   className="h-7 w-7"
                 >
                   <ChevronRight
