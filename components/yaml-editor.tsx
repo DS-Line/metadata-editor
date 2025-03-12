@@ -179,10 +179,24 @@ export default function YamlEditor({
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
 
   // Enhanced YAML validation function
-  const validateYaml = useCallback((yamlString: string) => {
+  const validateYaml = useCallback((yamlString: string, edit:boolean) => {
     try {
-      console.log("here")
       const parsed = parse(yamlString) as Record<string, any>
+      if (parsed) {
+        setMyListOfYamlData((prev)=>{
+            const currKeys = Object.keys(parsed);
+        // Iterate over the `prev` array to update only the matching objects in parsed
+        return prev.map((item) => {
+          const key = Object.keys(item)[0]; 
+          if (currKeys.includes(key)) {
+            // If the key exists in `currKeys`, update the value
+            return { [key]: parsed[key] };
+          }
+          // If the key doesn't exist in `currKeys`, return the original item
+          return item;
+        })
+      })
+      }
       setParsedYaml(parsed)
       setParseError(null)
 
@@ -256,7 +270,7 @@ export default function YamlEditor({
       setMyListOfYamlData(parsed)
       setYamlData(()=> metaYamlData.map(data=> `${data?.metadata_name}:\n  ${
                   data?.content?.replaceAll("\n", "\n  ") || ""
-                }`).join("\n"))
+                }`)[0])
 
     }
   },[metaYamlData])
@@ -1099,7 +1113,6 @@ export default function YamlEditor({
                   e.stopPropagation()
                   navigateToSection(currentPath)
                   toggleSectionExpansion(currentPath)
-                  console.log(id)
                 }}
                 data-active={isActive}
                 data-path={currentPath}
@@ -1109,7 +1122,6 @@ export default function YamlEditor({
                   onClick={(e) => {
                     e.stopPropagation()
                     toggleSectionExpansion(currentPath)
-                    console.log(id)
                   }}
                 >
                   {sidebarCollapsed ? (
@@ -1167,9 +1179,7 @@ export default function YamlEditor({
 
         if (typeof value === "object" && value !== null) {
           return (
-            <div onClick={(e)=>{
-              console.log(id)
-            }}  key={currentPath} className="mb-1">
+            <div key={currentPath} className="mb-1">
               <div
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
                   isActive ? "bg-primary/15 text-primary font-medium" : ""
