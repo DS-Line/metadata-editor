@@ -103,6 +103,18 @@ interface EditorStats {
   selectionLength: number
 }
 
+export interface Metadata {
+  id: string
+  metadata_name: string
+  content: string
+  owner_id: string
+  metadata_type: string
+  version: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 // Section icons mapping with fixed icons
 const SECTION_ICONS: SectionIcons = {
   company: Briefcase,
@@ -130,12 +142,14 @@ const LEVEL_ICONS: LevelIcons = {
 }
 
 export default function YamlEditor({
-  yamlData,
+  metaYamlData,
   getEditorData,
 }: {
-  yamlData: string
+  metaYamlData?: Metadata[]
   getEditorData?: (getEditorData: string) => void
 }): JSX.Element {
+  const [myListOfYamlData, setMyListOfYamlData]=useState<string[]>([])
+  const [yamlData,setYamlData]=useState<string>("")
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof monaco | null>(null)
   const sidebarTreeRef = useRef<HTMLDivElement | null>(null)
@@ -167,6 +181,7 @@ export default function YamlEditor({
   // Enhanced YAML validation function
   const validateYaml = useCallback((yamlString: string) => {
     try {
+      console.log("here")
       const parsed = parse(yamlString) as Record<string, any>
       setParsedYaml(parsed)
       setParseError(null)
@@ -232,6 +247,26 @@ export default function YamlEditor({
     }
   }, [])
 
+  useEffect(()=>{
+    if(metaYamlData && metaYamlData.length){
+      const yamlFolders=metaYamlData.map(data=> `${data?.metadata_name}:\n  ${
+        data?.content?.replaceAll("\n", "\n  ") || ""
+      }`)
+      const parsed = yamlFolders.map(el=> parse(el)) as Array<Record<string, any>>
+      setMyListOfYamlData(parsed)
+      setYamlData(()=> metaYamlData.map(data=> `${data?.metadata_name}:\n  ${
+                  data?.content?.replaceAll("\n", "\n  ") || ""
+                }`).join("\n"))
+
+    }
+  },[metaYamlData])
+  useEffect(()=>{
+    validateYaml(yamlData)
+    editorRef.current && editorRef.current.setValue( metaYamlData.map(data=> `${data?.metadata_name}:\n  ${
+      data?.content?.replaceAll("\n", "\n  ") || ""
+    }`)[0])
+  },[yamlData])
+  
   // Build a map of line numbers to YAML paths
   const buildEditorLineMap = useCallback(
     (yamlString: string, parsedYaml: Record<string, any>) => {
@@ -1042,7 +1077,7 @@ export default function YamlEditor({
 
   // Recursively render the YAML tree
   const renderYamlTree = useCallback(
-    (data: Record<string, any>, path = "", level = 0) => {
+    (data: Record<string, any>, path = "", level = 0, id?:string) => {
       if (!data || typeof data !== "object") return null
 
       return Object.entries(data).map(([key, value]) => {
@@ -1052,7 +1087,9 @@ export default function YamlEditor({
 
         if (Array.isArray(value)) {
           return (
-            <div key={currentPath} className="mb-1">
+            <div onClick={()=>{
+              console.log(id)
+            }} key={currentPath} className="mb-1">
               <div
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
                   isActive ? "bg-primary/15 text-primary font-medium" : ""
@@ -1062,6 +1099,7 @@ export default function YamlEditor({
                   e.stopPropagation()
                   navigateToSection(currentPath)
                   toggleSectionExpansion(currentPath)
+                  console.log(id)
                 }}
                 data-active={isActive}
                 data-path={currentPath}
@@ -1071,6 +1109,7 @@ export default function YamlEditor({
                   onClick={(e) => {
                     e.stopPropagation()
                     toggleSectionExpansion(currentPath)
+                    console.log(id)
                   }}
                 >
                   {sidebarCollapsed ? (
@@ -1095,8 +1134,9 @@ export default function YamlEditor({
                               ? "bg-primary/15 text-primary font-medium"
                               : ""
                           }`}
-                          onClick={() =>
-                            navigateToSection(`${currentPath}[${index}]`)
+                          onClick={() =>{
+                            console.log(id)
+                            navigateToSection(`${currentPath}[${index}]`)}
                           }
                           data-active={
                             selectedSection === `${currentPath}[${index}]`
@@ -1127,7 +1167,9 @@ export default function YamlEditor({
 
         if (typeof value === "object" && value !== null) {
           return (
-            <div key={currentPath} className="mb-1">
+            <div onClick={(e)=>{
+              console.log(id)
+            }}  key={currentPath} className="mb-1">
               <div
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
                   isActive ? "bg-primary/15 text-primary font-medium" : ""
@@ -1146,6 +1188,11 @@ export default function YamlEditor({
                   onClick={(e) => {
                     e.stopPropagation()
                     toggleSectionExpansion(currentPath)
+                    const requiredMeta= metaYamlData.filter(el=> el.id === id) 
+                    const requiredValue= `${requiredMeta[0].metadata_name}:\n  ${
+                  requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
+                }`
+                    editorRef.current && editorRef.current.setValue(requiredValue)
                   }}
                 >
                   {isExpanded ? (
@@ -1155,13 +1202,18 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <span className={cn("capitalize", isActive && "font-medium")}>
+                <span onClick={()=>{
+                  console.log(id)
+                  // editorRef.current && editorRef.current.setValue(metaYamlData.filter(el=> el.id === id).map(data=> `${data?.metadata_name}:\n  ${
+                  //   data?.content?.replaceAll("\n", "\n  ") || ""
+                  // }`))
+                }} className={cn("capitalize", isActive && "font-medium")}>
                   {key}
                 </span>
               </div>
               {isExpanded && (
                 <div className="pl-6">
-                  {renderYamlTree(value, currentPath, level + 1)}
+                  {renderYamlTree(value, currentPath, level + 1,id)}
                 </div>
               )}
             </div>
@@ -1170,7 +1222,9 @@ export default function YamlEditor({
 
         // Handle primitive values (strings, numbers, etc.)
         return (
-          <div key={currentPath} className="mb-1">
+          <div onClick={(e)=>{
+            console.log(id)
+          }} key={currentPath} className="mb-1">
             <div
               className={`flex items-center gap-2 ${
                 level > 0 ? "pl-" + level * 4 : ""
@@ -1812,8 +1866,7 @@ export default function YamlEditor({
     monacoRef.current = monaco
 
     configureMonaco(monaco)
-
-    validateYaml(yamlData)
+    // validateYaml(yamlData)
 
     editor.onDidChangeModelContent(() => {
       const currentValue = editor.getValue()
@@ -2173,12 +2226,14 @@ export default function YamlEditor({
                 </div>
               </div>
               <div className="yaml-structure-content">
-                {renderYamlTree(parsedYaml)}
+                {myListOfYamlData.map((el,index)=> {
+                  return renderYamlTree(el,"",0,metaYamlData[index].id)
+                })}
               </div>
             </div>
           </ResizablePanel>
         )}
-
+  
         <ResizablePanel defaultSize={isFullScreen ? 100 : 100 - sidebarSize}>
           <div className="flex flex-col h-full">
             {!isFullScreen && (
@@ -2370,64 +2425,64 @@ export default function YamlEditor({
                 )}
               >
                 <div className="flex-1">
-                  <Editor
-                    height="100%" // Let the parent handle height
-                    defaultLanguage="yaml"
-                    defaultValue={yamlData}
-                    theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
-                    onMount={handleEditorDidMount}
-                    options={{
-                      minimap: { enabled: showMinimap },
-                      lineNumbers: "on",
-                      scrollBeyondLastLine: false,
-                      automaticLayout: true,
-                      tabSize: 2,
-                      wordWrap: wordWrap,
-                      wrappingIndent: "deepIndent",
-                      formatOnPaste: true,
-                      formatOnType: true,
-                      autoIndent: "full",
-                      folding: true,
-                      foldingStrategy: "indentation",
-                      renderIndentGuides: true,
-                      renderLineHighlight: "all",
-                      renderWhitespace: "boundary",
-                      suggestOnTriggerCharacters: true,
-                      quickSuggestions: true,
-                      acceptSuggestionOnEnter: "on",
-                      cursorBlinking: "smooth",
-                      cursorSmoothCaretAnimation: "on",
-                      smoothScrolling: true,
-                      contextmenu: true,
-                      mouseWheelZoom: true,
-                      bracketPairColorization: { enabled: true },
-                      guides: { bracketPairs: true, indentation: true },
-                      glyphMargin: true,
-                      fixedOverflowWidgets: true,
-                      selectOnLineNumbers: true,
-                      lightbulb: { enabled: true },
-                      colorDecorators: true,
-                      semanticHighlighting: { enabled: true },
-                      linkedEditing: true,
-                      codeLens: true,
-                      fontLigatures: true,
-                      fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
-                      fontSize: 14,
-                      lineHeight: 22,
-                      padding: { top: 10, bottom: 10 },
-                      scrollbar: {
-                        verticalScrollbarSize: 12,
-                        horizontalScrollbarSize: 12,
-                        verticalSliderSize: 12,
-                        horizontalSliderSize: 12,
-                        verticalHasArrows: false,
-                        horizontalHasArrows: false,
-                        arrowSize: 15,
-                        useShadows: true,
-                      },
-                      find: { addExtraSpaceOnTop: false },
-                    }}
-                  />
+                <Editor
+  height="100%" // Let the parent handle height
+  defaultLanguage="yaml"
+  defaultValue={yamlData}
+  theme={theme === "dark" ? "yamlCustomTheme" : "vs"}
+  onMount={handleEditorDidMount}
+  options={{
+    minimap: { enabled: showMinimap },
+    lineNumbers: "on",
+    scrollBeyondLastLine: false,
+    automaticLayout: true,
+    tabSize: 2,
+    wordWrap: wordWrap,
+    wrappingIndent: "deepIndent",
+    formatOnPaste: true,
+    formatOnType: true,
+    autoIndent: "full",
+    folding: true,
+    foldingStrategy: "indentation",
+    renderIndentGuides: true,
+    renderLineHighlight: "all",
+    renderWhitespace: "boundary",
+    suggestOnTriggerCharacters: true,
+    quickSuggestions: true,
+    acceptSuggestionOnEnter: "on",
+    cursorBlinking: "smooth",
+    cursorSmoothCaretAnimation: "on",
+    smoothScrolling: true,
+    contextmenu: true,
+    mouseWheelZoom: true,
+    bracketPairColorization: { enabled: true },
+    guides: { bracketPairs: true, indentation: true },
+    glyphMargin: true,
+    fixedOverflowWidgets: true,
+    selectOnLineNumbers: true,
+    lightbulb: { enabled: true },
+    colorDecorators: true,
+    semanticHighlighting: { enabled: true },
+    linkedEditing: true,
+    codeLens: true,
+    fontLigatures: true,
+    fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
+    fontSize: 14,
+    lineHeight: 22,
+    padding: { top: 10, bottom: 10 },
+    scrollbar: {
+      verticalScrollbarSize: 12,
+      horizontalScrollbarSize: 12,
+      verticalSliderSize: 12,
+      horizontalSliderSize: 12,
+      verticalHasArrows: false,
+      horizontalHasArrows: false,
+      arrowSize: 15,
+      useShadows: true,
+    },
+    find: { addExtraSpaceOnTop: false },
+  }}
+/>
                 </div>
 
                 {/* Status Bar - Fixed at the Bottom */}
