@@ -36,6 +36,7 @@ import {
   Maximize2,
   Minimize2,
   Moon,
+  Save,
   Settings,
   Sun,
   TypeIcon as type,
@@ -66,37 +67,6 @@ import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
 import { cn } from "./ui/utils"
 
 // Sample YAML data (truncated for brevity)
-const yamlData = `
-company:
-name: TechCorp
-departments:
-  engineering:
-    teams:
-      backend:
-        lead: Alice
-        members:
-          - Bob
-          - Charlie
-          - Dave
-      frontend:
-        lead: Eve
-        members:
-          - Frank
-          - Grace
-          - Hannah
-  hr:
-    teams:
-      recruitment:
-        lead: Ian
-        members:
-          - Jack
-          - Karen
-      employee_relations:
-        lead: Laura
-        members:
-          - Mike
-          - Nancy
-`
 
 // Type definitions
 interface SectionIcons {
@@ -159,7 +129,13 @@ const LEVEL_ICONS: LevelIcons = {
   default: File, // Default for any other level
 }
 
-export default function YamlEditor(): JSX.Element {
+export default function YamlEditor({
+  yamlData,
+  getEditorData,
+}: {
+  yamlData: string
+  getEditorData?: (getEditorData: string) => void
+}): JSX.Element {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof monaco | null>(null)
   const sidebarTreeRef = useRef<HTMLDivElement | null>(null)
@@ -343,6 +319,7 @@ export default function YamlEditor(): JSX.Element {
 
   // Format YAML document
   const formatYamlDocument = useCallback(() => {
+    console.log(editorRef.current.getValue().substring(0, str.indexOf(":")))
     if (!editorRef.current) return
 
     try {
@@ -390,6 +367,15 @@ export default function YamlEditor(): JSX.Element {
       .catch((err) => {
         setParseError("Failed to copy to clipboard")
       })
+  }, [])
+
+  // Copy YAML to clipboard
+  const editorData = useCallback(() => {
+    if (!editorRef.current) return
+
+    const content = editorRef.current.getValue()
+    getEditorData(editorRef.current.getValue())
+    
   }, [])
 
   // Download YAML file
@@ -1952,7 +1938,17 @@ export default function YamlEditor(): JSX.Element {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" onClick={getEditorData}>
+                  <Save className="h-4 w-4 mr-1" />
+                  Save
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Save YAML document</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -2146,7 +2142,7 @@ export default function YamlEditor(): JSX.Element {
       className={cn(isFullScreen ? "fullscreen-editor" : "h-[80dvh] w-full")}
     >
       <ResizablePanelGroup direction="horizontal" className="h-full">
-        {(!isFullScreen && !sidebarCollapsed) && (
+        {!isFullScreen && !sidebarCollapsed && (
           <ResizablePanel
             defaultSize={sidebarSize}
             minSize={15}
@@ -2166,9 +2162,14 @@ export default function YamlEditor(): JSX.Element {
               <div className="yaml-structure-header sticky">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold">YAML Structure</h2>
-                  {parsedYaml && <Badge variant="outline" className="ml-2 text-txt-color-600">
-                    { Object.keys(parsedYaml).length} items
-                  </Badge>}
+                  {parsedYaml && (
+                    <Badge
+                      variant="outline"
+                      className="ml-2 text-txt-color-600"
+                    >
+                      {Object.keys(parsedYaml).length} items
+                    </Badge>
+                  )}
                 </div>
               </div>
               <div className="yaml-structure-content">
@@ -2185,7 +2186,9 @@ export default function YamlEditor(): JSX.Element {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={()=>{setSidebarCollapsed(!sidebarCollapsed)}}
+                  onClick={() => {
+                    setSidebarCollapsed(!sidebarCollapsed)
+                  }}
                   className="h-7 w-7"
                 >
                   <ChevronRight
@@ -2234,7 +2237,21 @@ export default function YamlEditor(): JSX.Element {
                       <TooltipContent>Validate YAML syntax</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={editorData}
+                        >
+                          <Save className="h-4 w-4 mr-1" />
+                          Save
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Save YAML document</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
