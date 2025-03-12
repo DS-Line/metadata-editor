@@ -31,6 +31,8 @@ import {
   Globe,
   Keyboard,
   Layers,
+  Loader,
+  Loader2,
   LucideIcon,
   Map,
   Maximize2,
@@ -132,8 +134,10 @@ const LEVEL_ICONS: LevelIcons = {
 export default function YamlEditor({
   yamlData,
   getEditorData,
+  isSaving = false,
 }: {
   yamlData: string
+  isSaving?: boolean
   getEditorData?: (getEditorData: string) => void
 }): JSX.Element {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -369,13 +373,10 @@ export default function YamlEditor({
       })
   }, [])
 
-  // Copy YAML to clipboard
   const editorData = useCallback(() => {
     if (!editorRef.current) return
-
     const content = editorRef.current.getValue()
     getEditorData(editorRef.current.getValue())
-    
   }, [])
 
   // Download YAML file
@@ -1806,6 +1807,10 @@ export default function YamlEditor({
     },
     [findPathForPosition, parsedYaml]
   )
+  useEffect(() => {
+    validateYaml(yamlData)
+    editorRef.current && editorRef.current.setValue(yamlData || "")
+  }, [yamlData])
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
@@ -1941,8 +1946,13 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={getEditorData}>
-                  <Save className="h-4 w-4 mr-1" />
+                <Button
+                  disabled={isSaving}
+                  variant="ghost"
+                  size="sm"
+                  onClick={getEditorData}
+                >
+                  {!isSaving ? <Loader2 /> : <Save className="h-4 w-4 mr-1" />}
                   Save
                 </Button>
               </TooltipTrigger>
@@ -2241,11 +2251,16 @@ export default function YamlEditor({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
+                          disabled={isSaving}
                           variant="outline"
                           size="sm"
                           onClick={editorData}
                         >
-                          <Save className="h-4 w-4 mr-1" />
+                          {isSaving ? (
+                            <Loader2 size={14} className="mr-1 animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4 mr-1" />
+                          )}
                           Save
                         </Button>
                       </TooltipTrigger>
