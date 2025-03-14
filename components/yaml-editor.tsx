@@ -192,29 +192,29 @@ export default function YamlEditor({
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
 
   // Enhanced YAML validation function
-  const validateYaml = useCallback((yamlString: string, edit:boolean) => {
+  const validateYaml = useCallback((yamlString: string, edit: boolean) => {
     try {
       const parsed = parse(yamlString) as Record<string, any>
       console.log(parsed)
       if (parsed) {
         console.log(myListOfYamlData)
-        setMyListOfYamlData((prev)=>{
-            const currKeys = Object.keys(parsed);
-        // Iterate over the `prev` array to update only the matching objects in parsed
-        if(prev.length){
-          return prev.map((item) => {
-            const key = Object.keys(item)[0]; 
-            if (currKeys.includes(key)) {
-              // If the key exists in `currKeys`, update the value
-              return { [key]: parsed[key] };
-            }
-            // If the key doesn't exist in `currKeys`, return the original item
-            return item;
-          })
-        }
-        if(typeof parsed === "object") return [parsed]
-        return []
-      })
+        setMyListOfYamlData((prev) => {
+          const currKeys = Object.keys(parsed)
+          // Iterate over the `prev` array to update only the matching objects in parsed
+          if (prev.length) {
+            return prev.map((item) => {
+              const key = Object.keys(item)[0]
+              if (currKeys.includes(key)) {
+                // If the key exists in `currKeys`, update the value
+                return { [key]: parsed[key] }
+              }
+              // If the key doesn't exist in `currKeys`, return the original item
+              return item
+            })
+          }
+          if (typeof parsed === "object") return [parsed]
+          return []
+        })
       }
       setParsedYaml(parsed)
       setParseError(null)
