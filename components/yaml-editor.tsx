@@ -408,7 +408,7 @@ export default function YamlEditor({
     try {
       const currentValue = editorRef.current.getValue()
       const parsed = parse(currentValue)
-      const formatted = stringify(parsed, { indent: 2 })
+      const formatted = stringify(parsed, { indent: 5})
 
       const position = editorRef.current.getPosition()
 
@@ -2308,7 +2308,11 @@ export default function YamlEditor({
                   {
                     <MetadataOptions
                       handleGenerate={handleGenerate}
-                      addMetadata={addMetadata}
+                      addMetadata={()=>{addMetadata()
+                        editorRef.current.setValue(`Metadata_new${Date.now()}:\n folder: ${Date.now()} `)
+                        setId("")
+
+                      }}
                       menuItems={{
                         generate: true,
                         upload: true,
