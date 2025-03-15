@@ -2326,7 +2326,13 @@ export default function YamlEditor({
                   }
                 </div>
               </div>
-              <div className={`${isFullScreen?"h-full overflow-auto":"yaml-structure-content"}`}>
+              <div
+                className={`${
+                  isFullScreen
+                    ? "h-full overflow-auto"
+                    : "yaml-structure-content"
+                }`}
+              >
                 {myListOfYamlData.map((el, index) => {
                   return renderYamlTree(
                     el,
