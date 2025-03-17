@@ -550,20 +550,23 @@ export default function YamlEditor({
   }, [])
   console.log(idData)
   // Toggle section expansion in the tree view
-  const toggleSectionExpansion = useCallback((section: string, expand:boolean) => {
-    console.log(section, expand)
-    console.log(expandedSections)
-    setExpandedSections((prev) => {
-      const newSet = new Set([...prev])
-      if (!expand) {
-        newSet.delete(section)
-      } else {
-        newSet.add(section)
-      }
-      console.log(newSet)
-      return newSet
-    })
-  }, [expandedSections])
+  const toggleSectionExpansion = useCallback(
+    (section: string, expand: boolean) => {
+      console.log(section, expand)
+      console.log(expandedSections)
+      setExpandedSections((prev) => {
+        const newSet = new Set([...prev])
+        if (!expand) {
+          newSet.delete(section)
+        } else {
+          newSet.add(section)
+        }
+        console.log(newSet)
+        return newSet
+      })
+    },
+    [expandedSections]
+  )
   console.log(expandedSections)
   // Find the line number and range for a specific section in the YAML
   const findSectionRange = useCallback(
@@ -1136,32 +1139,27 @@ export default function YamlEditor({
         const isActive = selectedSection === currentPath
 
         const handleSectionClick = (e: React.MouseEvent) => {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault()
+          e.stopPropagation()
           // Toggle section expansion if clicking on the same section
           if (isExpanded) {
-            toggleSectionExpansion(currentPath, false); // Collapse
+            toggleSectionExpansion(currentPath, false) // Collapse
           } else {
-            toggleSectionExpansion(currentPath, true); // Expand
+            toggleSectionExpansion(currentPath, true) // Expand
           }
 
           // Navigate to section
-          navigateToSection(currentPath);
-          if(id!==idData){
+          navigateToSection(currentPath)
+          if (id !== idData) {
             // Set ID if applicable
-            setId(id);
-              const requiredMeta = metaYamlData.filter(
-                (el) => el.id === id
-              )
-              const requiredValue = `${
-                requiredMeta[0].metadata_name
-              }:\n  ${
-                requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
-              }`
-              editorRef.current &&
-                editorRef.current.setValue(requiredValue)
+            setId(id)
+            const requiredMeta = metaYamlData.filter((el) => el.id === id)
+            const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
+              requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
+            }`
+            editorRef.current && editorRef.current.setValue(requiredValue)
           }
-        };
+        }
 
         if (Array.isArray(value)) {
           return (
@@ -1174,9 +1172,7 @@ export default function YamlEditor({
                 data-active={isActive}
                 data-path={currentPath}
               >
-                <div
-                  className="flex items-center cursor-pointer"
-                >
+                <div className="flex items-center cursor-pointer">
                   {sidebarCollapsed ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
@@ -1238,9 +1234,7 @@ export default function YamlEditor({
                 data-active={isActive}
                 data-path={currentPath}
               >
-                <div
-                  className="flex items-center cursor-pointer"
-                >
+                <div className="flex items-center cursor-pointer">
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
@@ -1248,9 +1242,7 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <span
-                  className={cn("capitalize", isActive && "font-medium")}
-                >
+                <span className={cn("capitalize", isActive && "font-medium")}>
                   {key}
                 </span>
               </div>
@@ -1265,10 +1257,7 @@ export default function YamlEditor({
 
         // Handle primitive values (strings, numbers, etc.)
         return (
-          <div
-            key={currentPath}
-            className="mb-1"
-          >
+          <div key={currentPath} className="mb-1">
             <div
               className={`flex items-center gap-2 ${
                 level > 0 ? "pl-" + level * 4 : ""
@@ -1914,7 +1903,6 @@ export default function YamlEditor({
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
-    metaYamlData && metaYamlData.length > 0 && formatYamlDocument()
     configureMonaco(monaco)
     // validateYaml(yamlData)
 
@@ -1953,14 +1941,16 @@ export default function YamlEditor({
   }
   useEffect(() => {
     metaYamlData && metaYamlData.length > 0 && setId(metaYamlData[0].id)
-  }, [isEditorReady])
+    metaYamlData && metaYamlData.length > 0 && formatYamlDocument()
+  }, [isEditorReady, metaYamlData])
 
   useEffect(() => {
-    if(metaYamlData && metaYamlData.length>0){
-      const requiredSection= metaYamlData.filter(el=> el.id === idData)
-      if(requiredSection.length) setSelectedSection(requiredSection[0].metadata_name)
+    if (metaYamlData && metaYamlData.length > 0) {
+      const requiredSection = metaYamlData.filter((el) => el.id === idData)
+      if (requiredSection.length)
+        setSelectedSection(requiredSection[0].metadata_name)
     }
-  }, [idData,isEditorReady])
+  }, [idData, isEditorReady])
 
   // Render keyboard shortcuts modal
   const renderKeyboardShortcuts = () => {
