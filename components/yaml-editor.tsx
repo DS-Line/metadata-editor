@@ -408,7 +408,7 @@ export default function YamlEditor({
     try {
       const currentValue = editorRef.current.getValue()
       const parsed = parse(currentValue)
-      const formatted = stringify(parsed, { indent: 5 })
+      const formatted = stringify(parsed)
 
       const position = editorRef.current.getPosition()
 
@@ -2554,15 +2554,11 @@ export default function YamlEditor({
                       lineNumbers: "on",
                       scrollBeyondLastLine: false,
                       automaticLayout: true,
-                      tabSize: 2,
                       wordWrap: wordWrap,
-                      wrappingIndent: "deepIndent",
                       formatOnPaste: true,
                       formatOnType: true,
-                      autoIndent: "full",
                       folding: true,
                       foldingStrategy: "indentation",
-                      renderIndentGuides: true,
                       renderLineHighlight: "all",
                       renderWhitespace: "boundary",
                       suggestOnTriggerCharacters: true,
@@ -2574,7 +2570,7 @@ export default function YamlEditor({
                       contextmenu: true,
                       mouseWheelZoom: true,
                       bracketPairColorization: { enabled: true },
-                      guides: { bracketPairs: true, indentation: true },
+                      guides: { bracketPairs: true },
                       glyphMargin: true,
                       fixedOverflowWidgets: true,
                       selectOnLineNumbers: true,
