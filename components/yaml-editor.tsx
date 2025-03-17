@@ -46,7 +46,7 @@ import {
 } from "lucide-react"
 import type * as monaco from "monaco-editor"
 import { useTheme } from "next-themes"
-import { parse, stringify } from "yaml"
+import { parse,parseDocument, stringify } from "yaml"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -406,7 +406,7 @@ export default function YamlEditor({
 
     try {
       const currentValue = editorRef.current.getValue()
-      const parsed = parse(currentValue)
+      const parsed = parseDocument(currentValue)
       const formatted = stringify(parsed)
 
       const position = editorRef.current.getPosition()
