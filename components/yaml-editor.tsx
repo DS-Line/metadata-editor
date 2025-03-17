@@ -2285,7 +2285,14 @@ export default function YamlEditor({
                       addMetadata={() => {
                         addMetadata()
                         editorRef.current.setValue(
-                          `Metadata_new${Date.now()}:\n folder: ${Date.now()} `
+                          `Metadata_new${Date.now()}:\n  sources:\n 
+    # Add your sources here\n
+  hierarchies:\n 
+    # Add your hierarchies here\n
+  metrics:\n 
+    # Add your metrics here\n
+  attributes:\n 
+    # Add your attributes here} `
                         )
                         setId("")
                       }}
