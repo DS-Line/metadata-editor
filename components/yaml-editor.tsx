@@ -2329,7 +2329,7 @@ export default function YamlEditor({
                     "",
                     0,
                     metaYamlData && metaYamlData.length > 0
-                      ? metaYamlData[index].id ||""
+                      ? metaYamlData[index].id || ""
                       : ""
                   )
                 })}

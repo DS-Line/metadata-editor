@@ -20,7 +20,7 @@ interface MenuItems {
   generate: boolean
   upload: boolean
   addYaml: boolean
-  disableGenerate?:boolean
+  disableGenerate?: boolean
 }
 
 export default function MetadataOptions({
