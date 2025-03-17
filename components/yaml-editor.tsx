@@ -195,7 +195,6 @@ export default function YamlEditor({
   const validateYaml = useCallback((yamlString: string, edit: boolean) => {
     try {
       const parsed = parse(yamlString) as Record<string, any>
-      console.log(parsed)
       if (parsed) {
         console.log(myListOfYamlData)
         setMyListOfYamlData((prev) => {
@@ -549,20 +548,23 @@ export default function YamlEditor({
   const toggleThemeData = useCallback(() => {
     setSidebarCollapsed((prev) => !prev)
   }, [])
-
+  console.log(idData)
   // Toggle section expansion in the tree view
-  const toggleSectionExpansion = useCallback((section: string) => {
+  const toggleSectionExpansion = useCallback((section: string, expand:boolean) => {
+    console.log(section, expand)
+    console.log(expandedSections)
     setExpandedSections((prev) => {
       const newSet = new Set([...prev])
-      if (newSet.has(section)) {
+      if (!expand) {
         newSet.delete(section)
       } else {
         newSet.add(section)
       }
+      console.log(newSet)
       return newSet
     })
-  }, [])
-
+  }, [expandedSections])
+  console.log(expandedSections)
   // Find the line number and range for a specific section in the YAML
   const findSectionRange = useCallback(
     (section: string, item?: string): SectionRange | null => {
@@ -907,7 +909,6 @@ export default function YamlEditor({
   // Navigate to a specific section in the editor
   const navigateToSection = useCallback(
     (section: string, item?: string) => {
-      console.log(section)
       if (!editorRef.current || !monacoRef.current) return
 
       const range = findSectionRange(section, item)
@@ -983,7 +984,7 @@ export default function YamlEditor({
             const arrayPath = currentPath
               ? `${currentPath}.${arrayPart}`
               : arrayPart
-            setExpandedSections((prev) => new Set([...prev, arrayPath]))
+            // setExpandedSections((prev) => new Set([...prev, arrayPath]))
 
             // Add the full path with array index
             currentPath = currentPath ? `${currentPath}.${part}` : part
@@ -992,7 +993,7 @@ export default function YamlEditor({
             currentPath = currentPath ? `${currentPath}.${part}` : part
           }
 
-          setExpandedSections((prev) => new Set([...prev, currentPath]))
+          // setExpandedSections((prev) => new Set([...prev, currentPath]))
         }
       }
 
@@ -1134,30 +1135,47 @@ export default function YamlEditor({
         const isExpanded = expandedSections.has(currentPath)
         const isActive = selectedSection === currentPath
 
+        const handleSectionClick = (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          // Toggle section expansion if clicking on the same section
+          if (isExpanded) {
+            toggleSectionExpansion(currentPath, false); // Collapse
+          } else {
+            toggleSectionExpansion(currentPath, true); // Expand
+          }
+
+          // Navigate to section
+          navigateToSection(currentPath);
+          if(id!==idData){
+            // Set ID if applicable
+            setId(id);
+              const requiredMeta = metaYamlData.filter(
+                (el) => el.id === id
+              )
+              const requiredValue = `${
+                requiredMeta[0].metadata_name
+              }:\n  ${
+                requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
+              }`
+              editorRef.current &&
+                editorRef.current.setValue(requiredValue)
+          }
+        };
+
         if (Array.isArray(value)) {
           return (
-            <div onClick={() => {}} key={currentPath} className="mb-1">
+            <div key={currentPath} className="mb-1">
               <div
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
                   isActive ? "bg-primary/15 text-primary font-medium" : ""
                 }`}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  navigateToSection(currentPath)
-                  toggleSectionExpansion(currentPath)
-                  setId(id)
-                }}
+                onClick={handleSectionClick}
                 data-active={isActive}
                 data-path={currentPath}
               >
                 <div
                   className="flex items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleSectionExpansion(currentPath)
-                    setId(id)
-                  }}
                 >
                   {sidebarCollapsed ? (
                     <ChevronDown className="h-4 w-4" />
@@ -1181,15 +1199,11 @@ export default function YamlEditor({
                               ? "bg-primary/15 text-primary font-medium"
                               : ""
                           }`}
-                          onClick={() => {
-                            console.log(id)
-                            navigateToSection(`${currentPath}[${index}]`)
-                            setId(id)
-                          }}
                           data-active={
                             selectedSection === `${currentPath}[${index}]`
                           }
                           data-path={`${currentPath}[${index}]`}
+                          onClick={handleSectionClick}
                         >
                           {getNodeIcon("item", level + 1)}
                           <span
@@ -1220,33 +1234,12 @@ export default function YamlEditor({
                 className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
                   isActive ? "bg-primary/15 text-primary font-medium" : ""
                 }`}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  navigateToSection(currentPath)
-                  toggleSectionExpansion(currentPath)
-                  setId(id)
-                }}
+                onClick={handleSectionClick}
                 data-active={isActive}
                 data-path={currentPath}
               >
                 <div
                   className="flex items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleSectionExpansion(currentPath)
-                    setId(id)
-                    const requiredMeta = metaYamlData.filter(
-                      (el) => el.id === id
-                    )
-                    const requiredValue = `${
-                      requiredMeta[0].metadata_name
-                    }:\n  ${
-                      requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
-                    }`
-                    editorRef.current &&
-                      editorRef.current.setValue(requiredValue)
-                  }}
                 >
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
@@ -1256,13 +1249,6 @@ export default function YamlEditor({
                 </div>
                 {getNodeIcon(key, level)}
                 <span
-                  onClick={() => {
-                    console.log(id)
-                    // editorRef.current && editorRef.current.setValue(metaYamlData.filter(el=> el.id === id).map(data=> `${data?.metadata_name}:\n  ${
-                    //   data?.content?.replaceAll("\n", "\n  ") || ""
-                    // }`))
-                    setId(id)
-                  }}
                   className={cn("capitalize", isActive && "font-medium")}
                 >
                   {key}
@@ -1280,9 +1266,6 @@ export default function YamlEditor({
         // Handle primitive values (strings, numbers, etc.)
         return (
           <div
-            onClick={(e) => {
-              setId(id)
-            }}
             key={currentPath}
             className="mb-1"
           >
@@ -1290,12 +1273,9 @@ export default function YamlEditor({
               className={`flex items-center gap-2 ${
                 level > 0 ? "pl-" + level * 4 : ""
               } py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer`}
-              onClick={() => {
-                navigateToSection(path, key)
-                setId(id)
-              }}
               data-active={selectedSection === `${path}.${key}`}
               data-path={`${path}.${key}`}
+              onClick={handleSectionClick}
             >
               {getNodeIcon(key, level)}
               <span
@@ -1339,16 +1319,16 @@ export default function YamlEditor({
   }, [])
 
   // Initialize expanded sections
-  useEffect(() => {
-    if (
-      parsedYaml &&
-      Object.keys(parsedYaml).length > 0 &&
-      expandedSections.size === 0
-    ) {
-      const topLevelSections = new Set(Object.keys(parsedYaml))
-      setExpandedSections(topLevelSections)
-    }
-  }, [parsedYaml, expandedSections.size])
+  // useEffect(() => {
+  //   if (
+  //     parsedYaml &&
+  //     Object.keys(parsedYaml).length > 0 &&
+  //     expandedSections.size === 0
+  //   ) {
+  //     const topLevelSections = new Set(Object.keys(parsedYaml))
+  //     setExpandedSections(topLevelSections)
+  //   }
+  // }, [parsedYaml, expandedSections.size])
 
   // Preserve expanded sections when YAML changes
   useEffect(() => {
@@ -1685,7 +1665,6 @@ export default function YamlEditor({
   }, [])
 
   useEffect(() => {
-    console.log("here ")
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.shiftKey && e.altKey && e.key === "F") {
         e.preventDefault()
@@ -1973,11 +1952,16 @@ export default function YamlEditor({
     setIsEditorReady(true)
   }
   useEffect(() => {
-    console.log(metaYamlData)
     metaYamlData && metaYamlData.length > 0 && setId(metaYamlData[0].id)
-    console.log(idData)
   }, [isEditorReady])
-  console.log(idData)
+
+  useEffect(() => {
+    if(metaYamlData && metaYamlData.length>0){
+      const requiredSection= metaYamlData.filter(el=> el.id === idData)
+      if(requiredSection.length) setSelectedSection(requiredSection[0].metadata_name)
+    }
+  }, [idData,isEditorReady])
+
   // Render keyboard shortcuts modal
   const renderKeyboardShortcuts = () => {
     if (!showKeyboardShortcuts) return null
