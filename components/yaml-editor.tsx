@@ -170,7 +170,7 @@ export default function YamlEditor({
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set()
   )
-  const [idData, setId] = useState("")
+  const idData = useRef<string>("")
   const [themeData, setThemeData] = useState("dark")
   const [activeDecorations, setActiveDecorations] = useState<string[]>([])
   const [isEditorReady, setIsEditorReady] = useState<boolean>(false)
@@ -196,7 +196,6 @@ export default function YamlEditor({
     try {
       const parsed = parse(yamlString) as Record<string, any>
       if (parsed) {
-        console.log(myListOfYamlData)
         setMyListOfYamlData((prev) => {
           const currKeys = Object.keys(parsed)
           // Iterate over the `prev` array to update only the matching objects in parsed
@@ -274,7 +273,7 @@ export default function YamlEditor({
           }, 5000)
         }
       }
-      setParseError(formattedError)
+      if(editorRef.current.getPosition().lineNumber !== 1)setParseError(formattedError)
       return { valid: false, error: formattedError }
     }
   }, [])
@@ -420,7 +419,7 @@ export default function YamlEditor({
 
       validateYaml(formatted)
     } catch (error) {
-      setParseError(
+      if(editorRef.current.getPosition().lineNumber !== 1)setParseError(
         `Error formatting YAML: ${
           error instanceof Error ? error.message : String(error)
         }`
@@ -454,7 +453,7 @@ export default function YamlEditor({
   // Copy YAML to clipboard
   const editorData = () => {
     if (!editorRef.current) return
-    getEditorData(editorRef.current.getValue(), idData)
+    getEditorData(editorRef.current.getValue(), idData.current)
   }
 
   // Download YAML file
@@ -548,12 +547,9 @@ export default function YamlEditor({
   const toggleThemeData = useCallback(() => {
     setSidebarCollapsed((prev) => !prev)
   }, [])
-  console.log(idData)
   // Toggle section expansion in the tree view
   const toggleSectionExpansion = useCallback(
     (section: string, expand: boolean) => {
-      console.log(section, expand)
-      console.log(expandedSections)
       setExpandedSections((prev) => {
         const newSet = new Set([...prev])
         if (!expand) {
@@ -561,13 +557,11 @@ export default function YamlEditor({
         } else {
           newSet.add(section)
         }
-        console.log(newSet)
         return newSet
       })
     },
     [expandedSections]
   )
-  console.log(expandedSections)
   // Find the line number and range for a specific section in the YAML
   const findSectionRange = useCallback(
     (section: string, item?: string): SectionRange | null => {
@@ -1150,9 +1144,9 @@ export default function YamlEditor({
 
           // Navigate to section
           navigateToSection(currentPath)
-          if (id !== idData) {
+          if (id !== idData.current) {
             // Set ID if applicable
-            setId(id)
+            idData.current=id
             const requiredMeta = metaYamlData.filter((el) => el.id === id)
             const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
               requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
@@ -1684,7 +1678,6 @@ export default function YamlEditor({
         toggleSidebar()
       }
       if (e.ctrlKey && e.key === "m") {
-        console.log("herer  ")
         e.preventDefault()
         toggleThemeData()
       }
@@ -1905,9 +1898,24 @@ export default function YamlEditor({
     monacoRef.current = monaco
     configureMonaco(monaco)
     // validateYaml(yamlData)
-
-    editor.onDidChangeModelContent(() => {
+    let isUpdatingFirstLine=false
+    editor.onDidChangeModelContent((e) => {
+      if(isUpdatingFirstLine) return
       const currentValue = editor.getValue()
+      const selectedFile=metaYamlData.filter(el=> el.id === idData.current)
+      if(editorRef.current.getPosition().lineNumber ===1){
+        isUpdatingFirstLine=true
+        const currentFirstLine = editorRef.current.getModel()?.getLineContent(1);
+        // If the first line has changed, restore the original content
+          editorRef.current.pushUndoStop();  // Stop this change from being part of the undo stack
+          editorRef.current.executeEdits('restoreFirstLine', [
+            {
+              range: new monaco.Range(1, 1, 1, currentFirstLine?.length + 1),
+              text: selectedFile.length? `${selectedFile[0].metadata_name}:`:'',
+            },
+          ]);
+        isUpdatingFirstLine=false
+      }
       validateYaml(currentValue)
     })
 
@@ -1940,17 +1948,17 @@ export default function YamlEditor({
     setIsEditorReady(true)
   }
   useEffect(() => {
-    metaYamlData && metaYamlData.length > 0 && setId(metaYamlData[0].id)
+    if(metaYamlData && metaYamlData.length > 0) idData.current=metaYamlData[0].id
     metaYamlData && metaYamlData.length > 0 && formatYamlDocument()
   }, [isEditorReady, metaYamlData])
 
   useEffect(() => {
     if (metaYamlData && metaYamlData.length > 0) {
-      const requiredSection = metaYamlData.filter((el) => el.id === idData)
+      const requiredSection = metaYamlData.filter((el) => el.id === idData.current)
       if (requiredSection.length)
         setSelectedSection(requiredSection[0].metadata_name)
     }
-  }, [idData, isEditorReady])
+  }, [idData.current, isEditorReady])
 
   // Render keyboard shortcuts modal
   const renderKeyboardShortcuts = () => {
@@ -2287,7 +2295,7 @@ export default function YamlEditor({
                         editorRef.current.setValue(
                           `Metadata_new${Date.now()}:\n folder: ${Date.now()} `
                         )
-                        setId("")
+                        idData.current=""
                       }}
                       menuItems={{
                         generate: true,
