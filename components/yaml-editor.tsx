@@ -165,7 +165,9 @@ export default function YamlEditor({
 
   getEditorData?: (getEditorData: string, id: string) => void
 }): JSX.Element {
-  const [myListOfYamlData, setMyListOfYamlData] = useState<Record<string,any>>({})
+  const [myListOfYamlData, setMyListOfYamlData] = useState<Record<string, any>>(
+    {}
+  )
   const [yamlData, setYamlData] = useState<string>("")
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof monaco | null>(null)
@@ -198,125 +200,131 @@ export default function YamlEditor({
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
   console.log(myListOfYamlData)
   // Enhanced YAML validation function
-  const validateYaml = useCallback((yamlString: string, edit: boolean) => {
-    try {
-      const parsed = parse(yamlString) as Record<string, any>
-      if (parsed) {
-        setMyListOfYamlData((prev) => {
-          try{
-          const currKeys = Object.keys(parsed)
-          const reqKey=Object.keys(prev).filter(el=> el!==idData.current).flatMap(el=> Object.keys(prev[el]))
-          if(reqKey.includes(currKeys[0])){
-            throw new Error("Duplicate File Name")
-          }else{
-            const requiredObj = {...prev}
-            requiredObj[idData.current]=parsed
-            return requiredObj
-          }
-        }catch(error){
-          const fileNameErrorMessage = error instanceof Error ? error.message : "Invalid YAML"          
+  const validateYaml = useCallback(
+    (yamlString: string, edit: boolean) => {
+      try {
+        const parsed = parse(yamlString) as Record<string, any>
+        if (parsed) {
+          setMyListOfYamlData((prev) => {
+            try {
+              const currKeys = Object.keys(parsed)
+              const reqKey = Object.keys(prev)
+                .filter((el) => el !== idData.current)
+                .flatMap((el) => Object.keys(prev[el]))
+              if (reqKey.includes(currKeys[0])) {
+                throw new Error("Duplicate File Name")
+              } else {
+                const requiredObj = { ...prev }
+                requiredObj[idData.current] = parsed
+                return requiredObj
+              }
+            } catch (error) {
+              const fileNameErrorMessage =
+                error instanceof Error ? error.message : "Invalid YAML"
+              if (editorRef.current && monacoRef.current) {
+                const decorations = editorRef.current.deltaDecorations(
+                  [],
+                  [
+                    {
+                      range: new monacoRef.current.Range(1, 1, 1, 10),
+                      options: {
+                        className: "yaml-error-highlight",
+                        glyphMarginClassName: "yaml-error-glyph",
+                        hoverMessage: { value: fileNameErrorMessage },
+                      },
+                    },
+                  ]
+                )
+
+                setTimeout(() => {
+                  if (editorRef.current) {
+                    editorRef.current.deltaDecorations(decorations, [])
+                  }
+                }, 5000)
+                setParseError(fileNameErrorMessage)
+              }
+              return prev
+            }
+            // // Iterate over the `prev` array to update only the matching objects in parsed
+            // if (prev.length) {
+            //   return prev.map((item) => {
+            //     const key = Object.keys(item)[0]
+            //     if (currKeys.includes(key)) {
+            //       // If the key exists in `currKeys`, update the value
+            //       return { [key]: parsed[key] }
+            //     }
+            //     // If the key doesn't exist in `currKeys`, return the original item
+            //     return item
+            //   })
+            // }
+            // if (typeof parsed === "object") return [parsed]
+            // return []
+          })
+        }
+        setParsedYaml(parsed)
+        setParseError(null)
+
+        // After successful parsing, build the line map
+        buildEditorLineMap(yamlString, parsed)
+
+        // Update file size
+        const bytes = new Blob([yamlString]).size
+        let fileSize = ""
+        if (bytes < 1024) {
+          fileSize = `${bytes} B`
+        } else if (bytes < 1024 * 1024) {
+          fileSize = `${(bytes / 1024).toFixed(1)} KB`
+        } else {
+          fileSize = `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+        }
+
+        setEditorStats((prev) => ({
+          ...prev,
+          lineCount: yamlString.split("\n").length,
+          fileSize,
+        }))
+
+        return { valid: true, parsed }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Invalid YAML"
+        let formattedError = errorMessage
+
+        const lineMatch = errorMessage.match(/line (\d+)/)
+        const colMatch = errorMessage.match(/column (\d+)/)
+        if (lineMatch && colMatch) {
+          const line = Number.parseInt(lineMatch[1])
+          const col = Number.parseInt(colMatch[1])
+          formattedError = `Error at line ${line}, column ${col}: ${errorMessage}`
+
           if (editorRef.current && monacoRef.current) {
             const decorations = editorRef.current.deltaDecorations(
               [],
               [
                 {
-                  range: new monacoRef.current.Range(1, 1, 1, 10),
+                  range: new monacoRef.current.Range(line, col, line, col + 1),
                   options: {
                     className: "yaml-error-highlight",
                     glyphMarginClassName: "yaml-error-glyph",
-                    hoverMessage: { value: fileNameErrorMessage },
+                    hoverMessage: { value: errorMessage },
                   },
                 },
               ]
             )
-  
+
             setTimeout(() => {
               if (editorRef.current) {
                 editorRef.current.deltaDecorations(decorations, [])
               }
             }, 5000)
-            setParseError(fileNameErrorMessage)
           }
-          return prev
         }
-          // // Iterate over the `prev` array to update only the matching objects in parsed
-          // if (prev.length) {
-          //   return prev.map((item) => {
-          //     const key = Object.keys(item)[0]
-          //     if (currKeys.includes(key)) {
-          //       // If the key exists in `currKeys`, update the value
-          //       return { [key]: parsed[key] }
-          //     }
-          //     // If the key doesn't exist in `currKeys`, return the original item
-          //     return item
-          //   })
-          // }
-          // if (typeof parsed === "object") return [parsed]
-          // return []
-        })
+        setParseError(formattedError)
+        return { valid: false, error: formattedError }
       }
-      setParsedYaml(parsed)
-      setParseError(null)
-
-      // After successful parsing, build the line map
-      buildEditorLineMap(yamlString, parsed)
-
-      // Update file size
-      const bytes = new Blob([yamlString]).size
-      let fileSize = ""
-      if (bytes < 1024) {
-        fileSize = `${bytes} B`
-      } else if (bytes < 1024 * 1024) {
-        fileSize = `${(bytes / 1024).toFixed(1)} KB`
-      } else {
-        fileSize = `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-      }
-
-      setEditorStats((prev) => ({
-        ...prev,
-        lineCount: yamlString.split("\n").length,
-        fileSize,
-      }))
-
-      return { valid: true, parsed }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Invalid YAML"
-      let formattedError = errorMessage
-
-      const lineMatch = errorMessage.match(/line (\d+)/)
-      const colMatch = errorMessage.match(/column (\d+)/)
-      if (lineMatch && colMatch) {
-        const line = Number.parseInt(lineMatch[1])
-        const col = Number.parseInt(colMatch[1])
-        formattedError = `Error at line ${line}, column ${col}: ${errorMessage}`
-
-        if (editorRef.current && monacoRef.current) {
-          const decorations = editorRef.current.deltaDecorations(
-            [],
-            [
-              {
-                range: new monacoRef.current.Range(line, col, line, col + 1),
-                options: {
-                  className: "yaml-error-highlight",
-                  glyphMarginClassName: "yaml-error-glyph",
-                  hoverMessage: { value: errorMessage },
-                },
-              },
-            ]
-          )
-
-          setTimeout(() => {
-            if (editorRef.current) {
-              editorRef.current.deltaDecorations(decorations, [])
-            }
-          }, 5000)
-        }
-      }
-      setParseError(formattedError)
-      return { valid: false, error: formattedError }
-    }
-  }, [myListOfYamlData])
+    },
+    [myListOfYamlData]
+  )
 
   useEffect(() => {
     if (metaYamlData && metaYamlData.length) {
@@ -329,12 +337,12 @@ export default function YamlEditor({
       const parsed = yamlFolders.map((el) => parse(el)) as Array<
         Record<string, any>
       >
-      const requiredObject={}
-      parsed.forEach((el,index)=>{
-        requiredObject[metaYamlData[index].id]=el
+      const requiredObject = {}
+      parsed.forEach((el, index) => {
+        requiredObject[metaYamlData[index].id] = el
       })
       setMyListOfYamlData(requiredObject)
-      setYamlData(yamlFolders[0]||"")
+      setYamlData(yamlFolders[0] || "")
     }
   }, [metaYamlData])
 
@@ -1046,7 +1054,7 @@ export default function YamlEditor({
   // that properly expands all parent nodes in the navigation tree
   const highlightTreeForEditorSelection = useCallback(
     (position: Position | null) => {
-      if(parseError) return
+      if (parseError) return
       if (!editorRef.current || !position) return
 
       const path = findPathForPosition(position)
@@ -1187,7 +1195,7 @@ export default function YamlEditor({
           navigateToSection(currentPath)
           if (id !== idData.current) {
             // Set ID if applicable
-            idData.current=id
+            idData.current = id
             const requiredMeta = metaYamlData.filter((el) => el.id === id)
             const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
               requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
@@ -1975,9 +1983,9 @@ export default function YamlEditor({
     setIsEditorReady(true)
   }
   useEffect(() => {
-    if(metaYamlData && metaYamlData.length > 0) {
-      idData.current=metaYamlData[0].id
-     formatYamlDocument()
+    if (metaYamlData && metaYamlData.length > 0) {
+      idData.current = metaYamlData[0].id
+      formatYamlDocument()
     }
   }, [isEditorReady, metaYamlData])
   console.log(idData)
@@ -2331,7 +2339,7 @@ export default function YamlEditor({
   attributes:\n 
     # Add your attributes here} `
                         )
-                        idData.current=""
+                        idData.current = ""
                       }}
                       menuItems={{
                         disableGenerate:
