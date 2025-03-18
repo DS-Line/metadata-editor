@@ -20,6 +20,7 @@ interface MenuItems {
   generate: boolean
   upload: boolean
   addYaml: boolean
+  disableGenerate?: boolean
 }
 
 export default function MetadataOptions({
@@ -54,7 +55,7 @@ export default function MetadataOptions({
           <DropdownMenuItem
             className="flex flex-row gap-2 mx-[-8px] focus:bg-primary focus:text-white [&>svg]:focus:text-white"
             onClick={handleGenerate}
-            // disabled={!metadataEmpty}
+            disabled={menuItems.disableGenerate}
           >
             <CircleArrowDown
               size={18}

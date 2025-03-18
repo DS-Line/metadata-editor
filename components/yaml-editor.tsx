@@ -46,7 +46,7 @@ import {
 } from "lucide-react"
 import type * as monaco from "monaco-editor"
 import { useTheme } from "next-themes"
-import { parse, stringify } from "yaml"
+import { parse, parseDocument, stringify } from "yaml"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -145,6 +145,9 @@ const LEVEL_ICONS: LevelIcons = {
 
 export default function YamlEditor({
   isSaving,
+  metadataType,
+  isLoadingYaml,
+  isFetchingList,
   handleGenerate,
   addMetadata,
   handleUploadMetadata,
@@ -152,6 +155,9 @@ export default function YamlEditor({
   getEditorData,
 }: {
   isSaving: boolean
+  metadataType: string
+  isLoadingYaml?: boolean
+  isFetchingList?: boolean
   metaYamlData?: Metadata[]
   handleUploadMetadata: () => void
   handleGenerate: () => void
@@ -436,7 +442,7 @@ export default function YamlEditor({
 
     try {
       const currentValue = editorRef.current.getValue()
-      const parsed = parse(currentValue)
+      const parsed = parseDocument(currentValue)
       const formatted = stringify(parsed)
 
       const position = editorRef.current.getPosition()
@@ -2328,16 +2334,19 @@ export default function YamlEditor({
                         idData.current=""
                       }}
                       menuItems={{
+                        disableGenerate:
+                          metadataType === "schema" && metaYamlData.length > 0,
                         generate: true,
                         upload: true,
                         addYaml: true,
                       }}
                       handleUploadClick={handleUploadMetadata}
-                      metadataType={"schema"}
+                      metadataType={metadataType}
                     />
                   }
                 </div>
               </div>
+
               <div
                 className={`${
                   isFullScreen
@@ -2351,10 +2360,22 @@ export default function YamlEditor({
                     "",
                     0,
                     metaYamlData && metaYamlData.length > 0
-                      ? metaYamlData[index].id
+                      ? metaYamlData[index].id || ""
                       : ""
                   )
                 })}
+                {isFetchingList && (
+                  <div className="relative flex items-center justify-center bg-background/80 z-50">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                      <Loader2
+                        color="#000000"
+                        size={35}
+                        className="animate-spin"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </ResizablePanel>
@@ -2556,6 +2577,13 @@ export default function YamlEditor({
               >
                 <div className="flex-1">
                   <Editor
+                    loading={
+                      <Loader2
+                        color="#ffffff"
+                        size={48}
+                        className="animate-spin"
+                      />
+                    }
                     height="100%" // Let the parent handle height
                     defaultLanguage="yaml"
                     defaultValue={yamlData}
@@ -2617,13 +2645,15 @@ export default function YamlEditor({
                 </div>
               </div>
 
-              {!isEditorReady && (
+              {(!isEditorReady || isLoadingYaml) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80">
                   <div className="flex flex-col items-center gap-2">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                    <p className="text-sm text-muted-foreground">
-                      Loading editor...
-                    </p>
+                    <Loader2
+                      color="#000000"
+                      size={48}
+                      className="animate-spin"
+                    />
                   </div>
                 </div>
               )}
