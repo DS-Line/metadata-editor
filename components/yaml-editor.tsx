@@ -40,6 +40,7 @@ import {
   Save,
   Settings,
   Sun,
+  Trash2,
   TypeIcon as type,
   Users,
   WrapTextIcon as Wrap,
@@ -145,6 +146,7 @@ const LEVEL_ICONS: LevelIcons = {
 
 export default function YamlEditor({
   isSaving,
+  deleteId,
   metadataType,
   isLoadingYaml,
   isFetchingList,
@@ -153,8 +155,10 @@ export default function YamlEditor({
   handleUploadMetadata,
   metaYamlData,
   getEditorData,
+  getidData,
 }: {
   isSaving: boolean
+  deleteId: string
   metadataType: string
   isLoadingYaml?: boolean
   isFetchingList?: boolean
@@ -162,6 +166,7 @@ export default function YamlEditor({
   handleUploadMetadata: () => void
   handleGenerate: () => void
   addMetadata: () => void
+  getidData?: (id: string) => void
 
   getEditorData?: (getEditorData: string, id: string) => void
 }): JSX.Element {
@@ -342,12 +347,18 @@ export default function YamlEditor({
       })
       setMyListOfYamlData(requiredObject)
       setYamlData(yamlFolders[0] || "")
+    } else {
+      setMyListOfYamlData({})
+      setYamlData("")
     }
   }, [metaYamlData])
 
   useEffect(() => {
     validateYaml(yamlData)
-    editorRef.current &&
+    metaYamlData &&
+      metaYamlData.length &&
+      editorRef &&
+      editorRef.current &&
       editorRef.current.setValue(
         metaYamlData.map(
           (data) =>
@@ -1281,9 +1292,34 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <span className={cn("capitalize", isActive && "font-medium")}>
-                  {key}
-                </span>
+                <div className="flex justify-between w-full">
+                  <span className={cn("capitalize", isActive && "font-medium")}>
+                    {key}
+                  </span>
+                  {level === 0 && (
+                    <div
+                      className="hover:bg-transparent"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        getidData(id)
+                        editorRef &&
+                          editorRef.current &&
+                          editorRef.current.setValue("")
+                      }}
+                    >
+                      {deleteId === id ? (
+                        <Loader2
+                          size={18}
+                          color="#000000"
+                          className="animate-spin"
+                        />
+                      ) : (
+                        <Trash2 size={18} className="mr-2 text-destructive" />
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
               {isExpanded && (
                 <div className="pl-6">
@@ -2368,7 +2404,7 @@ export default function YamlEditor({
                     "",
                     0,
                     metaYamlData && metaYamlData.length > 0
-                      ? metaYamlData[index].id || ""
+                      ? metaYamlData[index]?.id || ""
                       : ""
                   )
                 })}
