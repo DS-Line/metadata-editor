@@ -159,7 +159,7 @@ export default function YamlEditor({
 
   getEditorData?: (getEditorData: string, id: string) => void
 }): JSX.Element {
-  const [myListOfYamlData, setMyListOfYamlData] = useState<string[]>([])
+  const [myListOfYamlData, setMyListOfYamlData] = useState<Record<string,any>>({})
   const [yamlData, setYamlData] = useState<string>("")
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof monaco | null>(null)
@@ -170,7 +170,7 @@ export default function YamlEditor({
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set()
   )
-  const [idData, setId] = useState("")
+  const idData = useRef<string>("")
   const [themeData, setThemeData] = useState("dark")
   const [activeDecorations, setActiveDecorations] = useState<string[]>([])
   const [isEditorReady, setIsEditorReady] = useState<boolean>(false)
@@ -190,29 +190,63 @@ export default function YamlEditor({
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] =
     useState<boolean>(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
-
+  console.log(myListOfYamlData)
   // Enhanced YAML validation function
   const validateYaml = useCallback((yamlString: string, edit: boolean) => {
     try {
       const parsed = parse(yamlString) as Record<string, any>
       if (parsed) {
-        console.log(myListOfYamlData)
         setMyListOfYamlData((prev) => {
+          try{
           const currKeys = Object.keys(parsed)
-          // Iterate over the `prev` array to update only the matching objects in parsed
-          if (prev.length) {
-            return prev.map((item) => {
-              const key = Object.keys(item)[0]
-              if (currKeys.includes(key)) {
-                // If the key exists in `currKeys`, update the value
-                return { [key]: parsed[key] }
-              }
-              // If the key doesn't exist in `currKeys`, return the original item
-              return item
-            })
+          const reqKey=Object.keys(prev).filter(el=> el!==idData.current).flatMap(el=> Object.keys(prev[el]))
+          if(reqKey.includes(currKeys[0])){
+            throw new Error("Duplicate File Name")
+          }else{
+            const requiredObj = {...prev}
+            requiredObj[idData.current]=parsed
+            return requiredObj
           }
-          if (typeof parsed === "object") return [parsed]
-          return []
+        }catch(error){
+          const fileNameErrorMessage = error instanceof Error ? error.message : "Invalid YAML"          
+          if (editorRef.current && monacoRef.current) {
+            const decorations = editorRef.current.deltaDecorations(
+              [],
+              [
+                {
+                  range: new monacoRef.current.Range(1, 1, 1, 10),
+                  options: {
+                    className: "yaml-error-highlight",
+                    glyphMarginClassName: "yaml-error-glyph",
+                    hoverMessage: { value: fileNameErrorMessage },
+                  },
+                },
+              ]
+            )
+  
+            setTimeout(() => {
+              if (editorRef.current) {
+                editorRef.current.deltaDecorations(decorations, [])
+              }
+            }, 5000)
+            setParseError(fileNameErrorMessage)
+          }
+          return prev
+        }
+          // // Iterate over the `prev` array to update only the matching objects in parsed
+          // if (prev.length) {
+          //   return prev.map((item) => {
+          //     const key = Object.keys(item)[0]
+          //     if (currKeys.includes(key)) {
+          //       // If the key exists in `currKeys`, update the value
+          //       return { [key]: parsed[key] }
+          //     }
+          //     // If the key doesn't exist in `currKeys`, return the original item
+          //     return item
+          //   })
+          // }
+          // if (typeof parsed === "object") return [parsed]
+          // return []
         })
       }
       setParsedYaml(parsed)
@@ -246,7 +280,6 @@ export default function YamlEditor({
 
       const lineMatch = errorMessage.match(/line (\d+)/)
       const colMatch = errorMessage.match(/column (\d+)/)
-
       if (lineMatch && colMatch) {
         const line = Number.parseInt(lineMatch[1])
         const col = Number.parseInt(colMatch[1])
@@ -277,7 +310,7 @@ export default function YamlEditor({
       setParseError(formattedError)
       return { valid: false, error: formattedError }
     }
-  }, [])
+  }, [myListOfYamlData])
 
   useEffect(() => {
     if (metaYamlData && metaYamlData.length) {
@@ -290,18 +323,15 @@ export default function YamlEditor({
       const parsed = yamlFolders.map((el) => parse(el)) as Array<
         Record<string, any>
       >
-      setMyListOfYamlData(parsed)
-      setYamlData(
-        () =>
-          metaYamlData.map(
-            (data) =>
-              `${data?.metadata_name}:\n  ${
-                data?.content?.replaceAll("\n", "\n  ") || ""
-              }`
-          )[0]
-      )
+      const requiredObject={}
+      parsed.forEach((el,index)=>{
+        requiredObject[metaYamlData[index].id]=el
+      })
+      setMyListOfYamlData(requiredObject)
+      setYamlData(yamlFolders[0]||"")
     }
   }, [metaYamlData])
+
   useEffect(() => {
     validateYaml(yamlData)
     editorRef.current &&
@@ -454,7 +484,7 @@ export default function YamlEditor({
   // Copy YAML to clipboard
   const editorData = () => {
     if (!editorRef.current) return
-    getEditorData(editorRef.current.getValue(), idData)
+    getEditorData(editorRef.current.getValue(), idData.current.current)
   }
 
   // Download YAML file
@@ -548,12 +578,10 @@ export default function YamlEditor({
   const toggleThemeData = useCallback(() => {
     setSidebarCollapsed((prev) => !prev)
   }, [])
-  console.log(idData)
+  console.log(idData.current)
   // Toggle section expansion in the tree view
   const toggleSectionExpansion = useCallback(
     (section: string, expand: boolean) => {
-      console.log(section, expand)
-      console.log(expandedSections)
       setExpandedSections((prev) => {
         const newSet = new Set([...prev])
         if (!expand) {
@@ -1012,6 +1040,7 @@ export default function YamlEditor({
   // that properly expands all parent nodes in the navigation tree
   const highlightTreeForEditorSelection = useCallback(
     (position: Position | null) => {
+      if(parseError) return
       if (!editorRef.current || !position) return
 
       const path = findPathForPosition(position)
@@ -1150,9 +1179,9 @@ export default function YamlEditor({
 
           // Navigate to section
           navigateToSection(currentPath)
-          if (id !== idData) {
+          if (id !== idData.current) {
             // Set ID if applicable
-            setId(id)
+            idData.current=id
             const requiredMeta = metaYamlData.filter((el) => el.id === id)
             const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
               requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
@@ -1940,10 +1969,12 @@ export default function YamlEditor({
     setIsEditorReady(true)
   }
   useEffect(() => {
-    metaYamlData && metaYamlData.length > 0 && setId(metaYamlData[0].id)
-    metaYamlData && metaYamlData.length > 0 && formatYamlDocument()
+    if(metaYamlData && metaYamlData.length > 0) {
+      idData.current=metaYamlData[0].id
+     formatYamlDocument()
+    }
   }, [isEditorReady, metaYamlData])
-
+  console.log(idData)
   useEffect(() => {
     if (metaYamlData && metaYamlData.length > 0) {
       const requiredSection = metaYamlData.filter((el) => el.id === idData)
@@ -2294,7 +2325,7 @@ export default function YamlEditor({
   attributes:\n 
     # Add your attributes here} `
                         )
-                        setId("")
+                        idData.current=""
                       }}
                       menuItems={{
                         generate: true,
@@ -2314,9 +2345,9 @@ export default function YamlEditor({
                     : "yaml-structure-content"
                 }`}
               >
-                {myListOfYamlData.map((el, index) => {
+                {Object.keys(myListOfYamlData).map((id, index) => {
                   return renderYamlTree(
-                    el,
+                    myListOfYamlData[id],
                     "",
                     0,
                     metaYamlData && metaYamlData.length > 0
