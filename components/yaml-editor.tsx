@@ -497,7 +497,7 @@ export default function YamlEditor({
   // Copy YAML to clipboard
   const editorData = () => {
     if (!editorRef.current) return
-    getEditorData(editorRef.current.getValue(), idData.current.current)
+    getEditorData(editorRef.current.getValue(), idData.current)
   }
 
   // Download YAML file
