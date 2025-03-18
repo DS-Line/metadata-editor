@@ -2085,7 +2085,13 @@ export default function YamlEditor({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  disabled={isSaving || (editorRef && editorRef.current && !editorRef.current.getValue()) || parseError}
+                  disabled={
+                    isSaving ||
+                    (editorRef &&
+                      editorRef.current &&
+                      !editorRef.current.getValue()) ||
+                    parseError
+                  }
                   variant="ghost"
                   size="sm"
                   onClick={editorData}
@@ -2448,8 +2454,13 @@ export default function YamlEditor({
                           variant="outline"
                           size="sm"
                           onClick={editorData}
-                          disabled={isSaving || (editorRef && editorRef.current && !editorRef.current.getValue()) || parseError}
-
+                          disabled={
+                            isSaving ||
+                            (editorRef &&
+                              editorRef.current &&
+                              !editorRef.current.getValue()) ||
+                            parseError
+                          }
                         >
                           {isSaving ? (
                             <Loader2 size={14} className="mr-1 animate-spin" />
