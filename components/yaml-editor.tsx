@@ -1387,6 +1387,7 @@ export default function YamlEditor({
         } else if (current && current[segment] === undefined) {
           return false
         } else {
+
           if (current) {
             current = current[segment]
           } else {
