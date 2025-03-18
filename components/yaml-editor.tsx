@@ -198,7 +198,6 @@ export default function YamlEditor({
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] =
     useState<boolean>(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
-  console.log(myListOfYamlData)
   // Enhanced YAML validation function
   const validateYaml = useCallback(
     (yamlString: string, edit: boolean) => {
@@ -592,7 +591,6 @@ export default function YamlEditor({
   const toggleThemeData = useCallback(() => {
     setSidebarCollapsed((prev) => !prev)
   }, [])
-  console.log(idData.current)
   // Toggle section expansion in the tree view
   const toggleSectionExpansion = useCallback(
     (section: string, expand: boolean) => {
@@ -603,13 +601,11 @@ export default function YamlEditor({
         } else {
           newSet.add(section)
         }
-        console.log(newSet)
         return newSet
       })
     },
     [expandedSections]
   )
-  console.log(expandedSections)
   // Find the line number and range for a specific section in the YAML
   const findSectionRange = useCallback(
     (section: string, item?: string): SectionRange | null => {
@@ -1387,7 +1383,6 @@ export default function YamlEditor({
         } else if (current && current[segment] === undefined) {
           return false
         } else {
-
           if (current) {
             current = current[segment]
           } else {
@@ -1728,7 +1723,6 @@ export default function YamlEditor({
         toggleSidebar()
       }
       if (e.ctrlKey && e.key === "m") {
-        console.log("herer  ")
         e.preventDefault()
         toggleThemeData()
       }
@@ -1989,7 +1983,6 @@ export default function YamlEditor({
       formatYamlDocument()
     }
   }, [isEditorReady, metaYamlData])
-  console.log(idData)
   useEffect(() => {
     if (metaYamlData && metaYamlData.length > 0) {
       const requiredSection = metaYamlData.filter((el) => el.id === idData)
@@ -2092,7 +2085,7 @@ export default function YamlEditor({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  disabled={isSaving}
+                  disabled={isSaving || (editorRef && editorRef.current && !editorRef.current.getValue()) || parseError}
                   variant="ghost"
                   size="sm"
                   onClick={editorData}
@@ -2455,6 +2448,8 @@ export default function YamlEditor({
                           variant="outline"
                           size="sm"
                           onClick={editorData}
+                          disabled={isSaving || (editorRef && editorRef.current && !editorRef.current.getValue()) || parseError}
+
                         >
                           {isSaving ? (
                             <Loader2 size={14} className="mr-1 animate-spin" />
