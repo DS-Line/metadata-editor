@@ -65,6 +65,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog"
 import MetadataOptions from "./ui/metadata-options"
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
 import { cn } from "./ui/utils"
@@ -1297,17 +1308,7 @@ export default function YamlEditor({
                     {key}
                   </span>
                   {level === 0 && (
-                    <div
-                      className="hover:bg-transparent"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        getidData(id)
-                        editorRef &&
-                          editorRef.current &&
-                          editorRef.current.setValue("")
-                      }}
-                    >
+                    <div className="hover:bg-transparent">
                       {deleteId === id ? (
                         <Loader2
                           size={18}
@@ -1315,7 +1316,59 @@ export default function YamlEditor({
                           className="animate-spin"
                         />
                       ) : (
-                        <Trash2 size={18} className="mr-2 text-destructive" />
+                        <AlertDialog>
+                          <AlertDialogTrigger
+                            asChild
+                            onClick={(e) => e?.stopPropagation()}
+                          >
+                            <Trash2
+                              size={18}
+                              className="mr-2 text-destructive"
+                            />
+                          </AlertDialogTrigger>
+                          <AlertDialogContent
+                            onClick={(e) => e.stopPropagation()}
+                            className="py-5 text-txt-color-200"
+                          >
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="flex flex-col">
+                                <p className="text-lg font-semibold pb-4 m-0 ">
+                                  Delete Metadata
+                                </p>
+                                <div className="relative">
+                                  <hr className="absolute -left-5 -right-5" />
+                                </div>
+                              </AlertDialogTitle>
+                              <AlertDialogDescription className="m-0">
+                                <p className="py-4 text-base">
+                                  Are you sure you want to delete the metadata?
+                                </p>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="flex !justify-between">
+                              <div className="flex !justify-start sm:space-x-2">
+                                <div className="flex flex-row items-center gap-2">
+                                  <AlertDialogAction
+                                    className="bg-destructive hover:bg-destructive-foreground"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      getidData(id)
+                                      editorRef &&
+                                        editorRef.current &&
+                                        editorRef.current.setValue("")
+                                    }}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </div>
+                                <AlertDialogCancel className="bg-inherit">
+                                  Cancel
+                                </AlertDialogCancel>
+                              </div>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       )}
                     </div>
                   )}
@@ -1371,6 +1424,7 @@ export default function YamlEditor({
       navigateToSection,
       toggleSectionExpansion,
       getNodeIcon,
+      deleteId,
     ]
   )
 
@@ -2016,6 +2070,13 @@ export default function YamlEditor({
   useEffect(() => {
     if (metaYamlData && metaYamlData.length > 0) {
       idData.current = metaYamlData[0].id
+      editorRef &&
+        editorRef.current &&
+        editorRef.current.setValue(
+          `${metaYamlData[0]?.metadata_name}:\n  ${
+            metaYamlData[0]?.content?.replaceAll("\n", "\n  ") || ""
+          }`
+        )
       formatYamlDocument()
     }
   }, [isEditorReady, metaYamlData])
