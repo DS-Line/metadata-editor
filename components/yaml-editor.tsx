@@ -1424,6 +1424,7 @@ export default function YamlEditor({
       navigateToSection,
       toggleSectionExpansion,
       getNodeIcon,
+      deleteId
     ]
   )
 
@@ -2069,6 +2070,9 @@ export default function YamlEditor({
   useEffect(() => {
     if (metaYamlData && metaYamlData.length > 0) {
       idData.current = metaYamlData[0].id
+      edi && editorRef.current && editorRef.current.setValue(`${metaYamlData[0]?.metadata_name}:\n  ${
+        metaYamlData[0]?.content?.replaceAll("\n", "\n  ") || ""
+          }`)
       formatYamlDocument()
     }
   }, [isEditorReady, metaYamlData])
