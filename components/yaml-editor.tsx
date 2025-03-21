@@ -2398,7 +2398,7 @@ export default function YamlEditor({
 
   return (
     <div
-      className={cn(isFullScreen ? "fullscreen-editor" : "h-[80dvh] w-full")}
+      className={cn(isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full")}
     >
       <ResizablePanelGroup direction="horizontal" className="h-full">
         {!sidebarCollapsed && (
