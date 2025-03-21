@@ -277,7 +277,7 @@ export default function YamlEditor({
           })
         }
         setParsedYaml(parsed)
-        setParseError(null)
+        // setParseError(null)
 
         // After successful parsing, build the line map
         buildEditorLineMap(yamlString, parsed)
