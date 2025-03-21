@@ -278,7 +278,6 @@ export default function YamlEditor({
             // return []
           })
         }
- 
 
         // After successful parsing, build the line map
         buildEditorLineMap(yamlString, parsed)
