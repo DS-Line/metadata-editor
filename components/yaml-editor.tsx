@@ -340,7 +340,7 @@ export default function YamlEditor({
     },
     [myListOfYamlData]
   )
-
+  console.log(parseError)
   useEffect(() => {
     if (metaYamlData && metaYamlData.length) {
       const yamlFolders = metaYamlData.map(
