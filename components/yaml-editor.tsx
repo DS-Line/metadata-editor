@@ -219,6 +219,8 @@ export default function YamlEditor({
     (yamlString: string, edit: boolean) => {
       try {
         const parsed = parse(yamlString) as Record<string, any>
+        setParsedYaml(parsed)
+        setParseError(null)
         if (parsed) {
           setMyListOfYamlData((prev) => {
             try {
@@ -276,8 +278,7 @@ export default function YamlEditor({
             // return []
           })
         }
-        setParsedYaml(parsed)
-        // setParseError(null)
+ 
 
         // After successful parsing, build the line map
         buildEditorLineMap(yamlString, parsed)
