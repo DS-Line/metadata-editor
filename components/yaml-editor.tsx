@@ -1321,6 +1321,14 @@ export default function YamlEditor({
                         ref={inputRef}
                         autoFocus={true}
                         defaultValue={key}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            setEditId("")
+                          }
+                        }}
+                        onBlur={() => {
+                          setEditId("")
+                        }}
                         onChange={(e) => {
                           setValue(e.target.value)
                           const lines = editorRef.current.getValue().split("\n")
@@ -1336,7 +1344,7 @@ export default function YamlEditor({
                       {key}
                     </span>
                   )}
-                  {level === 0 && (
+                  {level === 0 && editId !== id && (
                     <div className="hover:bg-transparent flex gap-2">
                       <SquarePen
                         size={18}
@@ -1362,10 +1370,12 @@ export default function YamlEditor({
                             asChild
                             onClick={(e) => e?.stopPropagation()}
                           >
-                            <Trash2
-                              size={18}
-                              className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
-                            />
+                            {editId !== id && (
+                              <Trash2
+                                size={18}
+                                className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
+                              />
+                            )}
                           </AlertDialogTrigger>
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
