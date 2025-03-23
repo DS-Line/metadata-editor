@@ -2492,8 +2492,7 @@ export default function YamlEditor({
                         idData.current = ""
                       }}
                       menuItems={{
-                        disableGenerate:
-                          metadataType === "schema" && metaYamlData.length > 0,
+                        regenerateFlag: metaYamlData.length > 0,
                         generate: true,
                         upload: true,
                         addYaml: true,
