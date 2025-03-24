@@ -51,7 +51,6 @@ import { useTheme } from "next-themes"
 import { parse, parseDocument, stringify } from "yaml"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -79,7 +78,6 @@ import {
 } from "./ui/alert-dialog"
 import MetadataOptions from "./ui/metadata-options"
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
-import { toast } from "./ui/use-toast"
 import { cn } from "./ui/utils"
 
 // Sample YAML data (truncated for brevity)
@@ -515,11 +513,15 @@ export default function YamlEditor({
     navigator.clipboard
       .writeText(content)
       .then(() => {
-        toast({
-          title: "Yaml",
-          description: "Yaml copied successfully",
-          variant: "default",
-        })
+        const tempAlert = document.createElement("div")
+        tempAlert.className =
+          "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
+        tempAlert.textContent = "YAML copied to clipboard!"
+        document.body.appendChild(tempAlert)
+
+        setTimeout(() => {
+          document.body.removeChild(tempAlert)
+        }, 2000)
       })
       .catch((err) => {
         setParseError("Failed to copy to clipboard")
