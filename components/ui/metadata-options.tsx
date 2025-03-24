@@ -20,7 +20,7 @@ interface MenuItems {
   generate: boolean
   upload: boolean
   addYaml: boolean
-  disableGenerate?: boolean
+  regenerateFlag?: boolean
 }
 
 export default function MetadataOptions({
@@ -55,13 +55,16 @@ export default function MetadataOptions({
           <DropdownMenuItem
             className="flex flex-row gap-2 mx-[-8px] focus:bg-primary focus:text-white [&>svg]:focus:text-white"
             onClick={handleGenerate}
-            disabled={menuItems.disableGenerate}
           >
             <CircleArrowDown
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span>Generate Metadata</span>
+            <span>
+              {menuItems.regenerateFlag
+                ? "Regenerate Metadata"
+                : "Generate Metadata"}
+            </span>
           </DropdownMenuItem>
         )}
         {menuItems.upload && (

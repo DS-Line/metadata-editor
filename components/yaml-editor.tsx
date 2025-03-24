@@ -39,6 +39,7 @@ import {
   Moon,
   Save,
   Settings,
+  SquarePen,
   Sun,
   Trash2,
   TypeIcon as type,
@@ -204,6 +205,7 @@ export default function YamlEditor({
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false)
   const [showMinimap, setShowMinimap] = useState<boolean>(true)
   const [wordWrap, setWordWrap] = useState<"on" | "off">("on")
+  const inputRef = useRef<HTMLInputElement>(null)
   const [editorStats, setEditorStats] = useState<EditorStats>({
     lineCount: 0,
     currentLine: 1,
@@ -211,6 +213,9 @@ export default function YamlEditor({
     fileSize: "0 KB",
     selectionLength: 0,
   })
+  const [value, setValue] = useState("")
+  const [isEditing, setisEditing] = useState(true)
+  const [editId, setEditId] = useState("")
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] =
     useState<boolean>(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
@@ -340,7 +345,6 @@ export default function YamlEditor({
     },
     [myListOfYamlData]
   )
-  console.log(parseError)
   useEffect(() => {
     if (metaYamlData && metaYamlData.length) {
       const yamlFolders = metaYamlData.map(
@@ -1304,11 +1308,56 @@ export default function YamlEditor({
                 </div>
                 {getNodeIcon(key, level)}
                 <div className="flex justify-between w-full">
-                  <span className={cn("capitalize", isActive && "font-medium")}>
-                    {key}
-                  </span>
-                  {level === 0 && (
-                    <div className="hover:bg-transparent">
+                  {level === 0 && isEditing && editId === id ? (
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                      }}
+                      className="bg-red-400"
+                    >
+                      {" "}
+                      <input
+                        ref={inputRef}
+                        autoFocus={true}
+                        defaultValue={key}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            setEditId("")
+                          }
+                        }}
+                        onBlur={() => {
+                          setEditId("")
+                        }}
+                        onChange={(e) => {
+                          setValue(e.target.value)
+                          const lines = editorRef.current.getValue().split("\n")
+                          lines[0] = `${e.target.value}:`
+                          editorRef.current.setValue(lines.join("\n"))
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <span
+                      className={cn("capitalize", isActive && "font-medium")}
+                    >
+                      {key}
+                    </span>
+                  )}
+                  {level === 0 && editId !== id && (
+                    <div className="hover:bg-transparent flex gap-2">
+                      <SquarePen
+                        size={18}
+                        onClick={(e) => {
+                          // e.stopPropagation()
+                          // e.preventDefault()
+                          // setisEditing(true)
+                          setEditId(id)
+                          inputRef.current?.focus()
+                          inputRef.current?.select()
+                        }}
+                        className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
+                      />
                       {deleteId === id ? (
                         <Loader2
                           size={18}
@@ -1321,10 +1370,12 @@ export default function YamlEditor({
                             asChild
                             onClick={(e) => e?.stopPropagation()}
                           >
-                            <Trash2
-                              size={18}
-                              className="mr-2 text-destructive"
-                            />
+                            {editId !== id && (
+                              <Trash2
+                                size={18}
+                                className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
+                              />
+                            )}
                           </AlertDialogTrigger>
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
@@ -1425,6 +1476,8 @@ export default function YamlEditor({
       toggleSectionExpansion,
       getNodeIcon,
       deleteId,
+      editId,
+      inputRef.current,
     ]
   )
 
@@ -2439,8 +2492,7 @@ export default function YamlEditor({
                         idData.current = ""
                       }}
                       menuItems={{
-                        disableGenerate:
-                          metadataType === "schema" && metaYamlData.length > 0,
+                        regenerateFlag: metaYamlData.length > 0,
                         generate: true,
                         upload: true,
                         addYaml: true,
