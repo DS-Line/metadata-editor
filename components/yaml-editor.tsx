@@ -79,6 +79,7 @@ import {
 } from "./ui/alert-dialog"
 import MetadataOptions from "./ui/metadata-options"
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
+import { toast } from "./ui/use-toast"
 import { cn } from "./ui/utils"
 
 // Sample YAML data (truncated for brevity)
@@ -159,6 +160,7 @@ const LEVEL_ICONS: LevelIcons = {
 export default function YamlEditor({
   isSaving,
   deleteId,
+  isDeletedFlag,
   metadataType,
   isLoadingYaml,
   isFetchingList,
@@ -169,6 +171,7 @@ export default function YamlEditor({
   getEditorData,
   getidData,
 }: {
+  isDeletedFlag: boolean
   isSaving: boolean
   deleteId: string
   metadataType: string
@@ -345,6 +348,13 @@ export default function YamlEditor({
     },
     [myListOfYamlData]
   )
+
+  useEffect(() => {
+    if (isDeletedFlag) {
+      console.log("here")
+      editorRef && editorRef.current && editorRef.current.setValue("")
+    }
+  }, [isDeletedFlag])
   useEffect(() => {
     if (metaYamlData && metaYamlData.length) {
       const yamlFolders = metaYamlData.map(
@@ -505,15 +515,11 @@ export default function YamlEditor({
     navigator.clipboard
       .writeText(content)
       .then(() => {
-        const tempAlert = document.createElement("div")
-        tempAlert.className =
-          "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
-        tempAlert.textContent = "YAML copied to clipboard!"
-        document.body.appendChild(tempAlert)
-
-        setTimeout(() => {
-          document.body.removeChild(tempAlert)
-        }, 2000)
+        toast({
+          title: "Yaml",
+          description: "Yaml copied successfully",
+          variant: "default",
+        })
       })
       .catch((err) => {
         setParseError("Failed to copy to clipboard")
@@ -1405,9 +1411,6 @@ export default function YamlEditor({
                                       e.preventDefault()
                                       e.stopPropagation()
                                       getidData(id)
-                                      editorRef &&
-                                        editorRef.current &&
-                                        editorRef.current.setValue("")
                                     }}
                                   >
                                     Delete
