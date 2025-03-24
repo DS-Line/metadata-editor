@@ -5,8 +5,8 @@ import React from "react"
 import {
   CircleArrowDown,
   CircleArrowUp,
+  EllipsisVertical,
   FilePlus,
-  PlusIcon,
 } from "lucide-react"
 
 import {
@@ -48,7 +48,10 @@ export default function MetadataOptions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="items-center p-2 cursor-pointer">
-        <PlusIcon className="cursor-pointer text-txt-color-300 hover:text-primary" />
+        <EllipsisVertical
+          size={18}
+          className="cursor-pointer text-txt-color-300 hover:text-primary outline-none"
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 [&>*]:px-2 [&>*]:cursor-pointer [&>*]:hover:rounded-none">
         {menuItems.generate && (

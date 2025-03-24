@@ -51,7 +51,6 @@ import { useTheme } from "next-themes"
 import { parse, parseDocument, stringify } from "yaml"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -159,6 +158,7 @@ const LEVEL_ICONS: LevelIcons = {
 export default function YamlEditor({
   isSaving,
   deleteId,
+  isDeletedFlag,
   metadataType,
   isLoadingYaml,
   isFetchingList,
@@ -169,6 +169,7 @@ export default function YamlEditor({
   getEditorData,
   getidData,
 }: {
+  isDeletedFlag: boolean
   isSaving: boolean
   deleteId: string
   metadataType: string
@@ -345,6 +346,13 @@ export default function YamlEditor({
     },
     [myListOfYamlData]
   )
+
+  useEffect(() => {
+    if (isDeletedFlag) {
+      console.log("here")
+      editorRef && editorRef.current && editorRef.current.setValue("")
+    }
+  }, [isDeletedFlag])
   useEffect(() => {
     if (metaYamlData && metaYamlData.length) {
       const yamlFolders = metaYamlData.map(
@@ -1405,9 +1413,6 @@ export default function YamlEditor({
                                       e.preventDefault()
                                       e.stopPropagation()
                                       getidData(id)
-                                      editorRef &&
-                                        editorRef.current &&
-                                        editorRef.current.setValue("")
                                     }}
                                   >
                                     Delete
