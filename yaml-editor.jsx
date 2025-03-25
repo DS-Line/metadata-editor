@@ -774,7 +774,7 @@ export default function YamlEditor() {
                   <TooltipContent>Format YAML document</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <TooltipProvider>
+              {/* <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -791,7 +791,7 @@ export default function YamlEditor() {
                   </TooltipTrigger>
                   <TooltipContent>Validate YAML syntax</TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
+              </TooltipProvider> */}
             </div>
           </div>
 

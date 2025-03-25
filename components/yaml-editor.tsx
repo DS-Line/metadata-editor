@@ -2162,7 +2162,7 @@ export default function YamlEditor({
       { key: "Ctrl + /", description: "Toggle comment" },
       { key: "Ctrl + Space", description: "Trigger suggestions" },
       { key: "Ctrl + B", description: "Toggle sidebar" },
-      { key: "Ctrl + M", description: "Toggle theme" },
+      // { key: "Ctrl + M", description: "Toggle theme" },
     ]
 
     return (
@@ -2458,7 +2458,7 @@ export default function YamlEditor({
     <div
       className={cn(isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full")}
     >
-      <ResizablePanelGroup direction="horizontal" className="h-full">
+      <ResizablePanelGroup direction="horizontal" className="h-full rounded-md">
         {!sidebarCollapsed && (
           <ResizablePanel
             defaultSize={sidebarSize}
@@ -2582,7 +2582,7 @@ export default function YamlEditor({
                     </Tooltip>
                   </TooltipProvider>
 
-                  <TooltipProvider>
+                  {/* <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -2600,7 +2600,7 @@ export default function YamlEditor({
                       </TooltipTrigger>
                       <TooltipContent>Validate YAML syntax</TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
+                  </TooltipProvider> */}
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
