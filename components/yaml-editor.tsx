@@ -1305,6 +1305,10 @@ export default function YamlEditor({
         }
 
         if (typeof value === "object" && value !== null) {
+          let required=true
+          const splittedValue=currentPath.split(".")
+          const findIndex= splittedValue.findIndex((el)=> el === "columns")
+          if(findIndex>0 && findIndex+1<splittedValue.length) required=false
           return (
             <div key={currentPath} className="mb-1">
               <div
@@ -1315,13 +1319,13 @@ export default function YamlEditor({
                 data-active={isActive}
                 data-path={currentPath}
               >
-                <div className="flex items-center cursor-pointer">
+                {required && <div className="flex items-center cursor-pointer">
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
-                </div>
+                </div>}
                 {getNodeIcon(key, level)}
                 <div className="flex justify-between w-full">
                   {level === 0 && isEditing && editId === id ? (
@@ -1438,7 +1442,7 @@ export default function YamlEditor({
                   )}
                 </div>
               </div>
-              {isExpanded && (
+              {required && isExpanded && (
                 <div className="pl-6">
                   {renderYamlTree(value, currentPath, level + 1, id)}
                 </div>
