@@ -10,6 +10,7 @@ import React, {
   useState,
   type JSX,
 } from "react"
+import Image from "next/image"
 
 import Editor, { type OnMount } from "@monaco-editor/react"
 import {
@@ -166,6 +167,7 @@ export default function YamlEditor({
   isSaving,
   deleteId,
   isDeletedFlag,
+  setDeleteId,
   metadataType,
   isLoadingYaml,
   isFetchingList,
@@ -175,7 +177,9 @@ export default function YamlEditor({
   metaYamlData,
   getEditorData,
   getidData,
+  customLoader,
 }: {
+  setDeleteId: (value: React.SetStateAction<string>) => void
   isDeletedFlag: boolean
   isSaving: boolean
   deleteId: string
@@ -186,6 +190,7 @@ export default function YamlEditor({
   handleUploadMetadata: () => void
   handleGenerate: () => void
   addMetadata: () => void
+  customLoader: string
   getidData?: (id: string) => void
 
   getEditorData?: (getEditorData: string, id: string) => void
@@ -357,8 +362,8 @@ export default function YamlEditor({
 
   useEffect(() => {
     if (isDeletedFlag) {
-      console.log("here")
       editorRef && editorRef.current && editorRef.current.setValue("")
+      setDeleteId("-1")
     }
   }, [isDeletedFlag])
   useEffect(() => {
@@ -1261,9 +1266,7 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <span className={cn("capitalize", isActive && "font-medium")}>
-                  {key}
-                </span>
+                <span className={cn(isActive && "font-medium")}>{key}</span>
               </div>
               {isExpanded && (
                 <div className="pl-6">
@@ -1354,11 +1357,7 @@ export default function YamlEditor({
                       />
                     </div>
                   ) : (
-                    <span
-                      className={cn("capitalize", isActive && "font-medium")}
-                    >
-                      {key}
-                    </span>
+                    <span className={cn(isActive && "font-medium")}>{key}</span>
                   )}
                   {level === 0 && editId !== id && (
                     <div className="hover:bg-transparent flex gap-2">
@@ -1375,11 +1374,22 @@ export default function YamlEditor({
                         className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
                       />
                       {deleteId === id ? (
-                        <Loader2
-                          size={18}
-                          color="#000000"
-                          className="animate-spin"
-                        />
+                        customLoader ? (
+                          <Image
+                            id="deleting-loader"
+                            className="mb-2 mr-2"
+                            src={customLoader}
+                            width={18}
+                            height={18}
+                            alt="deleting"
+                          />
+                        ) : (
+                          <Loader2
+                            size={18}
+                            color="#000000"
+                            className="animate-spin"
+                          />
+                        )
                       ) : (
                         <AlertDialog>
                           <AlertDialogTrigger
@@ -1460,7 +1470,7 @@ export default function YamlEditor({
             >
               {getNodeIcon(key, level)}
               <span
-                className={`capitalize ${
+                className={`${
                   selectedSection === `${path}.${key}`
                     ? "font-medium text-primary"
                     : ""
@@ -2234,7 +2244,16 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={formatYamlDocument}>
+                <Button
+                  disabled={
+                    editorRef &&
+                    editorRef.current &&
+                    !editorRef.current.getValue().trim()
+                  }
+                  variant="ghost"
+                  size="sm"
+                  onClick={formatYamlDocument}
+                >
                   <FileCode className="h-4 w-4 mr-1" />
                   Format
                 </Button>
@@ -2252,7 +2271,7 @@ export default function YamlEditor({
                     isSaving ||
                     (editorRef &&
                       editorRef.current &&
-                      !editorRef.current.getValue()) ||
+                      editorRef.current.getValue().trim()) ||
                     parseError
                   }
                   variant="ghost"
@@ -2260,7 +2279,18 @@ export default function YamlEditor({
                   onClick={editorData}
                 >
                   {isSaving ? (
-                    <Loader2 size={14} className="mr-1 animate-spin" />
+                    customLoader ? (
+                      <Image
+                        id="saving-loader"
+                        src={customLoader}
+                        width={14}
+                        height={14}
+                        alt="deleting"
+                        className="mr-1 "
+                      />
+                    ) : (
+                      <Loader2 size={14} className="mr-1 animate-spin" />
+                    )
                   ) : (
                     <Save className="h-4 w-4 mr-1" />
                   )}{" "}
@@ -2273,7 +2303,16 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={copyToClipboard}>
+                <Button
+                  disabled={
+                    editorRef &&
+                    editorRef.current &&
+                    !editorRef.current.getValue().trim()
+                  }
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyToClipboard}
+                >
                   <Copy className="h-4 w-4 mr-1" />
                   Copy
                 </Button>
@@ -2536,14 +2575,24 @@ export default function YamlEditor({
                   )
                 })}
                 {isFetchingList && (
-                  <div className="relative flex items-center justify-center bg-background/80 z-50">
+                  <div className="relative flex items-center justify-center z-50">
                     <div className="flex flex-col items-center gap-2">
                       <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                      <Loader2
-                        color="#000000"
-                        size={35}
-                        className="animate-spin"
-                      />
+                      {customLoader ? (
+                        <Image
+                          id="deleting-loader"
+                          src={customLoader}
+                          width={35}
+                          height={35}
+                          alt="deleting"
+                        />
+                      ) : (
+                        <Loader2
+                          size={35}
+                          color="#000000"
+                          className="animate-spin"
+                        />
+                      )}
                     </div>
                   </div>
                 )}
@@ -2577,6 +2626,11 @@ export default function YamlEditor({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
+                          disabled={
+                            editorRef &&
+                            editorRef.current &&
+                            !editorRef.current.getValue().trim()
+                          }
                           variant="outline"
                           size="sm"
                           onClick={formatYamlDocument}
@@ -2621,12 +2675,26 @@ export default function YamlEditor({
                             isSaving ||
                             (editorRef &&
                               editorRef.current &&
-                              !editorRef.current.getValue()) ||
+                              !editorRef.current.getValue().trim()) ||
                             parseError
                           }
                         >
                           {isSaving ? (
-                            <Loader2 size={14} className="mr-1 animate-spin" />
+                            customLoader ? (
+                              <Image
+                                id="deleting-loader"
+                                src={customLoader}
+                                width={14}
+                                height={14}
+                                alt="deleting"
+                                className="mr-1 "
+                              />
+                            ) : (
+                              <Loader2
+                                size={14}
+                                className="mr-1 animate-spin"
+                              />
+                            )
                           ) : (
                             <Save className="h-4 w-4 mr-1" />
                           )}{" "}
@@ -2642,6 +2710,11 @@ export default function YamlEditor({
                         <Button
                           variant="outline"
                           size="sm"
+                          disabled={
+                            editorRef &&
+                            editorRef.current &&
+                            !editorRef.current.getValue().trim()
+                          }
                           onClick={copyToClipboard}
                         >
                           <Copy className="h-4 w-4 mr-1" />
@@ -2738,10 +2811,10 @@ export default function YamlEditor({
               {parseError && (
                 <Alert
                   variant="destructive"
-                  className="w-60 absolute top-4 right-2 z-10 max-h-20 flex flex-wrap break-all"
+                  className="w-60 absolute top-4 right-2 z-10 max-h-20 flex flex-wrap"
                 >
                   <AlertCircle height={20} width={20} className="pb-1" />
-                  <AlertDescription className=" pt-1 font-bold max-w-56">
+                  <AlertDescription className=" pt-1 font-bold max-w-56 break-words">
                     {parseError}
                   </AlertDescription>
                 </Alert>
@@ -2756,11 +2829,21 @@ export default function YamlEditor({
                 <div className="flex-1">
                   <Editor
                     loading={
-                      <Loader2
-                        color="#ffffff"
-                        size={48}
-                        className="animate-spin"
-                      />
+                      customLoader ? (
+                        <Image
+                          id="deleting-loader"
+                          src={customLoader}
+                          width={48}
+                          height={48}
+                          alt="deleting"
+                        />
+                      ) : (
+                        <Loader2
+                          size={48}
+                          color="#ffffff"
+                          className="animate-spin"
+                        />
+                      )
                     }
                     height="100%" // Let the parent handle height
                     defaultLanguage="yaml"
@@ -2827,11 +2910,21 @@ export default function YamlEditor({
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80">
                   <div className="flex flex-col items-center gap-2">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                    customLoader ? (
+                    <Image
+                      id="deleting-loader"
+                      src={customLoader}
+                      width={48}
+                      height={48}
+                      alt="deleting"
+                    />
+                    ) : (
                     <Loader2
-                      color="#000000"
                       size={48}
+                      color="#ffffff"
                       className="animate-spin"
                     />
+                    )
                   </div>
                 </div>
               )}
