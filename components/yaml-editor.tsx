@@ -515,7 +515,7 @@ export default function YamlEditor({
       .then(() => {
         const tempAlert = document.createElement("div")
         tempAlert.className =
-          "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
+          "fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded z-50"
         tempAlert.textContent = "YAML copied to clipboard!"
         document.body.appendChild(tempAlert)
 
@@ -2162,7 +2162,7 @@ export default function YamlEditor({
       { key: "Ctrl + /", description: "Toggle comment" },
       { key: "Ctrl + Space", description: "Trigger suggestions" },
       { key: "Ctrl + B", description: "Toggle sidebar" },
-      { key: "Ctrl + M", description: "Toggle theme" },
+      // { key: "Ctrl + M", description: "Toggle theme" },
     ]
 
     return (
@@ -2458,7 +2458,7 @@ export default function YamlEditor({
     <div
       className={cn(isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full")}
     >
-      <ResizablePanelGroup direction="horizontal" className="h-full">
+      <ResizablePanelGroup direction="horizontal" className="h-full rounded-md">
         {!sidebarCollapsed && (
           <ResizablePanel
             defaultSize={sidebarSize}
@@ -2582,7 +2582,7 @@ export default function YamlEditor({
                     </Tooltip>
                   </TooltipProvider>
 
-                  <TooltipProvider>
+                  {/* <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -2600,7 +2600,7 @@ export default function YamlEditor({
                       </TooltipTrigger>
                       <TooltipContent>Validate YAML syntax</TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
+                  </TooltipProvider> */}
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
