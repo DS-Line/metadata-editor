@@ -53,6 +53,13 @@ import { parse, parseDocument, stringify } from "yaml"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -207,6 +214,7 @@ export default function YamlEditor({
   const [showMinimap, setShowMinimap] = useState<boolean>(true)
   const [wordWrap, setWordWrap] = useState<"on" | "off">("on")
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editorStats, setEditorStats] = useState<EditorStats>({
     lineCount: 0,
     currentLine: 1,
@@ -2481,6 +2489,7 @@ export default function YamlEditor({
                   <h2 className="text-lg font-semibold">YAML Structure</h2>
                   {
                     <MetadataOptions
+                      setDialog={setIsDialogOpen}
                       handleGenerate={handleGenerate}
                       addMetadata={() => {
                         addMetadata()
@@ -2832,6 +2841,40 @@ export default function YamlEditor({
       </ResizablePanelGroup>
 
       {showKeyboardShortcuts && renderKeyboardShortcuts()}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Regenerate Metadata</DialogTitle>
+          </DialogHeader>
+          <p>
+            {
+              "Do you want to regenerate metadata? This will delete all your existing metadata."
+            }
+          </p>
+          <DialogFooter className="gap-2">
+            <Button
+              className="self-center flex justify-center items-center"
+              variant="destructive"
+              onClick={() => {
+                setIsDialogOpen(false)
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              className="self-center flex justify-center items-center"
+              variant="default"
+              onClick={() => {
+                handleGenerate()
+                setIsDialogOpen(false)
+              }}
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
