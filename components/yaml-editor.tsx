@@ -515,7 +515,7 @@ export default function YamlEditor({
       .then(() => {
         const tempAlert = document.createElement("div")
         tempAlert.className =
-          "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
+          "fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded z-50"
         tempAlert.textContent = "YAML copied to clipboard!"
         document.body.appendChild(tempAlert)
 
