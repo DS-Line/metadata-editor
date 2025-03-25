@@ -1361,7 +1361,7 @@ export default function YamlEditor({
                     <span className={cn(isActive && "font-medium")}>{key}</span>
                   )}
                   {level === 0 && editId !== id && (
-                    <div className="hover:bg-transparent flex gap-2">
+                    <div className="hover:bg-transparent flex gap-2 items-center">
                       <SquarePen
                         size={18}
                         onClick={(e) => {
