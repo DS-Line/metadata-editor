@@ -29,12 +29,14 @@ export default function MetadataOptions({
   handleGenerate,
   addMetadata,
   metadataType,
+  setDialog,
 }: {
   menuItems: MenuItems
   handleUploadClick: () => void
   handleGenerate: () => void
   addMetadata: () => void
   metadataType: string
+  setDialog: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   //   const setMetadataStatus = useSetAtom(metadataEditorStatusAtom)
   //   const setMetadataDetails = useSetAtom(metadataDetailsAtom)
@@ -57,7 +59,13 @@ export default function MetadataOptions({
         {menuItems.generate && (
           <DropdownMenuItem
             className="flex flex-row gap-2 mx-[-8px] focus:bg-primary focus:text-white [&>svg]:focus:text-white"
-            onClick={handleGenerate}
+            onClick={() => {
+              if (menuItems.regenerateFlag) {
+                setDialog(true)
+              } else {
+                handleGenerate()
+              }
+            }}
           >
             <CircleArrowDown
               size={18}
