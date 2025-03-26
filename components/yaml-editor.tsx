@@ -2328,7 +2328,12 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={downloadYaml}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={downloadYaml}
+                  className="h-auto"
+                >
                   <Download className="h-4 w-4 mr-1" />
                   Download
                 </Button>
@@ -2342,8 +2347,13 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={exportToJson}>
-                  <FileJson className="h-4 w-4 mr-1" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={exportToJson}
+                  className="h-auto"
+                >
+                  <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
                   Export to JSON
                 </Button>
               </TooltipTrigger>
@@ -2356,8 +2366,13 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={toggleMinimap}>
-                  <Map className="h-4 w-4 mr-1" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleMinimap}
+                  className="h-auto"
+                >
+                  <Map className="h-4 w-4 mr-1 flex-shrink-0" />
                   {showMinimap ? "Hide Minimap" : "Show Minimap"}
                 </Button>
               </TooltipTrigger>
@@ -2370,8 +2385,13 @@ export default function YamlEditor({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" onClick={toggleWordWrap}>
-                  <Wrap className="h-4 w-4 mr-1" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleWordWrap}
+                  className="h-auto"
+                >
+                  <Wrap className="h-4 w-4 mr-1 flex-shrink-0" />
                   {wordWrap === "on" ? "Disable Wrap" : "Enable Wrap"}
                 </Button>
               </TooltipTrigger>
@@ -2390,6 +2410,7 @@ export default function YamlEditor({
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowKeyboardShortcuts(true)}
+                  className="h-auto"
                 >
                   <Keyboard className="h-4 w-4 mr-1" />
                   Shortcuts
