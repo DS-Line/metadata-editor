@@ -281,7 +281,7 @@ export default function YamlEditor({
                   if (editorRef.current) {
                     editorRef.current.deltaDecorations(decorations, [])
                   }
-                }, 5000)
+                }, 1500)
                 setParseError(fileNameErrorMessage)
               }
               return prev
@@ -355,7 +355,7 @@ export default function YamlEditor({
               if (editorRef.current) {
                 editorRef.current.deltaDecorations(decorations, [])
               }
-            }, 5000)
+            }, 1500)
           }
         }
         setParseError(formattedError)
@@ -1367,6 +1367,9 @@ export default function YamlEditor({
                   )}
                   {level === 0 && editId !== id && (
                     <div className="hover:bg-transparent flex gap-2 items-center">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
                       <SquarePen
                         size={18}
                         onClick={(e) => {
@@ -1379,6 +1382,12 @@ export default function YamlEditor({
                         }}
                         className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
                       />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Edit Name
+                        </TooltipContent>
+                       </Tooltip>
+                       </TooltipProvider>
                       {deleteId === id ? (
                         customLoader ? (
                           <Image
@@ -1402,12 +1411,21 @@ export default function YamlEditor({
                             asChild
                             onClick={(e) => e?.stopPropagation()}
                           >
-                            {editId !== id && (
+                            <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                          {editId !== id && (
                               <Trash2
                                 size={18}
                                 className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
                               />
                             )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Delete
+                        </TooltipContent>
+                       </Tooltip>
+                       </TooltipProvider>
                           </AlertDialogTrigger>
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
@@ -2635,21 +2653,32 @@ export default function YamlEditor({
           <div className="flex flex-col h-full">
             {!isFullScreen && (
               <div className="flex items-center h-14 px-4 border-b">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
                 <Button
-                  variant="ghost"
+                  variant="chevron"
                   size="icon"
                   onClick={() => {
                     setSidebarCollapsed(!sidebarCollapsed)
                   }}
-                  className="h-7 w-7"
+                  className="pt-1"
                 >
                   <ChevronRight
-                    className={`h-4 w-4 transition-transform ${
+                  height={18}
+                  width={18}
+                    className={`transition-transform ${
                       !sidebarCollapsed ? "rotate-180" : ""
                     }`}
                   />
                   <span className="sr-only">Toggle Sidebar</span>
                 </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                {sidebarCollapsed ? "Expand": "Collapse"}
+                  </TooltipContent>
+                  </Tooltip>
+                  </TooltipProvider>
                 <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
                 <div className="ml-auto flex gap-2">
                   <TooltipProvider>

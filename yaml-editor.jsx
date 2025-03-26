@@ -161,7 +161,7 @@ export default function YamlEditor() {
             if (editorRef.current) {
               editorRef.current.deltaDecorations(decorations, [])
             }
-          }, 5000)
+          }, 1500)
         }
       }
 
