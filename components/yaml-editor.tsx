@@ -1430,35 +1430,32 @@ export default function YamlEditor({
                         )
                       ) : (
                         <AlertDialog>
-                        <TooltipProvider>
+                                   <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger>
+                          <TooltipTrigger asChild>
                           <AlertDialogTrigger
                             asChild
-                            onClick={(e) => e?.stopPropagation()}
+                            onClick={(e) => {
+                              e?.stopPropagation()
+                            }
+                          }
                           >
-                            <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
+                   
                           {editId !== id && (
                               <Trash2
                                 size={18}
                                 className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
                               />
                             )}
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Delete
-                        </TooltipContent>
-                       </Tooltip>
-                       </TooltipProvider>
+                      
+                       
  
                           </AlertDialogTrigger>
-                          </TooltipTrigger>
-                      <TooltipContent>
+                      </TooltipTrigger>
+                          <TooltipContent>
                         Delete
                         </TooltipContent>
-                       </Tooltip>
+                          </Tooltip>
                        </TooltipProvider>
  
                           <AlertDialogContent
