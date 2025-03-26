@@ -251,7 +251,7 @@ export default function YamlEditor({
               const currKeys = Object.keys(parsed)
               const reqKey = Object.keys(prev)
                 .filter((el) => el !== idData.current)
-                .flatMap((el) => Object.keys(prev[el]))
+                .flatMap((el) => prev[el]!==null?Object.keys(prev[el]):[])
               if (reqKey.includes(currKeys[0])) {
                 throw new Error("Duplicate File Name")
               } else {
@@ -301,7 +301,14 @@ export default function YamlEditor({
             // if (typeof parsed === "object") return [parsed]
             // return []
           })
-        }
+        }else{
+          setMyListOfYamlData((prev) => {
+            if (Object.keys(prev).some(el=> el === idData.current)) {
+              return { ...prev, [idData.current]: null}
+            }
+            return prev
+        })
+      }
 
         // After successful parsing, build the line map
         buildEditorLineMap(yamlString, parsed)
@@ -322,7 +329,6 @@ export default function YamlEditor({
           lineCount: yamlString.split("\n").length,
           fileSize,
         }))
-
         return { valid: true, parsed }
       } catch (error) {
         const errorMessage =
@@ -1424,6 +1430,9 @@ export default function YamlEditor({
                         )
                       ) : (
                         <AlertDialog>
+                        <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
                           <AlertDialogTrigger
                             asChild
                             onClick={(e) => e?.stopPropagation()}
@@ -1443,7 +1452,15 @@ export default function YamlEditor({
                         </TooltipContent>
                        </Tooltip>
                        </TooltipProvider>
+ 
                           </AlertDialogTrigger>
+                          </TooltipTrigger>
+                      <TooltipContent>
+                        Delete
+                        </TooltipContent>
+                       </Tooltip>
+                       </TooltipProvider>
+ 
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
                             className="py-5 text-txt-color-200"
