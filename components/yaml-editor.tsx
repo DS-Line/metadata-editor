@@ -29,9 +29,12 @@ import {
   FileText,
   Folder,
   FolderOpen,
+  FolderTree,
+  GitBranch,
   Globe,
   Keyboard,
   Layers,
+  LineChart,
   Loader2,
   LucideIcon,
   Map,
@@ -56,6 +59,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -140,9 +144,9 @@ export interface Metadata {
 
 // Section icons mapping with fixed icons
 const SECTION_ICONS: SectionIcons = {
-  company: Briefcase,
-  departments: Database,
-  engineering: Code,
+  attributes: GitBranch,
+  source: Database,
+  metrics: LineChart,
   marketing: BarChart3,
   sales: Globe,
   technologies: Layers,
@@ -157,8 +161,8 @@ const SECTION_ICONS: SectionIcons = {
 
 // Level-based icons for tree hierarchy
 const LEVEL_ICONS: LevelIcons = {
-  0: Folder, // Root level
-  1: FolderOpen, // First level
+  0: FolderTree, // Root level
+  1: Folder, // First level
   2: Database, // Second level
   3: FileText, // Third level
   default: File, // Default for any other level
@@ -1206,6 +1210,7 @@ export default function YamlEditor({
 
   // Get icon for a specific node based on its level and type
   const getNodeIcon = useCallback((nodeName: string, level: number) => {
+    console.log(nodeName)
     if (SECTION_ICONS[nodeName]) {
       const IconComponent = SECTION_ICONS[nodeName]
       return <IconComponent className="h-4 w-4" />
@@ -1266,7 +1271,7 @@ export default function YamlEditor({
                     <ChevronRight className="h-4 w-4" />
                   )}
                 </div>
-                {getNodeIcon(key, level)}
+                {getNodeIcon(key, level) && getNodeIcon(key, level)}
                 <span className={cn(isActive && "font-medium")}>{key}</span>
               </div>
               {isExpanded && (
@@ -1419,7 +1424,9 @@ export default function YamlEditor({
                               </AlertDialogTitle>
                               <AlertDialogDescription className="m-0">
                                 <p className="py-4 text-base">
-                                  Are you sure you want to delete the metadata?
+                                  {`Are you sure you want to delete the ${
+                                    metadataType || "metadata"
+                                  }?`}
                                 </p>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
@@ -1438,7 +1445,7 @@ export default function YamlEditor({
                                   </AlertDialogAction>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 </div>
-                                <AlertDialogCancel className="absolute right-2 top-4 border-none">
+                                <AlertDialogCancel className="absolute right-2 top-2 mt-1 border-none">
                                   <X className="h-5 w-5" />
                                 </AlertDialogCancel>
                               </div>
