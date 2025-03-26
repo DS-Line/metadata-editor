@@ -1468,7 +1468,9 @@ export default function YamlEditor({
                             <AlertDialogHeader>
                               <AlertDialogTitle className="flex flex-col">
                                 <p className="text-lg font-semibold pb-4 m-0 ">
-                                  Delete Metadata
+                                  {` Delete ${
+                                    metadataType.toUpperCase() || "Metadata"
+                                  }`}
                                 </p>
                                 <div className="relative">
                                   <hr className="absolute -left-5 -right-5" />
