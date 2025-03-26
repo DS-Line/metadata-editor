@@ -2591,7 +2591,7 @@ export default function YamlEditor({
   attributes:\n 
     # Add your attributes here} `
                         )
-                        idData.current = "60"
+                        idData.current = ""
                       }}
                       menuItems={{
                         regenerateFlag: metaYamlData.length > 0,
