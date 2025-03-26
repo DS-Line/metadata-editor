@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip"
 
 interface MenuItems {
   generate: boolean
@@ -50,15 +51,24 @@ export default function MetadataOptions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="items-center p-2 cursor-pointer">
-        <EllipsisVertical
-          size={18}
-          className="cursor-pointer text-txt-color-300 hover:text-primary outline-none"
-        />
+        <TooltipProvider>
+          <Tooltip>
+          <TooltipTrigger>
+            <EllipsisVertical
+              size={18}
+              className="cursor-pointer text-txt-color-300 hover:text-primary outline-none"
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            More Options
+          </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 [&>*]:px-2 [&>*]:cursor-pointer [&>*]:hover:rounded-none">
         {menuItems.generate && (
           <DropdownMenuItem
-            className="flex flex-row gap-2 mx-[-8px] focus:bg-primary focus:text-white [&>svg]:focus:text-white"
+            className="flex flex-row gap-2 mx-[-8px] focus:bg-accent "
             onClick={() => {
               if (menuItems.regenerateFlag) {
                 setDialog(true)
@@ -80,7 +90,7 @@ export default function MetadataOptions({
         )}
         {menuItems.upload && (
           <DropdownMenuItem
-            className="flex flex-row gap-2 mx-[-8px] focus:bg-primary focus:text-white [&>svg]:focus:text-white"
+            className="flex flex-row gap-2 mx-[-8px] focus:bg-accent"
             onClick={handleUploadClick}
           >
             <CircleArrowUp
@@ -92,7 +102,7 @@ export default function MetadataOptions({
         )}
         {menuItems.addYaml && (
           <DropdownMenuItem
-            className="flex flex-row gap-2 mx-[-8px] focus:bg-primary focus:text-white [&>svg]:focus:text-white"
+            className="flex flex-row gap-2 mx-[-8px] focus:bg-accent"
             onClick={addMetadata}
           >
             <FilePlus
