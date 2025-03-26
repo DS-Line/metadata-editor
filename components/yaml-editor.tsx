@@ -2592,6 +2592,7 @@ export default function YamlEditor({
     # Add your attributes here} `
                         )
                         idData.current = ""
+                        setSelectedSection(null)
                       }}
                       menuItems={{
                         regenerateFlag: metaYamlData.length > 0,
