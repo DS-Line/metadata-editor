@@ -46,6 +46,7 @@ import {
   TypeIcon as type,
   Users,
   WrapTextIcon as Wrap,
+  X,
 } from "lucide-react"
 import type * as monaco from "monaco-editor"
 import { useTheme } from "next-themes"
@@ -1435,9 +1436,10 @@ export default function YamlEditor({
                                   >
                                     Delete
                                   </AlertDialogAction>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 </div>
-                                <AlertDialogCancel className="bg-inherit">
-                                  Cancel
+                                <AlertDialogCancel className="absolute right-2 top-4 border-none">
+                                  <X className="h-5 w-5" />
                                 </AlertDialogCancel>
                               </div>
                             </AlertDialogFooter>
@@ -2271,7 +2273,7 @@ export default function YamlEditor({
                     isSaving ||
                     (editorRef &&
                       editorRef.current &&
-                      editorRef.current.getValue().trim()) ||
+                      !editorRef.current.getValue().trim()) ||
                     parseError
                   }
                   variant="ghost"
