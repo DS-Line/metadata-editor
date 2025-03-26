@@ -301,7 +301,14 @@ export default function YamlEditor({
             // if (typeof parsed === "object") return [parsed]
             // return []
           })
-        }
+        }else{
+          setMyListOfYamlData((prev) => {
+            if (Object.keys(prev).some(el=> el === idData.current)) {
+              return { ...prev, [idData.current]: null}
+            }
+            return prev
+        })
+      }
 
         // After successful parsing, build the line map
         buildEditorLineMap(yamlString, parsed)
@@ -1398,6 +1405,9 @@ export default function YamlEditor({
                         )
                       ) : (
                         <AlertDialog>
+                        <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
                           <AlertDialogTrigger
                             asChild
                             onClick={(e) => e?.stopPropagation()}
@@ -1408,7 +1418,15 @@ export default function YamlEditor({
                                 className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
                               />
                             )}
+ 
                           </AlertDialogTrigger>
+                          </TooltipTrigger>
+                      <TooltipContent>
+                        Delete
+                        </TooltipContent>
+                       </Tooltip>
+                       </TooltipProvider>
+ 
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
                             className="py-5 text-txt-color-200"
