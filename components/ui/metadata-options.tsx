@@ -15,7 +15,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip"
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./tooltip"
 
 interface MenuItems {
   generate: boolean
@@ -53,15 +59,13 @@ export default function MetadataOptions({
       <DropdownMenuTrigger className="items-center p-2 cursor-pointer">
         <TooltipProvider>
           <Tooltip>
-          <TooltipTrigger>
-            <EllipsisVertical
-              size={18}
-              className="cursor-pointer text-txt-color-300 hover:text-primary outline-none"
-            />
-          </TooltipTrigger>
-          <TooltipContent>
-            More Options
-          </TooltipContent>
+            <TooltipTrigger>
+              <EllipsisVertical
+                size={18}
+                className="cursor-pointer text-txt-color-300 hover:text-primary outline-none"
+              />
+            </TooltipTrigger>
+            <TooltipContent>More Options</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </DropdownMenuTrigger>

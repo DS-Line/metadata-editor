@@ -162,9 +162,9 @@ const SECTION_ICONS: SectionIcons = {
 // Level-based icons for tree hierarchy
 const LEVEL_ICONS: LevelIcons = {
   0: FolderTree, // Root level
-  1: Folder, // First level
-  2: Database, // Second level
-  3: FileText, // Third level
+  // 1: Folder, // First level
+  // 2: Database, // Second level
+  // 3: FileText, // Third level
   default: File, // Default for any other level
 }
 
@@ -251,7 +251,9 @@ export default function YamlEditor({
               const currKeys = Object.keys(parsed)
               const reqKey = Object.keys(prev)
                 .filter((el) => el !== idData.current)
-                .flatMap((el) => prev[el]!==null?Object.keys(prev[el]):[])
+                .flatMap((el) =>
+                  prev[el] !== null ? Object.keys(prev[el]) : []
+                )
               if (reqKey.includes(currKeys[0])) {
                 throw new Error("Duplicate File Name")
               } else {
@@ -301,14 +303,14 @@ export default function YamlEditor({
             // if (typeof parsed === "object") return [parsed]
             // return []
           })
-        }else{
+        } else {
           setMyListOfYamlData((prev) => {
-            if (Object.keys(prev).some(el=> el === idData.current)) {
-              return { ...prev, [idData.current]: null}
+            if (Object.keys(prev).some((el) => el === idData.current)) {
+              return { ...prev, [idData.current]: null }
             }
             return prev
-        })
-      }
+          })
+        }
 
         // After successful parsing, build the line map
         buildEditorLineMap(yamlString, parsed)
@@ -374,7 +376,7 @@ export default function YamlEditor({
   useEffect(() => {
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
-      idData.current=""
+      idData.current = ""
       setDeleteId("-1")
     }
   }, [isDeletedFlag])
@@ -404,7 +406,9 @@ export default function YamlEditor({
   // Add effect to handle initial file selection
   useEffect(() => {
     if (metaYamlData && metaYamlData.length > 0 && idData.current) {
-      const selectedFile = metaYamlData.find(file => file.id === idData.current)
+      const selectedFile = metaYamlData.find(
+        (file) => file.id === idData.current
+      )
       if (selectedFile) {
         setSelectedSection(selectedFile.metadata_name)
         // Ensure the editor is focused and the content is visible
@@ -412,8 +416,8 @@ export default function YamlEditor({
     }
   }, [metaYamlData, idData.current])
 
-  useEffect(()=>{
-    if(isEditorReady){
+  useEffect(() => {
+    if (isEditorReady) {
       navigateToSection(selectedSection)
     }
   }, [isEditorReady])
@@ -1238,8 +1242,8 @@ export default function YamlEditor({
       return <IconComponent className="h-4 w-4" />
     }
 
-    const LevelIcon = LEVEL_ICONS[level] || LEVEL_ICONS.default
-    return <LevelIcon className="h-4 w-4" />
+    const LevelIcon = LEVEL_ICONS[level] || null
+    return LevelIcon && <LevelIcon className="h-4 w-4" />
   }, [])
 
   // Recursively render the YAML tree
@@ -1261,7 +1265,7 @@ export default function YamlEditor({
           } else {
             toggleSectionExpansion(currentPath, true) // Expand
           }
-          if(id===idData.current) navigateToSection(currentPath)
+          if (id === idData.current) navigateToSection(currentPath)
           // Navigate to section
           if (id !== idData.current) {
             // Set ID if applicable
@@ -1280,8 +1284,10 @@ export default function YamlEditor({
           return (
             <div key={currentPath} className="mb-1">
               <div
-                className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
-                  isActive ? "bg-primary/15 text-primary font-medium" : ""
+                className={`flex items-center gap-2 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
+                  isActive
+                    ? "bg-primary/15 text-primary font-medium"
+                    : "font-semibold text-txt-color-300"
                 }`}
                 onClick={handleSectionClick}
                 data-active={isActive}
@@ -1295,18 +1301,26 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level) && getNodeIcon(key, level)}
-                <span className={cn(isActive && "font-medium")}>{key}</span>
+                <span
+                  className={cn(
+                    isActive
+                      ? "font-semibold"
+                      : "font-medium text-txt-color-300"
+                  )}
+                >
+                  {key}
+                </span>
               </div>
               {isExpanded && (
-                <div className="pl-6">
+                <div className="pl-4">
                   <ul className="space-y-1">
                     {value.map((item: any, index: number) => (
                       <li key={`${currentPath}-${index}`}>
                         <div
-                          className={`flex items-center gap-2 pl-2 py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${
+                          className={`flex items-center gap-2 pl-4 py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${
                             selectedSection === `${currentPath}[${index}]`
-                              ? "bg-primary/15 text-primary font-medium"
-                              : ""
+                              ? "bg-primary/15 text-primary font-semibold"
+                              : "font-medium text-txt-color-300"
                           }`}
                           data-active={
                             selectedSection === `${currentPath}[${index}]`
@@ -1318,8 +1332,8 @@ export default function YamlEditor({
                           <span
                             className={`truncate ${
                               selectedSection === `${currentPath}[${index}]`
-                                ? "text-primary font-medium"
-                                : "text-muted-foreground"
+                                ? "text-primary font-semibold"
+                                : " font-medium text-txt-color-300"
                             }`}
                           >
                             {typeof item === "string"
@@ -1338,10 +1352,12 @@ export default function YamlEditor({
 
         if (typeof value === "object" && value !== null) {
           return (
-            <div key={currentPath} className="mb-1">
+            <div key={currentPath} className="">
               <div
-                className={`flex items-center gap-2 cursor-pointer p-2 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
-                  isActive ? "bg-primary/15 text-primary font-medium" : ""
+                className={`flex items-center gap-2 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
+                  isActive
+                    ? "bg-primary/15 text-primary font-semibold"
+                    : "font-medium text-txt-color-300"
                 }`}
                 onClick={handleSectionClick}
                 data-active={isActive}
@@ -1355,7 +1371,7 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <div className="flex justify-between w-full">
+                <div className={cn("flex justify-between w-full")}>
                   {level === 0 && isEditing && editId === id ? (
                     <div
                       onClick={(e) => {
@@ -1366,6 +1382,7 @@ export default function YamlEditor({
                     >
                       {" "}
                       <input
+                        className="flex h-6 mt-[1px] w-full rounded-sm bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-txt-color-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         ref={inputRef}
                         autoFocus={true}
                         defaultValue={key}
@@ -1386,31 +1403,41 @@ export default function YamlEditor({
                       />
                     </div>
                   ) : (
-                    <span className={cn(isActive && "font-medium")}>{key}</span>
+                    <span
+                      style={{
+                        maxWidth: "214px",
+                      }}
+                      className={cn(
+                        isActive
+                          ? "font-semibold"
+                          : "font-medium text-txt-color-300",
+                        "truncate whitespace-nowrap overflow-hidden"
+                      )}
+                    >
+                      {key}
+                    </span>
                   )}
                   {level === 0 && editId !== id && (
                     <div className="hover:bg-transparent flex gap-2 items-center">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                      <SquarePen
-                        size={18}
-                        onClick={(e) => {
-                          // e.stopPropagation()
-                          // e.preventDefault()
-                          // setisEditing(true)
-                          setEditId(id)
-                          inputRef.current?.focus()
-                          inputRef.current?.select()
-                        }}
-                        className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
-                      />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Edit Name
-                        </TooltipContent>
-                       </Tooltip>
-                       </TooltipProvider>
+                            <SquarePen
+                              size={18}
+                              onClick={(e) => {
+                                // e.stopPropagation()
+                                // e.preventDefault()
+                                // setisEditing(true)
+                                setEditId(id)
+                                inputRef.current?.focus()
+                                inputRef.current?.select()
+                              }}
+                              className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>Edit Name</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       {deleteId === id ? (
                         customLoader ? (
                           <Image
@@ -1430,34 +1457,27 @@ export default function YamlEditor({
                         )
                       ) : (
                         <AlertDialog>
-                                   <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                          <AlertDialogTrigger
-                            asChild
-                            onClick={(e) => {
-                              e?.stopPropagation()
-                            }
-                          }
-                          >
-                   
-                          {editId !== id && (
-                              <Trash2
-                                size={18}
-                                className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
-                              />
-                            )}
-                      
-                       
- 
-                          </AlertDialogTrigger>
-                      </TooltipTrigger>
-                          <TooltipContent>
-                        Delete
-                        </TooltipContent>
-                          </Tooltip>
-                       </TooltipProvider>
- 
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <AlertDialogTrigger
+                                  asChild
+                                  onClick={(e) => {
+                                    e?.stopPropagation()
+                                  }}
+                                >
+                                  {editId !== id && (
+                                    <Trash2
+                                      size={18}
+                                      className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
+                                    />
+                                  )}
+                                </AlertDialogTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent>Delete</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
                             className="py-5 text-txt-color-200"
@@ -1509,7 +1529,7 @@ export default function YamlEditor({
                 </div>
               </div>
               {isExpanded && (
-                <div className="pl-6">
+                <div className="pl-4">
                   {renderYamlTree(value, currentPath, level + 1, id)}
                 </div>
               )}
@@ -1519,11 +1539,11 @@ export default function YamlEditor({
 
         // Handle primitive values (strings, numbers, etc.)
         return (
-          <div key={currentPath} className="mb-1">
+          <div key={currentPath} className="mb-0">
             <div
               className={`flex items-center gap-2 ${
-                level > 0 ? "pl-" + level * 4 : ""
-              } py-1.5 my-0.5 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer`}
+                level > 0 ? "pl-" + level * 1 : ""
+              } py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer`}
               data-active={selectedSection === `${path}.${key}`}
               data-path={`${path}.${key}`}
               onClick={handleSectionClick}
@@ -1532,8 +1552,8 @@ export default function YamlEditor({
               <span
                 className={`${
                   selectedSection === `${path}.${key}`
-                    ? "font-medium text-primary"
-                    : ""
+                    ? "font-semibold text-primary"
+                    : "font-medium text-txt-color-300"
                 }`}
               >
                 {key}:
@@ -2615,8 +2635,10 @@ export default function YamlEditor({
                       handleGenerate={handleGenerate}
                       addMetadata={() => {
                         addMetadata()
-                        editorRef && editorRef.current && editorRef.current.setValue(
-                          `Metadata_new${Date.now()}:\n  sources:\n 
+                        editorRef &&
+                          editorRef.current &&
+                          editorRef.current.setValue(
+                            `Metadata_new${Date.now()}:\n  sources:\n 
     # Add your sources here\n
   hierarchies:\n 
     # Add your hierarchies here\n
@@ -2624,7 +2646,7 @@ export default function YamlEditor({
     # Add your metrics here\n
   attributes:\n 
     # Add your attributes here} `
-                        )
+                          )
                         idData.current = ""
                         setSelectedSection(null)
                       }}
@@ -2692,29 +2714,29 @@ export default function YamlEditor({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                <Button
-                  variant="chevron"
-                  size="icon"
-                  onClick={() => {
-                    setSidebarCollapsed(!sidebarCollapsed)
-                  }}
-                  className="pt-1"
-                >
-                  <ChevronRight
-                  height={18}
-                  width={18}
-                    className={`transition-transform ${
-                      !sidebarCollapsed ? "rotate-180" : ""
-                    }`}
-                  />
-                  <span className="sr-only">Toggle Sidebar</span>
-                </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                {sidebarCollapsed ? "Expand": "Collapse"}
-                  </TooltipContent>
+                      <Button
+                        variant="chevron"
+                        size="icon"
+                        onClick={() => {
+                          setSidebarCollapsed(!sidebarCollapsed)
+                        }}
+                        className="pt-1"
+                      >
+                        <ChevronRight
+                          height={18}
+                          width={18}
+                          className={`transition-transform ${
+                            !sidebarCollapsed ? "rotate-180" : ""
+                          }`}
+                        />
+                        <span className="sr-only">Toggle Sidebar</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {sidebarCollapsed ? "Expand" : "Collapse"}
+                    </TooltipContent>
                   </Tooltip>
-                  </TooltipProvider>
+                </TooltipProvider>
                 <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
                 <div className="ml-auto flex gap-2">
                   <TooltipProvider>
@@ -2900,128 +2922,131 @@ export default function YamlEditor({
               </div>
             )}
 
-            {idData.current !== "" ? <div className="flex-1 relative flex flex-col">
-              {isFullScreen && renderEditorToolbar()}
+            {idData.current !== "" ? (
+              <div className="flex-1 relative flex flex-col">
+                {isFullScreen && renderEditorToolbar()}
 
-              {parseError && (
-                <Alert
-                  variant="destructive"
-                  className="w-60 absolute top-4 right-2 z-10 max-h-20 flex flex-wrap"
-                >
-                  <AlertCircle height={20} width={20} className="pb-1" />
-                  <AlertDescription className=" pt-1 font-bold max-w-56 break-words">
-                    {parseError}
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <div
-                className={cn(
-                  isFullScreen ? "editor-container-full" : "editor-container",
-                  "flex flex-col h-full"
+                {parseError && (
+                  <Alert
+                    variant="destructive"
+                    className="w-60 absolute top-4 right-2 z-10 max-h-20 flex flex-wrap"
+                  >
+                    <AlertCircle height={20} width={20} className="pb-1" />
+                    <AlertDescription className=" pt-1 font-bold max-w-56 break-words">
+                      {parseError}
+                    </AlertDescription>
+                  </Alert>
                 )}
-              >
-                <div className="flex-1">
-                  <Editor
-                    height="100%" // Let the parent handle height
-                    defaultLanguage="yaml"
-                    defaultValue={yamlData}
-                    theme={themeData === "dark" ? "vs-dark" : "vs-light"}
-                    onMount={handleEditorDidMount}
-                    options={{
-                      minimap: { enabled: showMinimap },
-                      lineNumbers: "on",
-                      scrollBeyondLastLine: false,
-                      automaticLayout: true,
-                      wordWrap: wordWrap,
-                      formatOnPaste: true,
-                      formatOnType: true,
-                      folding: true,
-                      foldingStrategy: "indentation",
-                      renderLineHighlight: "all",
-                      renderWhitespace: "boundary",
-                      suggestOnTriggerCharacters: true,
-                      quickSuggestions: true,
-                      acceptSuggestionOnEnter: "on",
-                      cursorBlinking: "smooth",
-                      cursorSmoothCaretAnimation: "on",
-                      smoothScrolling: true,
-                      contextmenu: true,
-                      mouseWheelZoom: true,
-                      bracketPairColorization: { enabled: true },
-                      guides: { bracketPairs: true },
-                      glyphMargin: true,
-                      fixedOverflowWidgets: true,
-                      selectOnLineNumbers: true,
-                      lightbulb: { enabled: true },
-                      colorDecorators: true,
-                      semanticHighlighting: { enabled: true },
-                      linkedEditing: true,
-                      codeLens: true,
-                      fontLigatures: true,
-                      fontFamily: "'Fira Code', 'Droid Sans Mono', 'monospace'",
-                      fontSize: 14,
-                      lineHeight: 22,
-                      padding: { top: 10, bottom: 10 },
-                      scrollbar: {
-                        verticalScrollbarSize: 12,
-                        horizontalScrollbarSize: 12,
-                        verticalSliderSize: 12,
-                        horizontalSliderSize: 12,
-                        verticalHasArrows: false,
-                        horizontalHasArrows: false,
-                        arrowSize: 15,
-                        useShadows: true,
-                      },
-                      find: { addExtraSpaceOnTop: false },
-                    }}
-                  />
-                </div>
 
-                {/* Status Bar - Fixed at the Bottom */}
-                <div className="status-bar bg-gray-100 text-sm p-2 border-t">
-                  {renderStatusBar()}
-                </div>
-              </div>
+                <div
+                  className={cn(
+                    isFullScreen ? "editor-container-full" : "editor-container",
+                    "flex flex-col h-full"
+                  )}
+                >
+                  <div className="flex-1">
+                    <Editor
+                      height="100%" // Let the parent handle height
+                      defaultLanguage="yaml"
+                      defaultValue={yamlData}
+                      theme={themeData === "dark" ? "vs-dark" : "vs-light"}
+                      onMount={handleEditorDidMount}
+                      options={{
+                        minimap: { enabled: showMinimap },
+                        lineNumbers: "on",
+                        scrollBeyondLastLine: false,
+                        automaticLayout: true,
+                        wordWrap: wordWrap,
+                        formatOnPaste: true,
+                        formatOnType: true,
+                        folding: true,
+                        foldingStrategy: "indentation",
+                        renderLineHighlight: "all",
+                        renderWhitespace: "boundary",
+                        suggestOnTriggerCharacters: true,
+                        quickSuggestions: true,
+                        acceptSuggestionOnEnter: "on",
+                        cursorBlinking: "smooth",
+                        cursorSmoothCaretAnimation: "on",
+                        smoothScrolling: true,
+                        contextmenu: true,
+                        mouseWheelZoom: true,
+                        bracketPairColorization: { enabled: true },
+                        guides: { bracketPairs: true },
+                        glyphMargin: true,
+                        fixedOverflowWidgets: true,
+                        selectOnLineNumbers: true,
+                        lightbulb: { enabled: true },
+                        colorDecorators: true,
+                        semanticHighlighting: { enabled: true },
+                        linkedEditing: true,
+                        codeLens: true,
+                        fontLigatures: true,
+                        fontFamily:
+                          "'Fira Code', 'Droid Sans Mono', 'monospace'",
+                        fontSize: 14,
+                        lineHeight: 22,
+                        padding: { top: 10, bottom: 10 },
+                        scrollbar: {
+                          verticalScrollbarSize: 12,
+                          horizontalScrollbarSize: 12,
+                          verticalSliderSize: 12,
+                          horizontalSliderSize: 12,
+                          verticalHasArrows: false,
+                          horizontalHasArrows: false,
+                          arrowSize: 15,
+                          useShadows: true,
+                        },
+                        find: { addExtraSpaceOnTop: false },
+                      }}
+                    />
+                  </div>
 
-              {(!isEditorReady || isLoadingYaml) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                    {customLoader ? (
-                    <Image
-                      id="deleting-loader"
-                      src={customLoader}
-                      width={48}
-                      height={48}
-                      alt="deleting"
-                    />
-                    ) : (
-                    <Loader2
-                      size={48}
-                      color="#ffffff"
-                      className="animate-spin"
-                    />
-                    )}
+                  {/* Status Bar - Fixed at the Bottom */}
+                  <div className="status-bar bg-gray-100 text-sm p-2 border-t">
+                    {renderStatusBar()}
                   </div>
                 </div>
-              )}
-            </div>:
-            <div className="grow flex flex-col justify-center items-center">
-            <Image
-              key="metrics-editor-empty-state"
-              src="/images/empty-file-state.svg"
-              width={150}
-              height={150}
-              alt="Empty"
-            />
-            <p>
-              {metaYamlData.length === 0
-                ? "No Metrics available at this moment"
-                : "No Metrics selected at this moment"}
-            </p>
-          </div> 
-          }
+
+                {(!isEditorReady || isLoadingYaml) && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                      {customLoader ? (
+                        <Image
+                          id="deleting-loader"
+                          src={customLoader}
+                          width={48}
+                          height={48}
+                          alt="deleting"
+                        />
+                      ) : (
+                        <Loader2
+                          size={48}
+                          color="#ffffff"
+                          className="animate-spin"
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="grow flex flex-col justify-center items-center">
+                <Image
+                  key="metrics-editor-empty-state"
+                  src="/images/empty-file-state.svg"
+                  width={150}
+                  height={150}
+                  alt="Empty"
+                />
+                <p>
+                  {metaYamlData.length === 0
+                    ? "No Metrics available at this moment"
+                    : "No Metrics selected at this moment"}
+                </p>
+              </div>
+            )}
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -3037,7 +3062,7 @@ export default function YamlEditor({
               "Do you want to regenerate metadata? This will delete all your existing metadata."
             }
           </p>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-4">
             <Button
               className="self-center flex justify-center items-center"
               variant="destructive"
