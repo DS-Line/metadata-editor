@@ -251,7 +251,7 @@ export default function YamlEditor({
               const currKeys = Object.keys(parsed)
               const reqKey = Object.keys(prev)
                 .filter((el) => el !== idData.current)
-                .flatMap((el) => Object.keys(prev[el]))
+                .flatMap((el) => prev[el]!==null?Object.keys(prev[el]):[])
               if (reqKey.includes(currKeys[0])) {
                 throw new Error("Duplicate File Name")
               } else {
@@ -281,7 +281,7 @@ export default function YamlEditor({
                   if (editorRef.current) {
                     editorRef.current.deltaDecorations(decorations, [])
                   }
-                }, 5000)
+                }, 1500)
                 setParseError(fileNameErrorMessage)
               }
               return prev
@@ -329,7 +329,6 @@ export default function YamlEditor({
           lineCount: yamlString.split("\n").length,
           fileSize,
         }))
-
         return { valid: true, parsed }
       } catch (error) {
         const errorMessage =
@@ -362,7 +361,7 @@ export default function YamlEditor({
               if (editorRef.current) {
                 editorRef.current.deltaDecorations(decorations, [])
               }
-            }, 5000)
+            }, 1500)
           }
         }
         setParseError(formattedError)
@@ -375,6 +374,7 @@ export default function YamlEditor({
   useEffect(() => {
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
+      idData.current=""
       setDeleteId("-1")
     }
   }, [isDeletedFlag])
@@ -394,28 +394,44 @@ export default function YamlEditor({
         requiredObject[metaYamlData[index].id] = el
       })
       setMyListOfYamlData(requiredObject)
-      setYamlData(yamlFolders[0] || "")
     } else {
       setMyListOfYamlData({})
       setYamlData("")
+      setSelectedSection(null)
     }
   }, [metaYamlData])
 
+  // Add effect to handle initial file selection
   useEffect(() => {
-    validateYaml(yamlData)
-    metaYamlData &&
-      metaYamlData.length &&
-      editorRef &&
-      editorRef.current &&
-      editorRef.current.setValue(
-        metaYamlData.map(
-          (data) =>
-            `${data?.metadata_name}:\n  ${
-              data?.content?.replaceAll("\n", "\n  ") || ""
-            }`
-        )[0]
-      )
-  }, [yamlData])
+    if (metaYamlData && metaYamlData.length > 0 && idData.current) {
+      const selectedFile = metaYamlData.find(file => file.id === idData.current)
+      if (selectedFile) {
+        setSelectedSection(selectedFile.metadata_name)
+        // Ensure the editor is focused and the content is visible
+      }
+    }
+  }, [metaYamlData, idData.current])
+
+  useEffect(()=>{
+    if(isEditorReady){
+      navigateToSection(selectedSection)
+    }
+  }, [isEditorReady])
+  // useEffect(() => {
+  //   validateYaml(yamlData)
+  //   metaYamlData &&
+  //     metaYamlData.length &&
+  //     editorRef &&
+  //     editorRef.current &&
+  //     editorRef.current.setValue(
+  //       metaYamlData.map(
+  //         (data) =>
+  //           `${data?.metadata_name}:\n  ${
+  //             data?.content?.replaceAll("\n", "\n  ") || ""
+  //           }`
+  //       )[0]
+  //     )
+  // }, [yamlData])
 
   // Build a map of line numbers to YAML paths
   const buildEditorLineMap = useCallback(
@@ -512,7 +528,6 @@ export default function YamlEditor({
       const formatted = stringify(parsed)
 
       const position = editorRef.current.getPosition()
-
       editorRef.current.setValue(formatted)
 
       if (position) {
@@ -1246,9 +1261,8 @@ export default function YamlEditor({
           } else {
             toggleSectionExpansion(currentPath, true) // Expand
           }
-
+          if(id===idData.current) navigateToSection(currentPath)
           // Navigate to section
-          navigateToSection(currentPath)
           if (id !== idData.current) {
             // Set ID if applicable
             idData.current = id
@@ -1256,7 +1270,9 @@ export default function YamlEditor({
             const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
               requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
             }`
+            setYamlData(requiredValue)
             editorRef.current && editorRef.current.setValue(requiredValue)
+            navigateToSection(currentPath)
           }
         }
 
@@ -1374,6 +1390,9 @@ export default function YamlEditor({
                   )}
                   {level === 0 && editId !== id && (
                     <div className="hover:bg-transparent flex gap-2 items-center">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
                       <SquarePen
                         size={18}
                         onClick={(e) => {
@@ -1386,6 +1405,12 @@ export default function YamlEditor({
                         }}
                         className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
                       />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Edit Name
+                        </TooltipContent>
+                       </Tooltip>
+                       </TooltipProvider>
                       {deleteId === id ? (
                         customLoader ? (
                           <Image
@@ -1412,12 +1437,21 @@ export default function YamlEditor({
                             asChild
                             onClick={(e) => e?.stopPropagation()}
                           >
-                            {editId !== id && (
+                            <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                          {editId !== id && (
                               <Trash2
                                 size={18}
                                 className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
                               />
                             )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Delete
+                        </TooltipContent>
+                       </Tooltip>
+                       </TooltipProvider>
  
                           </AlertDialogTrigger>
                           </TooltipTrigger>
@@ -1520,6 +1554,8 @@ export default function YamlEditor({
       })
     },
     [
+      metaYamlData,
+      yamlData,
       expandedSections,
       selectedSection,
       navigateToSection,
@@ -2170,26 +2206,26 @@ export default function YamlEditor({
 
     setIsEditorReady(true)
   }
-  useEffect(() => {
-    if (metaYamlData && metaYamlData.length > 0) {
-      idData.current = metaYamlData[0].id
-      editorRef &&
-        editorRef.current &&
-        editorRef.current.setValue(
-          `${metaYamlData[0]?.metadata_name}:\n  ${
-            metaYamlData[0]?.content?.replaceAll("\n", "\n  ") || ""
-          }`
-        )
-      formatYamlDocument()
-    }
-  }, [isEditorReady, metaYamlData])
-  useEffect(() => {
-    if (metaYamlData && metaYamlData.length > 0) {
-      const requiredSection = metaYamlData.filter((el) => el.id === idData)
-      if (requiredSection.length)
-        setSelectedSection(requiredSection[0].metadata_name)
-    }
-  }, [idData, isEditorReady])
+  // useEffect(() => {
+  //   if (metaYamlData && metaYamlData.length > 0) {
+  //     idData.current = metaYamlData[0].id
+  //     editorRef &&
+  //       editorRef.current &&
+  //       editorRef.current.setValue(
+  //         `${metaYamlData[0]?.metadata_name}:\n  ${
+  //           metaYamlData[0]?.content?.replaceAll("\n", "\n  ") || ""
+  //         }`
+  //       )
+  //     formatYamlDocument()
+  //   }
+  // }, [isEditorReady, metaYamlData])
+  // useEffect(() => {
+  //   if (metaYamlData && metaYamlData.length > 0) {
+  //     const requiredSection = metaYamlData.filter((el) => el.id === idData)
+  //     if (requiredSection.length)
+  //       setSelectedSection(requiredSection[0].metadata_name)
+  //   }
+  // }, [idData, isEditorReady])
 
   // Render keyboard shortcuts modal
   const renderKeyboardShortcuts = () => {
@@ -2580,7 +2616,7 @@ export default function YamlEditor({
                       handleGenerate={handleGenerate}
                       addMetadata={() => {
                         addMetadata()
-                        editorRef.current.setValue(
+                        editorRef && editorRef.current && editorRef.current.setValue(
                           `Metadata_new${Date.now()}:\n  sources:\n 
     # Add your sources here\n
   hierarchies:\n 
@@ -2591,6 +2627,7 @@ export default function YamlEditor({
     # Add your attributes here} `
                         )
                         idData.current = ""
+                        setSelectedSection(null)
                       }}
                       menuItems={{
                         regenerateFlag: metaYamlData.length > 0,
@@ -2653,21 +2690,32 @@ export default function YamlEditor({
           <div className="flex flex-col h-full">
             {!isFullScreen && (
               <div className="flex items-center h-14 px-4 border-b">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
                 <Button
-                  variant="ghost"
+                  variant="chevron"
                   size="icon"
                   onClick={() => {
                     setSidebarCollapsed(!sidebarCollapsed)
                   }}
-                  className="h-7 w-7"
+                  className="pt-1"
                 >
                   <ChevronRight
-                    className={`h-4 w-4 transition-transform ${
+                  height={18}
+                  width={18}
+                    className={`transition-transform ${
                       !sidebarCollapsed ? "rotate-180" : ""
                     }`}
                   />
                   <span className="sr-only">Toggle Sidebar</span>
                 </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                {sidebarCollapsed ? "Expand": "Collapse"}
+                  </TooltipContent>
+                  </Tooltip>
+                  </TooltipProvider>
                 <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
                 <div className="ml-auto flex gap-2">
                   <TooltipProvider>
@@ -2853,7 +2901,7 @@ export default function YamlEditor({
               </div>
             )}
 
-            <div className="flex-1 relative flex flex-col">
+            {idData.current !== "" ? <div className="flex-1 relative flex flex-col">
               {isFullScreen && renderEditorToolbar()}
 
               {parseError && (
@@ -2876,23 +2924,6 @@ export default function YamlEditor({
               >
                 <div className="flex-1">
                   <Editor
-                    loading={
-                      customLoader ? (
-                        <Image
-                          id="deleting-loader"
-                          src={customLoader}
-                          width={48}
-                          height={48}
-                          alt="deleting"
-                        />
-                      ) : (
-                        <Loader2
-                          size={48}
-                          color="#ffffff"
-                          className="animate-spin"
-                        />
-                      )
-                    }
                     height="100%" // Let the parent handle height
                     defaultLanguage="yaml"
                     defaultValue={yamlData}
@@ -2958,7 +2989,7 @@ export default function YamlEditor({
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80">
                   <div className="flex flex-col items-center gap-2">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                    customLoader ? (
+                    {customLoader ? (
                     <Image
                       id="deleting-loader"
                       src={customLoader}
@@ -2972,11 +3003,26 @@ export default function YamlEditor({
                       color="#ffffff"
                       className="animate-spin"
                     />
-                    )
+                    )}
                   </div>
                 </div>
               )}
-            </div>
+            </div>:
+            <div className="grow flex flex-col justify-center items-center">
+            <Image
+              key="metrics-editor-empty-state"
+              src="/images/empty-file-state.svg"
+              width={150}
+              height={150}
+              alt="Empty"
+            />
+            <p>
+              {metaYamlData.length === 0
+                ? "No Metrics available at this moment"
+                : "No Metrics selected at this moment"}
+            </p>
+          </div> 
+          }
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
