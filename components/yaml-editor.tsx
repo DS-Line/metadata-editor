@@ -258,7 +258,7 @@ export default function YamlEditor({
                 throw new Error("Duplicate File Name")
               } else {
                 const requiredObj = { ...prev }
-                requiredObj[idData.current] = parsed
+                requiredObj[idData.current] = typeof parsed ==="string"?{[parsed]:{}}:parsed
                 return requiredObj
               }
             } catch (error) {
@@ -306,7 +306,7 @@ export default function YamlEditor({
         } else {
           setMyListOfYamlData((prev) => {
             if (Object.keys(prev).some((el) => el === idData.current)) {
-              return { ...prev, [idData.current]: null }
+              return { ...prev, [idData.current]: {"":{}} }
             }
             return prev
           })
@@ -1239,12 +1239,16 @@ export default function YamlEditor({
     console.log(nodeName)
     if (SECTION_ICONS[nodeName]) {
       const IconComponent = SECTION_ICONS[nodeName]
-      return <IconComponent className="h-4 w-4" />
+      return <IconComponent className="h-4 w-4 shrink-0" />
     }
 
     const LevelIcon = LEVEL_ICONS[level] || null
-    return LevelIcon && <LevelIcon className="h-4 w-4" />
+    return LevelIcon && <LevelIcon className="h-4 w-4 shrink-0" />
   }, [])
+
+  const EditComponent = useCallback(()=>{
+
+  },[editId])
 
   // Recursively render the YAML tree
   const renderYamlTree = useCallback(
@@ -1382,7 +1386,7 @@ export default function YamlEditor({
                     >
                       {" "}
                       <input
-                        className="flex h-6 mt-[1px] w-full rounded-sm bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-txt-color-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-6 mt-[1px] w-full rounded-sm bg-transparent px-2 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-txt-color-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         ref={inputRef}
                         autoFocus={true}
                         defaultValue={key}
@@ -1403,22 +1407,29 @@ export default function YamlEditor({
                       />
                     </div>
                   ) : (
+                    <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
                     <span
-                      style={{
-                        maxWidth: "214px",
-                      }}
+                      // style={{
+                      //   maxWidth: "200px",
+                      // }}
                       className={cn(
                         isActive
                           ? "font-semibold"
                           : "font-medium text-txt-color-300",
-                        "truncate whitespace-nowrap overflow-hidden"
+                        "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px]"
                       )}
                     >
                       {key}
                     </span>
+                    </TooltipTrigger>
+                    <TooltipContent>{key}</TooltipContent>
+                    </Tooltip>
+                    </TooltipProvider>
                   )}
                   {level === 0 && editId !== id && (
-                    <div className="hover:bg-transparent flex gap-2 items-center">
+                    <div className="hover:bg-transparent flex gap-2 items-center shrink-0">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
@@ -1428,9 +1439,9 @@ export default function YamlEditor({
                                 // e.stopPropagation()
                                 // e.preventDefault()
                                 // setisEditing(true)
-                                setEditId(id)
                                 inputRef.current?.focus()
                                 inputRef.current?.select()
+                                setEditId(id)
                               }}
                               className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
                             />
@@ -1903,7 +1914,7 @@ export default function YamlEditor({
 .yaml-structure-content {
   flex-grow: 1;
     max-height: calc(100dvh - 256px); /* Adjust height dynamically */
-
+  max-width: 100%;
   overflow-y: auto;
 }
   
