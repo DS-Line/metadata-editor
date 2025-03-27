@@ -673,7 +673,6 @@ export default function YamlEditor({
   // Toggle section expansion in the tree view
   const toggleSectionExpansion = useCallback(
     (section: string, expand: boolean) => {
-      console.log(section, expand)
       setExpandedSections((prev) => {
         const newSet = new Set([...prev])
         if (!expand) {
@@ -1267,7 +1266,6 @@ export default function YamlEditor({
         const handleSectionClick = (e: React.MouseEvent) => {
           e.preventDefault()
           e.stopPropagation()
-          console.log(isExpanded)
           // Toggle section expansion if clicking on the same section
           if (isExpanded) {
             toggleSectionExpansion(currentPath, false) // Collapse
