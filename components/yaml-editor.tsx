@@ -869,7 +869,6 @@ export default function YamlEditor({
       const lineNumbers = Object.keys(editorLineMap)
         .map(Number)
         .sort((a, b) => a - b)
-
       let closestLine = -1
       for (const line of lineNumbers) {
         if (line <= position.lineNumber && line > closestLine) {
@@ -993,7 +992,7 @@ export default function YamlEditor({
 
       return findPathToKey(parsedYaml, key)
     },
-    [editorLineMap, parsedYaml, findSectionRange]
+    [editorLineMap, parsedYaml, findSectionRange, isEditorReady, idData.current, editorRef.current]
   )
 
   // Scroll the sidebar to make the selected item visible
@@ -1127,7 +1126,6 @@ export default function YamlEditor({
     (position: Position | null) => {
       if (parseError) return
       if (!editorRef.current || !position) return
-
       const path = findPathForPosition(position)
       if (!path) return
 
@@ -1213,6 +1211,8 @@ export default function YamlEditor({
       setExpandedSections,
       setSelectedSection,
       sidebarCollapsed,
+      idData.current,
+      isEditorReady
     ]
   )
 
@@ -1233,7 +1233,6 @@ export default function YamlEditor({
 
   // Get icon for a specific node based on its level and type
   const getNodeIcon = useCallback((nodeName: string, level: number) => {
-    console.log(nodeName)
     if (SECTION_ICONS[nodeName]) {
       const IconComponent = SECTION_ICONS[nodeName]
       return <IconComponent className="h-4 w-4 shrink-0" />
@@ -1243,9 +1242,6 @@ export default function YamlEditor({
     return LevelIcon && <LevelIcon className="h-4 w-4 shrink-0" />
   }, [])
 
-  const EditComponent = useCallback(() => {
-
-  }, [editId])
 
   // Recursively render the YAML tree
   const renderYamlTree = useCallback(
@@ -1433,7 +1429,12 @@ export default function YamlEditor({
                                 // setisEditing(true)
                                 inputRef.current?.focus()
                                 inputRef.current?.select()
-                                setEditId(id)
+                                // should refactor later
+                                if(isEditorReady){
+                                  setEditId(id)
+                                }else{
+                                  setTimeout(()=> setEditId(id), 500)
+                                }
                               }}
                               className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
                             />
@@ -2336,7 +2337,7 @@ export default function YamlEditor({
     return (
       <div className="editor-toolbar">
         <div className="toolbar-group">
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -2357,7 +2358,7 @@ export default function YamlEditor({
                 Format YAML document (Shift + Alt + F)
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -2495,7 +2496,7 @@ export default function YamlEditor({
           </TooltipProvider>
         </div>
 
-        <div className="toolbar-group">
+        {/* <div className="toolbar-group">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -2514,7 +2515,7 @@ export default function YamlEditor({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
+        </div> */}
 
         <div className="ml-auto flex items-center gap-2">
           <TooltipProvider>
@@ -2750,7 +2751,23 @@ export default function YamlEditor({
                 </TooltipProvider>
                 <h2 className="ml-2 text-lg font-medium text-primary">YAML Editor</h2>
                 <div className="ml-auto flex gap-2">
-                  <TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exportToJson}
+                  className="h-auto"
+                >
+                  <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
+                  Export to JSON
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Export YAML as JSON</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+                  {/* <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -2771,7 +2788,7 @@ export default function YamlEditor({
                         Format YAML document (Shift + Alt + F)
                       </TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
+                  </TooltipProvider> */}
 
                   {/* <TooltipProvider>
                     <Tooltip>
@@ -2921,12 +2938,12 @@ export default function YamlEditor({
                           ? "Disable Word Wrap"
                           : "Enable Word Wrap"}
                       </DropdownMenuItem>
-                      <DropdownMenuItem
+                      {/* <DropdownMenuItem
                         onClick={() => setShowKeyboardShortcuts(true)}
                       >
                         <Keyboard className="h-4 w-4 mr-2" />
                         Keyboard Shortcuts
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
