@@ -1347,7 +1347,7 @@ export default function YamlEditor({
           return (
             <div key={currentPath} className="mb-1 text-sm leading-3">
               <div
-                className={`flex items-center gap-2 cursor-pointer p-2 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${isActive
+                className={`flex items-center gap-2 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${isActive
                     ? "bg-primary/15 text-primary font-semibold"
                     : "font-medium text-txt-color-300"
                   }`}
@@ -1909,8 +1909,8 @@ export default function YamlEditor({
   top: 0;
   z-index: 10;
   background: white; /* Ensure background is set to avoid transparency */
-  padding: 8px;
-  height:61px;
+  padding: 8px 4px;
+  height:40px;
   border-bottom: 1px solid #ddd; /* Optional for separation */
 }
 
@@ -2723,7 +2723,7 @@ export default function YamlEditor({
         <ResizablePanel defaultSize={isFullScreen ? 100 : 100 - sidebarSize}>
           <div className="flex flex-col h-full">
             {!isFullScreen && (
-              <div className="flex items-center h-14 px-4 border-b">
+              <div className="flex items-center h-10 px-4 border-b">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
