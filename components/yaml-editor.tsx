@@ -1486,7 +1486,11 @@ export default function YamlEditor({
                               <AlertDialogTitle className="flex flex-col">
                                 <p className="text-lg font-semibold pb-4 m-0 ">
                                   {` Delete ${
-                                    metadataType.toUpperCase() || "Metadata"
+                                    metadataType
+                                      .slice(0, 1)
+                                      .toUpperCase()
+                                      .concat(metadataType.substring(1)) ||
+                                    "Metadata"
                                   }`}
                                 </p>
                                 <div className="relative">
@@ -1504,8 +1508,8 @@ export default function YamlEditor({
                             <AlertDialogFooter className="flex !justify-between">
                               <div className="flex !justify-start sm:space-x-2">
                                 <div className="flex flex-row items-center gap-2">
-                                  <AlertDialogAction
-                                    className="bg-destructive hover:bg-destructive-foreground"
+                                  <Button
+                                    variant="destructive"
                                     onClick={(e) => {
                                       e.preventDefault()
                                       e.stopPropagation()
@@ -1513,7 +1517,17 @@ export default function YamlEditor({
                                     }}
                                   >
                                     Delete
-                                  </AlertDialogAction>
+                                  </Button>
+                                  {/* <AlertDialogAction
+                                    className="bg-destructive text-white hover:bg-destructive-foreground"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      getidData(id)
+                                    }}
+                                  >
+                                    Delete
+                                  </AlertDialogAction> */}
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 </div>
                                 <AlertDialogCancel className="absolute right-2 top-2 mt-1 border-none">
