@@ -632,6 +632,7 @@ export default function YamlEditor({
 
   // Toggle full screen mode
   const toggleFullScreen = useCallback(() => {
+    if(!idData.current) return
     setIsFullScreen((prev) => !prev)
 
     // Add a small delay to allow the UI to update before focusing the editor
@@ -2933,7 +2934,7 @@ export default function YamlEditor({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={toggleFullScreen}>
+                      {idData.current && <DropdownMenuItem onClick={toggleFullScreen}>
                         {isFullScreen ? (
                           <>
                             <Minimize2 className="h-4 w-4 mr-2" />
@@ -2945,7 +2946,7 @@ export default function YamlEditor({
                             Fullscreen Mode
                           </>
                         )}
-                      </DropdownMenuItem>
+                      </DropdownMenuItem>}
                       <DropdownMenuItem
                         onClick={() =>
                           setThemeData(themeData === "dark" ? "light" : "dark")
