@@ -1303,7 +1303,14 @@ export default function YamlEditor({
               >
                 <div className="flex items-center cursor-pointer">
                   {sidebarCollapsed ? (
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        toggleSectionExpansion(currentPath, false) // Collapse
+                      }}
+                      className="h-4 w-4"
+                    />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
@@ -1373,7 +1380,14 @@ export default function YamlEditor({
               >
                 <div className="flex items-center cursor-pointer">
                   {isExpanded ? (
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        toggleSectionExpansion(currentPath, false) // Collapse
+                      }}
+                      className="h-4 w-4"
+                    />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
