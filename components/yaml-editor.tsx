@@ -258,7 +258,8 @@ export default function YamlEditor({
                 throw new Error("Duplicate File Name")
               } else {
                 const requiredObj = { ...prev }
-                requiredObj[idData.current] = typeof parsed ==="string"?{[parsed]:{}}:parsed
+                requiredObj[idData.current] =
+                  typeof parsed === "string" ? { [parsed]: {} } : parsed
                 return requiredObj
               }
             } catch (error) {
@@ -306,7 +307,7 @@ export default function YamlEditor({
         } else {
           setMyListOfYamlData((prev) => {
             if (Object.keys(prev).some((el) => el === idData.current)) {
-              return { ...prev, [idData.current]: {"":{}} }
+              return { ...prev, [idData.current]: { "": {} } }
             }
             return prev
           })
@@ -995,7 +996,14 @@ export default function YamlEditor({
 
       return findPathToKey(parsedYaml, key)
     },
-    [editorLineMap, parsedYaml, findSectionRange, isEditorReady, idData.current, editorRef.current]
+    [
+      editorLineMap,
+      parsedYaml,
+      findSectionRange,
+      isEditorReady,
+      idData.current,
+      editorRef.current,
+    ]
   )
 
   // Scroll the sidebar to make the selected item visible
@@ -1215,7 +1223,7 @@ export default function YamlEditor({
       setSelectedSection,
       sidebarCollapsed,
       idData.current,
-      isEditorReady
+      isEditorReady,
     ]
   )
 
@@ -1244,7 +1252,6 @@ export default function YamlEditor({
     const LevelIcon = LEVEL_ICONS[level] || null
     return LevelIcon && <LevelIcon className="h-4 w-4 shrink-0" />
   }, [])
-
 
   // Recursively render the YAML tree
   const renderYamlTree = useCallback(
@@ -1295,7 +1302,14 @@ export default function YamlEditor({
               >
                 <div className="flex items-center cursor-pointer">
                   {sidebarCollapsed ? (
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        toggleSectionExpansion(currentPath, false) // Collapse
+                      }}
+                      className="h-4 w-4"
+                    />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
@@ -1365,7 +1379,14 @@ export default function YamlEditor({
               >
                 <div className="flex items-center cursor-pointer">
                   {isExpanded ? (
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        toggleSectionExpansion(currentPath, false) // Collapse
+                      }}
+                      className="h-4 w-4"
+                    />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
@@ -1404,24 +1425,24 @@ export default function YamlEditor({
                     </div>
                   ) : (
                     <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                    <span
-                      // style={{
-                      //   maxWidth: "200px",
-                      // }}
-                      className={cn(
-                        isActive
-                          ? "font-semibold"
-                          : "font-medium text-txt-color-300",
-                        "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px]"
-                      )}
-                    >
-                      {key}
-                    </span>
-                    </TooltipTrigger>
-                    <TooltipContent>{key}</TooltipContent>
-                    </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span
+                            // style={{
+                            //   maxWidth: "200px",
+                            // }}
+                            className={cn(
+                              isActive
+                                ? "font-semibold"
+                                : "font-medium text-txt-color-300",
+                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px]"
+                            )}
+                          >
+                            {key}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>{key}</TooltipContent>
+                      </Tooltip>
                     </TooltipProvider>
                   )}
                   {level === 0 && editId !== id && (
@@ -1438,10 +1459,10 @@ export default function YamlEditor({
                                 inputRef.current?.focus()
                                 inputRef.current?.select()
                                 // should refactor later
-                                if(isEditorReady){
+                                if (isEditorReady) {
                                   setEditId(id)
-                                }else{
-                                  setTimeout(()=> setEditId(id), 500)
+                                } else {
+                                  setTimeout(() => setEditId(id), 500)
                                 }
                               }}
                               className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
@@ -2765,22 +2786,22 @@ export default function YamlEditor({
                 </TooltipProvider>
                 <h2 className="ml-2 text-lg font-medium">YAML Editor</h2>
                 <div className="ml-auto flex gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={exportToJson}
-                  className="h-auto"
-                >
-                  <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
-                  Export to JSON
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Export YAML as JSON</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={exportToJson}
+                          className="h-auto"
+                        >
+                          <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
+                          Export to JSON
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Export YAML as JSON</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   {/* <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
