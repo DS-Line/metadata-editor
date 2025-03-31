@@ -3150,11 +3150,21 @@ export default function YamlEditor({
       {showKeyboardShortcuts && renderKeyboardShortcuts()}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Regenerate Metadata</DialogTitle>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle>
+            {metadataType === "schema"
+              ? "Regenerate Metadata"
+              : metadataType === "semantic"
+              ? "Regenerate Semantic"
+              : "Regenerate Metadata"}
+          </DialogTitle>
+        </DialogHeader>
+
           <p>
-            {
+            { metadataType === "schema"?
+              "Do you want to regenerate schema? This will delete all your existing schema and semantic.." :
+              metadataType === "semantic"?
+              "Do you want to regenerate semantic? This will delete all your existing semantic " :
               "Do you want to regenerate metadata? This will delete all your existing metadata."
             }
           </p>
