@@ -1448,7 +1448,7 @@ export default function YamlEditor({
                               isActive
                                 ? "font-semibold"
                                 : "font-medium text-txt-color-300",
-                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px] text-sm"
+                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px] text-sm pr"
                             )}
                           >
                             {key}
