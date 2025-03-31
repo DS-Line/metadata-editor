@@ -282,12 +282,13 @@ export default function YamlEditor({
                     },
                   ]
                 )
+                setActiveDecorations(decorations)
 
-                setTimeout(() => {
-                  if (editorRef.current) {
-                    editorRef.current.deltaDecorations(decorations, [])
-                  }
-                }, 1500)
+                // setTimeout(() => {
+                //   if (editorRef.current) {
+                //     editorRef.current.deltaDecorations(decorations, [])
+                //   }
+                // }, 1500)
                 setParseError(fileNameErrorMessage)
               }
               return prev
@@ -362,12 +363,12 @@ export default function YamlEditor({
                 },
               ]
             )
-
-            setTimeout(() => {
-              if (editorRef.current) {
-                editorRef.current.deltaDecorations(decorations, [])
-              }
-            }, 1500)
+            setActiveDecorations(decorations)
+            // setTimeout(() => {
+            //   if (editorRef.current) {
+            //     editorRef.current.deltaDecorations(decorations, [])
+            //   }
+            // }, 1500)
           }
         }
         setParseError(formattedError)
@@ -377,6 +378,11 @@ export default function YamlEditor({
     [myListOfYamlData]
   )
 
+  useEffect(() => {
+    if (editorRef.current && !parseError) {
+      editorRef.current.deltaDecorations(activeDecorations, [])
+    }
+  }, [parseError])
   useEffect(() => {
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
@@ -1448,7 +1454,7 @@ export default function YamlEditor({
                               isActive
                                 ? "font-semibold"
                                 : "font-medium text-txt-color-300",
-                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px] text-sm pr"
+                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px] text-sm"
                             )}
                           >
                             {key}
