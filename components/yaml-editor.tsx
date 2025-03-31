@@ -183,6 +183,7 @@ export default function YamlEditor({
   getEditorData,
   getidData,
   customLoader,
+  currentTab
 }: {
   setDeleteId: (value: React.SetStateAction<string>) => void
   isDeletedFlag: boolean
@@ -197,6 +198,7 @@ export default function YamlEditor({
   addMetadata: () => void
   customLoader: string
   getidData?: (id: string) => void
+  currentTab? : string
 
   getEditorData?: (getEditorData: string, id: string) => void
 }): JSX.Element {
@@ -244,6 +246,7 @@ export default function YamlEditor({
       try {
         const parsed = parse(yamlString) as Record<string, any>
         setParsedYaml(parsed)
+        
         setParseError(null)
         if (parsed) {
           setMyListOfYamlData((prev) => {
@@ -332,19 +335,19 @@ export default function YamlEditor({
           lineCount: yamlString.split("\n").length,
           fileSize,
         }))
-        return { valid: true, parsed }
+          return { valid: true, parsed }
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Invalid YAML"
         let formattedError = errorMessage
-
+  
         const lineMatch = errorMessage.match(/line (\d+)/)
         const colMatch = errorMessage.match(/column (\d+)/)
         if (lineMatch && colMatch) {
           const line = Number.parseInt(lineMatch[1])
           const col = Number.parseInt(colMatch[1])
           formattedError = `Error at line ${line}, column ${col}: ${errorMessage}`
-
+  
           if (editorRef.current && monacoRef.current) {
             const decorations = editorRef.current.deltaDecorations(
               [],
@@ -359,7 +362,7 @@ export default function YamlEditor({
                 },
               ]
             )
-
+            
             setTimeout(() => {
               if (editorRef.current) {
                 editorRef.current.deltaDecorations(decorations, [])
