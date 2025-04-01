@@ -1411,7 +1411,7 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <div className={cn("flex justify-between w-full")}>
+                <div className={cn("flex justify-between w-full gap-2")}>
                   {level === 0 && isEditing && editId === id ? (
                     <div
                       onClick={(e) => {
@@ -1454,13 +1454,17 @@ export default function YamlEditor({
                               isActive
                                 ? "font-semibold"
                                 : "font-medium text-txt-color-300",
-                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px] text-sm"
+                              "truncate whitespace-nowrap overflow-hidden flex-1 w-[20px] text-sm pr"
                             )}
                           >
                             {key}
                           </span>
                         </TooltipTrigger>
-                        <TooltipContent>{key}</TooltipContent>
+                        <TooltipContent
+                          style={{ maxWidth: "628px", wordWrap: "break-word" }}
+                        >
+                          {key}
+                        </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   )}
@@ -1470,7 +1474,7 @@ export default function YamlEditor({
                         <Tooltip>
                           <TooltipTrigger>
                             <SquarePen
-                              size={18}
+                              size={16}
                               onClick={(e) => {
                                 // e.stopPropagation()
                                 // e.preventDefault()
@@ -1520,7 +1524,7 @@ export default function YamlEditor({
                                 >
                                   {editId !== id && (
                                     <Trash2
-                                      size={18}
+                                      size={16}
                                       className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
                                     />
                                   )}
@@ -3189,7 +3193,7 @@ export default function YamlEditor({
 
             <Button
               className="self-center flex justify-center items-center"
-              variant="default"
+              variant="outline"
               onClick={() => {
                 handleGenerate()
                 setIsDialogOpen(false)
