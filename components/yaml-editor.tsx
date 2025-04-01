@@ -171,6 +171,7 @@ const LEVEL_ICONS: LevelIcons = {
 export default function YamlEditor({
   isSaving,
   deleteId,
+  generateReset,
   isDeletedFlag,
   setDeleteId,
   metadataType,
@@ -183,11 +184,12 @@ export default function YamlEditor({
   getEditorData,
   getidData,
   customLoader,
-  currentTab,
+  openEditor,
 }: {
   setDeleteId: (value: React.SetStateAction<string>) => void
   isDeletedFlag: boolean
   isSaving: boolean
+  generateReset?: () => void
   deleteId: string
   metadataType: string
   isLoadingYaml?: boolean
@@ -198,7 +200,7 @@ export default function YamlEditor({
   addMetadata: () => void
   customLoader: string
   getidData?: (id: string) => void
-  currentTab?: string
+  openEditor: boolean
 
   getEditorData?: (getEditorData: string, id: string) => void
 }): JSX.Element {
@@ -377,12 +379,27 @@ export default function YamlEditor({
     },
     [myListOfYamlData]
   )
+  console.log(openEditor)
+  useEffect(() => {
+    if (openEditor && metaYamlData) {
+      idData.current = metaYamlData[0].id
 
-  // useEffect(() => {
-  //   if (editorRef.current && !parseError) {
-  //     editorRef.current.deltaDecorations(activeDecorations, [])
-  //   }
-  // }, [parseError])
+      editorRef &&
+        editorRef.current &&
+        editorRef.current.setValue(
+          `${metaYamlData[0].metadata_name}:\n  ${
+            metaYamlData[0]?.content?.replaceAll("\n", "\n  ") || ""
+          }`
+        )
+      generateReset()
+    }
+  }, [metaYamlData, isEditorReady])
+  useEffect(() => {
+    if (editorRef.current && !parseError) {
+      setActiveDecorations([])
+      editorRef.current.deltaDecorations(activeDecorations, [])
+    }
+  }, [parseError, editorRef.current])
   useEffect(() => {
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
