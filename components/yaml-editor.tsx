@@ -2714,7 +2714,10 @@ export default function YamlEditor({
                         editorRef &&
                           editorRef.current &&
                           editorRef.current.setValue(
-                            `Metadata_new${Date.now()}:\n  sources:\n 
+                            metadataType === "schema"
+                              ? `Metadata_new_schema${Date.now()}:\n subject_area: [subject_area]\ntable_info:\n  - table: [table name]\n    joins: []\ncolumns:\n    [column_name]:\n      name: [column display name]\n      type: [data type only]\n      column: [column name]\n      desc: [description]\n      primary_key: [true/false]\n      foreign_key: [true/false]
+`
+                              : `Metadata_new_semantic${Date.now()}:\n  sources:\n 
     # Add your sources here\n
   hierarchies:\n 
     # Add your hierarchies here\n
