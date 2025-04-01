@@ -282,13 +282,13 @@ export default function YamlEditor({
                     },
                   ]
                 )
-                setActiveDecorations(decorations)
+                // setActiveDecorations(decorations)
 
-                // setTimeout(() => {
-                //   if (editorRef.current) {
-                //     editorRef.current.deltaDecorations(decorations, [])
-                //   }
-                // }, 1500)
+                setTimeout(() => {
+                  if (editorRef.current) {
+                    editorRef.current.deltaDecorations(decorations, [])
+                  }
+                }, 1500)
                 setParseError(fileNameErrorMessage)
               }
               return prev
@@ -363,12 +363,12 @@ export default function YamlEditor({
                 },
               ]
             )
-            setActiveDecorations(decorations)
-            // setTimeout(() => {
-            //   if (editorRef.current) {
-            //     editorRef.current.deltaDecorations(decorations, [])
-            //   }
-            // }, 1500)
+            // setActiveDecorations(decorations)
+            setTimeout(() => {
+              if (editorRef.current) {
+                editorRef.current.deltaDecorations(decorations, [])
+              }
+            }, 1500)
           }
         }
         setParseError(formattedError)
@@ -378,11 +378,11 @@ export default function YamlEditor({
     [myListOfYamlData]
   )
 
-  useEffect(() => {
-    if (editorRef.current && !parseError) {
-      editorRef.current.deltaDecorations(activeDecorations, [])
-    }
-  }, [parseError])
+  // useEffect(() => {
+  //   if (editorRef.current && !parseError) {
+  //     editorRef.current.deltaDecorations(activeDecorations, [])
+  //   }
+  // }, [parseError])
   useEffect(() => {
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
