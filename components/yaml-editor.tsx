@@ -378,11 +378,28 @@ export default function YamlEditor({
     [myListOfYamlData]
   )
 
-  // useEffect(() => {
-  //   if (editorRef.current && !parseError) {
-  //     editorRef.current.deltaDecorations(activeDecorations, [])
-  //   }
-  // }, [parseError])
+  useEffect(() => {
+    if (idData.current && !Number.isNaN(Number(idData.current))) {
+      const foundItem: Metadata = metaYamlData.find(
+        (item) => item.id === idData.current
+      )
+      if (!foundItem && editorRef && editorRef.current) {
+        const itemNameMeta: Metadata = metaYamlData.find(
+          (item) =>
+            item.metadata_name ===
+            editorRef.current
+              .getValue()
+              .substring(0, editorRef.current.getValue().indexOf(":"))
+              .toString()
+              .trim()
+        )
+
+        if (itemNameMeta) {
+          idData.current = itemNameMeta.id
+        }
+      }
+    }
+  }, [metaYamlData])
   useEffect(() => {
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
@@ -1319,7 +1336,6 @@ export default function YamlEditor({
                   {sidebarCollapsed ? (
                     <ChevronDown
                       onClick={(e) => {
-                        console.log("this")
                         e.preventDefault()
                         e.stopPropagation()
                         toggleSectionExpansion(currentPath, false) // Collapse
