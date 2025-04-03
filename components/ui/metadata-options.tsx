@@ -87,8 +87,8 @@ export default function MetadataOptions({
             />
             <span>
               {menuItems.regenerateFlag
-                ? "Regenerate Metadata"
-                : "Generate Metadata"}
+                ? `Regenerate ${metadataType}`
+                : `Generate ${metadataType}`}
             </span>
           </DropdownMenuItem>
         )}
@@ -101,7 +101,7 @@ export default function MetadataOptions({
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span>Upload Metadata</span>
+            <span>{`Upload ${metadataType}`}</span>
           </DropdownMenuItem>
         )}
         {menuItems.addYaml && (
@@ -113,7 +113,7 @@ export default function MetadataOptions({
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span>Add YAML</span>
+            <span>{`Add ${metadataType}`}</span>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
