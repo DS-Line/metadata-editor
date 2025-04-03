@@ -1514,7 +1514,7 @@ export default function YamlEditor({
                         customLoader ? (
                           <Image
                             id="deleting-loader"
-                            className="mb-2 mr-2"
+                            className="mr-2"
                             src={customLoader}
                             width={18}
                             height={18}
@@ -2752,7 +2752,7 @@ export default function YamlEditor({
                         addYaml: true,
                       }}
                       handleUploadClick={handleUploadMetadata}
-                      metadataType={metadataType}
+                      metadataType={metadataType==="schema"?"Schema":"Semantic"}
                     />
                   }
                 </div>
@@ -3185,7 +3185,7 @@ export default function YamlEditor({
           <DialogHeader>
             <DialogTitle>
               {metadataType === "schema"
-                ? "Regenerate Metadata"
+                ? "Regenerate Schema"
                 : metadataType === "semantic"
                 ? "Regenerate Semantic"
                 : "Regenerate Metadata"}
@@ -3194,10 +3194,10 @@ export default function YamlEditor({
 
           <p>
             {metadataType === "schema"
-              ? "Do you want to regenerate schema? This will delete all your existing schema and semantic.."
+              ? "Do you want to regenerate schema? This will delete all your existing schema and semantic"
               : metadataType === "semantic"
-              ? "Do you want to regenerate semantic? This will delete all your existing semantic "
-              : "Do you want to regenerate metadata? This will delete all your existing metadata."}
+              ? "Do you want to regenerate semantic? This will delete all your existing semantic"
+              : "Do you want to regenerate metadata? This will delete all your existing metadata"}
           </p>
           <DialogFooter className="gap-4">
             <Button
