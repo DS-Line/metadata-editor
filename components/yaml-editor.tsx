@@ -2752,7 +2752,9 @@ export default function YamlEditor({
                         addYaml: true,
                       }}
                       handleUploadClick={handleUploadMetadata}
-                      metadataType={metadataType==="schema"?"Schema":"Semantic"}
+                      metadataType={
+                        metadataType === "schema" ? "Schema" : "Semantic"
+                      }
                     />
                   }
                 </div>
@@ -2838,24 +2840,25 @@ export default function YamlEditor({
                     YAML Editor
                   </h2>
                 </div>
-                <div className="ml-auto flex gap-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={exportToJson}
-                          className="h-7 text-xs font-normal"
-                        >
-                          <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
-                          Export to JSON
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Export YAML as JSON</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  {/* <TooltipProvider>
+                {idData.current && (
+                  <div className="ml-auto flex gap-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={exportToJson}
+                            className="h-7 text-xs font-normal"
+                          >
+                            <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
+                            Export to JSON
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Export YAML as JSON</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    {/* <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -2879,7 +2882,7 @@ export default function YamlEditor({
                     </Tooltip>
                   </TooltipProvider> */}
 
-                  {/* <TooltipProvider>
+                    {/* <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -2899,154 +2902,157 @@ export default function YamlEditor({
                       <TooltipContent>Validate YAML syntax</TooltipContent>
                     </Tooltip>
                   </TooltipProvider> */}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          aria-label="save-button-normal-screen"
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs font-normal"
-                          onClick={editorData}
-                          disabled={
-                            isSaving ||
-                            (editorRef &&
-                              editorRef.current &&
-                              !editorRef.current.getValue().trim()) ||
-                            parseError
-                          }
-                        >
-                          {isSaving ? (
-                            customLoader ? (
-                              <Image
-                                id="deleting-loader"
-                                src={customLoader}
-                                width={14}
-                                height={14}
-                                alt="deleting"
-                                className="mr-1 "
-                              />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            aria-label="save-button-normal-screen"
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs font-normal"
+                            onClick={editorData}
+                            disabled={
+                              isSaving ||
+                              (editorRef &&
+                                editorRef.current &&
+                                !editorRef.current.getValue().trim()) ||
+                              parseError
+                            }
+                          >
+                            {isSaving ? (
+                              customLoader ? (
+                                <Image
+                                  id="deleting-loader"
+                                  src={customLoader}
+                                  width={14}
+                                  height={14}
+                                  alt="deleting"
+                                  className="mr-1 "
+                                />
+                              ) : (
+                                <Loader2
+                                  size={14}
+                                  className="mr-1 animate-spin"
+                                />
+                              )
                             ) : (
-                              <Loader2
-                                size={14}
-                                className="mr-1 animate-spin"
-                              />
+                              <Save className="h-4 w-4 mr-1" />
+                            )}{" "}
+                            Save
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Save YAML document</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs font-normal"
+                            disabled={
+                              editorRef &&
+                              editorRef.current &&
+                              !editorRef.current.getValue().trim()
+                            }
+                            onClick={copyToClipboard}
+                          >
+                            <Copy className="h-4 w-4 mr-1" />
+                            Copy
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Copy YAML to clipboard (Ctrl + Shift + C)
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs font-normal"
+                            onClick={downloadYaml}
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            Download
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Download YAML file (Ctrl + S)
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs font-normal"
+                        >
+                          <Settings className="h-4 w-4" />
+                          <span className="hidden sm:inline">Settings</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {idData.current && (
+                          <DropdownMenuItem onClick={toggleFullScreen}>
+                            {isFullScreen ? (
+                              <>
+                                <Minimize2 className="h-4 w-4 mr-2" />
+                                Exit Fullscreen
+                              </>
+                            ) : (
+                              <>
+                                <Maximize2 className="h-4 w-4 mr-2" />
+                                Fullscreen Mode
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setThemeData(
+                              themeData === "dark" ? "light" : "dark"
                             )
-                          ) : (
-                            <Save className="h-4 w-4 mr-1" />
-                          )}{" "}
-                          Save
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Save YAML document</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs font-normal"
-                          disabled={
-                            editorRef &&
-                            editorRef.current &&
-                            !editorRef.current.getValue().trim()
                           }
-                          onClick={copyToClipboard}
                         >
-                          <Copy className="h-4 w-4 mr-1" />
-                          Copy
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Copy YAML to clipboard (Ctrl + Shift + C)
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs font-normal"
-                          onClick={downloadYaml}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Download YAML file (Ctrl + S)
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs font-normal"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="hidden sm:inline">Settings</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {idData.current && (
-                        <DropdownMenuItem onClick={toggleFullScreen}>
-                          {isFullScreen ? (
+                          {themeData === "dark" ? (
                             <>
-                              <Minimize2 className="h-4 w-4 mr-2" />
-                              Exit Fullscreen
+                              <Sun className="h-4 w-4 mr-2" />
+                              Light Mode
                             </>
                           ) : (
                             <>
-                              <Maximize2 className="h-4 w-4 mr-2" />
-                              Fullscreen Mode
+                              <Moon className="h-4 w-4 mr-2" />
+                              Dark Mode
                             </>
                           )}
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setThemeData(themeData === "dark" ? "light" : "dark")
-                        }
-                      >
-                        {themeData === "dark" ? (
-                          <>
-                            <Sun className="h-4 w-4 mr-2" />
-                            Light Mode
-                          </>
-                        ) : (
-                          <>
-                            <Moon className="h-4 w-4 mr-2" />
-                            Dark Mode
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={toggleMinimap}>
-                        <Map className="h-4 w-4 mr-2" />
-                        {showMinimap ? "Hide Minimap" : "Show Minimap"}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={toggleWordWrap}>
-                        <Wrap className="h-4 w-4 mr-2" />
-                        {wordWrap === "on"
-                          ? "Disable Word Wrap"
-                          : "Enable Word Wrap"}
-                      </DropdownMenuItem>
-                      {/* <DropdownMenuItem
+                        <DropdownMenuItem onClick={toggleMinimap}>
+                          <Map className="h-4 w-4 mr-2" />
+                          {showMinimap ? "Hide Minimap" : "Show Minimap"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={toggleWordWrap}>
+                          <Wrap className="h-4 w-4 mr-2" />
+                          {wordWrap === "on"
+                            ? "Disable Word Wrap"
+                            : "Enable Word Wrap"}
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem
                         onClick={() => setShowKeyboardShortcuts(true)}
                       >
                         <Keyboard className="h-4 w-4 mr-2" />
                         Keyboard Shortcuts
                       </DropdownMenuItem> */}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )}
               </div>
             )}
 
