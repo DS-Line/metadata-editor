@@ -2312,6 +2312,11 @@ export default function YamlEditor({
 
     setIsEditorReady(true)
   }
+  useEffect(() => {
+    if (!idData.current) {
+      setIsFullScreen(false)
+    }
+  }, [idData.current])
   // useEffect(() => {
   //   if (metaYamlData && metaYamlData.length > 0) {
   //     idData.current = metaYamlData[0].id
