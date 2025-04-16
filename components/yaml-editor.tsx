@@ -891,6 +891,7 @@ export default function YamlEditor({
   // Find the exact path for a cursor position
   const findPathForPosition = useCallback(
     (position: Position | null): string | null => {
+      console.log(editorLineMap)
       if (!editorRef.current || !position) return null
 
       if (editorLineMap[position.lineNumber]) {
@@ -1165,6 +1166,7 @@ export default function YamlEditor({
       if (parseError) return
       if (!editorRef.current || !position) return
       const path = findPathForPosition(position)
+      console.log(path)
       if (!path) return
 
       // Set the selected section
@@ -1251,6 +1253,7 @@ export default function YamlEditor({
       sidebarCollapsed,
       idData.current,
       isEditorReady,
+      expandedSections,
     ]
   )
 
@@ -1316,6 +1319,7 @@ export default function YamlEditor({
             }`
             setYamlData(requiredValue)
             editorRef.current && editorRef.current.setValue(requiredValue)
+            validateYaml(requiredValue)
             navigateToSection(currentPath)
           }
         }
