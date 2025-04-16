@@ -1316,6 +1316,7 @@ export default function YamlEditor({
             }`
             setYamlData(requiredValue)
             editorRef.current && editorRef.current.setValue(requiredValue)
+            validateYaml(requiredValue)
             navigateToSection(currentPath)
           }
         }
