@@ -2729,7 +2729,10 @@ export default function YamlEditor({
                   {
                     <MetadataOptions
                       setDialog={setIsDialogOpen}
-                      handleGenerate={handleGenerate}
+                      handleGenerate={() => {
+                        idData.current = ""
+                        handleGenerate()
+                      }}
                       addMetadata={() => {
                         addMetadata()
                         editorRef &&
@@ -3225,6 +3228,7 @@ export default function YamlEditor({
               className="self-center flex justify-center items-center"
               variant="outline"
               onClick={() => {
+                idData.current = ""
                 handleGenerate()
                 setIsDialogOpen(false)
               }}
