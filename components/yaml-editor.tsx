@@ -240,14 +240,17 @@ export default function YamlEditor({
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] =
     useState<boolean>(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
+  const redDotDecoration = useRef<monaco.editor.IEditorDecorationsCollection>()
   // Enhanced YAML validation function
   const validateYaml = useCallback(
     (yamlString: string, edit: boolean) => {
       try {
         const parsed = parse(yamlString) as Record<string, any>
         setParsedYaml(parsed)
-
         setParseError(null)
+        if (redDotDecoration.current) {
+          redDotDecoration.current.clear()
+        }
         if (parsed) {
           setMyListOfYamlData((prev) => {
             try {
@@ -268,10 +271,12 @@ export default function YamlEditor({
             } catch (error) {
               const fileNameErrorMessage =
                 error instanceof Error ? error.message : "Invalid YAML"
+              if (redDotDecoration.current) {
+                redDotDecoration.current.clear()
+              }
               if (editorRef.current && monacoRef.current) {
-                const decorations = editorRef.current.deltaDecorations(
-                  [],
-                  [
+                redDotDecoration.current =
+                  editorRef.current.createDecorationsCollection([
                     {
                       range: new monacoRef.current.Range(1, 1, 1, 10),
                       options: {
@@ -280,15 +285,14 @@ export default function YamlEditor({
                         hoverMessage: { value: fileNameErrorMessage },
                       },
                     },
-                  ]
-                )
+                  ])
                 // setActiveDecorations(decorations)
 
-                setTimeout(() => {
-                  if (editorRef.current) {
-                    editorRef.current.deltaDecorations(decorations, [])
-                  }
-                }, 1500)
+                // setTimeout(() => {
+                //   if (editorRef.current) {
+                //     editorRef.current.deltaDecorations(decorations, [])
+                //   }
+                // }, 1500)
                 setParseError(fileNameErrorMessage)
               }
               return prev
@@ -348,11 +352,12 @@ export default function YamlEditor({
           const line = Number.parseInt(lineMatch[1])
           const col = Number.parseInt(colMatch[1])
           formattedError = `Error at line ${line}, column ${col}: ${errorMessage}`
-
+          if (redDotDecoration.current) {
+            redDotDecoration.current.clear()
+          }
           if (editorRef.current && monacoRef.current) {
-            const decorations = editorRef.current.deltaDecorations(
-              [],
-              [
+            redDotDecoration.current =
+              editorRef.current.createDecorationsCollection([
                 {
                   range: new monacoRef.current.Range(line, col, line, col + 1),
                   options: {
@@ -361,14 +366,15 @@ export default function YamlEditor({
                     hoverMessage: { value: errorMessage },
                   },
                 },
-              ]
-            )
+              ])
+
             // setActiveDecorations(decorations)
-            setTimeout(() => {
-              if (editorRef.current) {
-                editorRef.current.deltaDecorations(decorations, [])
-              }
-            }, 1500)
+
+            // setTimeout(()=>{
+            //   if (editorRef.current) {
+            //     editorRef.current.deltaDecorations(decorations, [])
+            //   }
+            // },100)
           }
         }
         setParseError(formattedError)
