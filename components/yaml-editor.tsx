@@ -2761,7 +2761,7 @@ export default function YamlEditor({
                         setSelectedSection(null)
                       }}
                       menuItems={{
-                        regenerateFlag: metaYamlData.length > 0,
+                        regenerateFlag: metaYamlData && metaYamlData.length > 0,
                         generate: true,
                         upload: true,
                         addYaml: true,
@@ -3190,7 +3190,7 @@ export default function YamlEditor({
                   alt="Empty"
                 />
                 <p>
-                  {metaYamlData.length === 0
+                  {metaYamlData && metaYamlData.length === 0
                     ? "No Metrics available at this moment"
                     : "No Metrics selected at this moment"}
                 </p>
