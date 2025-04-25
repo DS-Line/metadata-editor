@@ -2769,9 +2769,7 @@ export default function YamlEditor({
                         addYaml: true,
                       }}
                       handleUploadClick={handleUploadMetadata}
-                      metadataType={
-                        metadataType === "schema" ? "Schema" : "Semantic"
-                      }
+                      metadataType={metadataType}
                     />
                   )}
                 </div>
