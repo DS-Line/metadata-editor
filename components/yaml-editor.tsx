@@ -2606,7 +2606,7 @@ export default function YamlEditor({
         </div> */}
 
         <div className="ml-auto flex items-center gap-2">
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -2636,7 +2636,7 @@ export default function YamlEditor({
                 Switch to {themeData === "dark" ? "light" : "dark"} mode
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <TooltipProvider>
             <Tooltip>
@@ -3029,7 +3029,7 @@ export default function YamlEditor({
                             )}
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem
+                        {/* <DropdownMenuItem
                           onClick={() =>
                             setThemeData(
                               themeData === "dark" ? "light" : "dark"
@@ -3047,7 +3047,7 @@ export default function YamlEditor({
                               Dark Mode
                             </>
                           )}
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem onClick={toggleMinimap}>
                           <Map className="h-4 w-4 mr-2" />
                           {showMinimap ? "Hide Minimap" : "Show Minimap"}
