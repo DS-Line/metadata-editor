@@ -611,8 +611,6 @@ export default function YamlEditor({
   // Copy YAML to clipboard
   const editorData = () => {
     if (!editorRef.current) return
-    console.log(metaYamlData)
-    console.log(idData.current)
     getEditorData(editorRef.current.getValue(), idData.current)
     if (!metaYamlData.some((el) => el.metadata_name === nameData.current)) {
       idData.current = ""
