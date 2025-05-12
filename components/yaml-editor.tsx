@@ -184,6 +184,7 @@ export default function YamlEditor({
   getidData,
   customLoader,
   currentTab,
+  isViewOnly = false,
 }: {
   setDeleteId: (value: React.SetStateAction<string>) => void
   isDeletedFlag: boolean
@@ -199,6 +200,7 @@ export default function YamlEditor({
   customLoader: string
   getidData?: (id: string) => void
   currentTab?: string
+  isViewOnly?: boolean
 
   getEditorData?: (getEditorData: string, id: string) => void
 }): JSX.Element {
@@ -1500,7 +1502,7 @@ export default function YamlEditor({
                       </Tooltip>
                     </TooltipProvider>
                   )}
-                  {level === 0 && editId !== id && (
+                  {level === 0 && editId !== id && !isViewOnly && (
                     <div className="hover:bg-transparent flex gap-2 items-center shrink-0">
                       <TooltipProvider>
                         <Tooltip>
@@ -2742,7 +2744,7 @@ export default function YamlEditor({
                   <h2 className="text-lg font-medium text-primary">
                     YAML Structure
                   </h2>
-                  {
+                  {!isViewOnly && (
                     <MetadataOptions
                       setDialog={setIsDialogOpen}
                       handleGenerate={() => {
@@ -2772,17 +2774,15 @@ export default function YamlEditor({
                         setSelectedSection(null)
                       }}
                       menuItems={{
-                        regenerateFlag: metaYamlData.length > 0,
+                        regenerateFlag: metaYamlData && metaYamlData.length > 0,
                         generate: true,
                         upload: true,
                         addYaml: true,
                       }}
                       handleUploadClick={handleUploadMetadata}
-                      metadataType={
-                        metadataType === "schema" ? "Schema" : "Semantic"
-                      }
+                      metadataType={metadataType}
                     />
-                  }
+                  )}
                 </div>
               </div>
 
@@ -2863,10 +2863,10 @@ export default function YamlEditor({
                     </Tooltip>
                   </TooltipProvider>
                   <h2 className="ml-2 text-lg font-medium text-primary">
-                    YAML Editor
+                    {isViewOnly ? "Yaml Viewer" : "YAML Editor"}
                   </h2>
                 </div>
-                {idData.current && (
+                {idData.current && !isViewOnly && (
                   <div className="ml-auto flex gap-2">
                     <TooltipProvider>
                       <Tooltip>
@@ -3113,6 +3113,8 @@ export default function YamlEditor({
                       onMount={handleEditorDidMount}
                       options={{
                         minimap: { enabled: showMinimap },
+                        readOnly: isViewOnly,
+                        domReadOnly: isViewOnly,
                         lineNumbers: "on",
                         scrollBeyondLastLine: false,
                         automaticLayout: true,
@@ -3201,7 +3203,7 @@ export default function YamlEditor({
                   alt="Empty"
                 />
                 <p>
-                  {metaYamlData.length === 0
+                  {metaYamlData && metaYamlData.length === 0
                     ? "No Metrics available at this moment"
                     : "No Metrics selected at this moment"}
                 </p>
