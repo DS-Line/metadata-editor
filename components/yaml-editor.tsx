@@ -218,6 +218,7 @@ export default function YamlEditor({
     new Set()
   )
   const idData = useRef<string>("")
+  const nameData = useRef<string>("")
   const [themeData, setThemeData] = useState("dark")
   const [activeDecorations, setActiveDecorations] = useState<string[]>([])
   const [isEditorReady, setIsEditorReady] = useState<boolean>(false)
@@ -404,6 +405,7 @@ export default function YamlEditor({
 
         if (itemNameMeta) {
           idData.current = itemNameMeta.id
+          nameData.current = itemNameMeta.metadata_name
         }
       }
     }
@@ -412,6 +414,7 @@ export default function YamlEditor({
     if (isDeletedFlag) {
       editorRef && editorRef.current && editorRef.current.setValue("")
       idData.current = ""
+      nameData.current = ""
       setDeleteId("-1")
     }
   }, [isDeletedFlag])
@@ -611,6 +614,11 @@ export default function YamlEditor({
   const editorData = () => {
     if (!editorRef.current) return
     getEditorData(editorRef.current.getValue(), idData.current)
+    if (!metaYamlData.some((el) => el.metadata_name === nameData.current)) {
+      idData.current = ""
+      nameData.current = ""
+      editorRef.current = null
+    }
   }
 
   // Download YAML file
@@ -1319,6 +1327,7 @@ export default function YamlEditor({
             // Set ID if applicable
             idData.current = id
             const requiredMeta = metaYamlData.filter((el) => el.id === id)
+            nameData.current = requiredMeta[0].metadata_name
             const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
               requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
             }`
@@ -2608,7 +2617,7 @@ export default function YamlEditor({
         </div> */}
 
         <div className="ml-auto flex items-center gap-2">
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -2638,7 +2647,7 @@ export default function YamlEditor({
                 Switch to {themeData === "dark" ? "light" : "dark"} mode
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <TooltipProvider>
             <Tooltip>
@@ -2740,6 +2749,7 @@ export default function YamlEditor({
                       setDialog={setIsDialogOpen}
                       handleGenerate={() => {
                         idData.current = ""
+                        nameData.current = ""
                         handleGenerate()
                       }}
                       addMetadata={() => {
@@ -2760,6 +2770,7 @@ export default function YamlEditor({
     # Add your attributes here} `
                           )
                         idData.current = ""
+                        nameData.current = ""
                         setSelectedSection(null)
                       }}
                       menuItems={{
@@ -3029,7 +3040,7 @@ export default function YamlEditor({
                             )}
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem
+                        {/* <DropdownMenuItem
                           onClick={() =>
                             setThemeData(
                               themeData === "dark" ? "light" : "dark"
@@ -3047,7 +3058,7 @@ export default function YamlEditor({
                               Dark Mode
                             </>
                           )}
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem onClick={toggleMinimap}>
                           <Map className="h-4 w-4 mr-2" />
                           {showMinimap ? "Hide Minimap" : "Show Minimap"}
@@ -3238,6 +3249,7 @@ export default function YamlEditor({
               variant="outline"
               onClick={() => {
                 idData.current = ""
+                nameData.current = ""
                 handleGenerate()
                 setIsDialogOpen(false)
               }}
