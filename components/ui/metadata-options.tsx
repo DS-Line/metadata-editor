@@ -70,7 +70,7 @@ export default function MetadataOptions({
         </TooltipProvider>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 [&>*]:px-2 [&>*]:cursor-pointer [&>*]:hover:rounded-none">
-        {menuItems.generate && (
+        {menuItems.generate && metadataType.toLowerCase()!=="presentation" && (
           <DropdownMenuItem
             className="flex flex-row gap-2 mx-[-8px] focus:bg-accent "
             onClick={() => {
@@ -85,7 +85,7 @@ export default function MetadataOptions({
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span>
+            <span className="capitalize">
               {menuItems.regenerateFlag
                 ? `Regenerate ${metadataType}`
                 : `Generate ${metadataType}`}
@@ -101,7 +101,7 @@ export default function MetadataOptions({
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span>{`Upload ${metadataType}`}</span>
+            <span className="capitalize">{`Upload ${metadataType}`}</span>
           </DropdownMenuItem>
         )}
         {menuItems.addYaml && (
@@ -113,7 +113,7 @@ export default function MetadataOptions({
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span>{`Add ${metadataType}`}</span>
+            <span className="capitalize">{`Add ${metadataType}`}</span>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
