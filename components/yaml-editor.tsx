@@ -185,6 +185,7 @@ export default function YamlEditor({
   customLoader,
   currentTab,
   isViewOnly = false,
+  className = "",
 }: {
   setDeleteId: (value: React.SetStateAction<string>) => void
   isDeletedFlag: boolean
@@ -200,9 +201,9 @@ export default function YamlEditor({
   customLoader: string
   getidData?: (id: string) => void
   currentTab?: string
-  isViewOnly?: boolean
 
   getEditorData?: (getEditorData: string, id: string) => void
+  className?: string
 }): JSX.Element {
   const [myListOfYamlData, setMyListOfYamlData] = useState<Record<string, any>>(
     {}
@@ -2383,7 +2384,7 @@ export default function YamlEditor({
         ></div>
         <div className="keyboard-shortcuts-modal">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Keyboard Shortcuts</h2>
+            <h2 className="text-xl font-semibold">Keyboard shortcuts</h2>
             <Button
               variant="ghost"
               size="sm"
@@ -2566,7 +2567,7 @@ export default function YamlEditor({
                   className="h-7 text-xs font-normal"
                 >
                   <Map className="h-4 w-4 mr-1 flex-shrink-0" />
-                  {showMinimap ? "Hide Minimap" : "Show Minimap"}
+                  {showMinimap ? "Hide minimap" : "Show minimap"}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -2585,7 +2586,7 @@ export default function YamlEditor({
                   className="h-7 text-xs font-normal"
                 >
                   <Wrap className="h-4 w-4 mr-1 flex-shrink-0" />
-                  {wordWrap === "on" ? "Disable Wrap" : "Enable Wrap"}
+                  {wordWrap === "on" ? "Disable wrap" : "Enable wrap"}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -2661,7 +2662,7 @@ export default function YamlEditor({
                   {isFullScreen ? (
                     <>
                       <Minimize2 className="h-4 w-4" />
-                      <span className="hidden sm:inline">Exit Fullscreen</span>
+                      <span className="hidden sm:inline">Exit fullscreen</span>
                     </>
                   ) : (
                     <>
@@ -2719,7 +2720,10 @@ export default function YamlEditor({
 
   return (
     <div
-      className={cn(isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full")}
+      className={cn(
+        isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full",
+        className
+      )}
     >
       <ResizablePanelGroup direction="horizontal" className="h-full rounded-md">
         {!sidebarCollapsed && (
@@ -2742,7 +2746,7 @@ export default function YamlEditor({
               <div className="yaml-structure-header">
                 <div className="flex flex-row items-center justify-between h-full">
                   <h2 className="text-lg font-medium text-primary">
-                    YAML Structure
+                    YAML structure
                   </h2>
                   {!isViewOnly && (
                     <MetadataOptions
@@ -2854,7 +2858,7 @@ export default function YamlEditor({
                               !sidebarCollapsed ? "rotate-180" : ""
                             }`}
                           />
-                          <span className="sr-only">Toggle Sidebar</span>
+                          <span className="sr-only">Toggle sidebar</span>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -2863,7 +2867,7 @@ export default function YamlEditor({
                     </Tooltip>
                   </TooltipProvider>
                   <h2 className="ml-2 text-lg font-medium text-primary">
-                    {isViewOnly ? "Yaml Viewer" : "YAML Editor"}
+                    YAML Editor
                   </h2>
                 </div>
                 {idData.current && !isViewOnly && (
@@ -3030,12 +3034,12 @@ export default function YamlEditor({
                             {isFullScreen ? (
                               <>
                                 <Minimize2 className="h-4 w-4 mr-2" />
-                                Exit Fullscreen
+                                Exit fullscreen
                               </>
                             ) : (
                               <>
                                 <Maximize2 className="h-4 w-4 mr-2" />
-                                Fullscreen Mode
+                                Fullscreen mode
                               </>
                             )}
                           </DropdownMenuItem>
@@ -3061,13 +3065,13 @@ export default function YamlEditor({
                         </DropdownMenuItem> */}
                         <DropdownMenuItem onClick={toggleMinimap}>
                           <Map className="h-4 w-4 mr-2" />
-                          {showMinimap ? "Hide Minimap" : "Show Minimap"}
+                          {showMinimap ? "Hide minimap" : "Show minimap"}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={toggleWordWrap}>
                           <Wrap className="h-4 w-4 mr-2" />
                           {wordWrap === "on"
-                            ? "Disable Word Wrap"
-                            : "Enable Word Wrap"}
+                            ? "Disable word wrap"
+                            : "Enable word wrap"}
                         </DropdownMenuItem>
                         {/* <DropdownMenuItem
                         onClick={() => setShowKeyboardShortcuts(true)}
@@ -3112,6 +3116,7 @@ export default function YamlEditor({
                       theme={themeData === "dark" ? "vs-dark" : "vs-light"}
                       onMount={handleEditorDidMount}
                       options={{
+                        isViewOnly: isViewOnly,
                         minimap: { enabled: showMinimap },
                         readOnly: isViewOnly,
                         domReadOnly: isViewOnly,
@@ -3204,8 +3209,8 @@ export default function YamlEditor({
                 />
                 <p>
                   {metaYamlData && metaYamlData.length === 0
-                    ? "No Metrics available at this moment"
-                    : "No Metrics selected at this moment"}
+                    ? "No metrics available at this moment"
+                    : "No metrics selected at this moment"}
                 </p>
               </div>
             )}
@@ -3219,10 +3224,10 @@ export default function YamlEditor({
           <DialogHeader>
             <DialogTitle>
               {metadataType === "schema"
-                ? "Regenerate Schema"
+                ? "Regenerate schema"
                 : metadataType === "semantic"
-                ? "Regenerate Semantic"
-                : "Regenerate Metadata"}
+                ? "Regenerate semantic"
+                : "Regenerate metadata"}
             </DialogTitle>
           </DialogHeader>
 
