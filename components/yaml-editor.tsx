@@ -201,6 +201,7 @@ export default function YamlEditor({
   customLoader: string
   getidData?: (id: string) => void
   currentTab?: string
+  isViewOnly?:boolean
 
   getEditorData?: (getEditorData: string, id: string) => void
   className?: string
