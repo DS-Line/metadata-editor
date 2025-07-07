@@ -201,7 +201,7 @@ export default function YamlEditor({
   customLoader: string
   getidData?: (id: string) => void
   currentTab?: string
-  isViewOnly?:boolean
+  isViewOnly?: boolean
 
   getEditorData?: (getEditorData: string, id: string) => void
   className?: string
@@ -3142,7 +3142,7 @@ export default function YamlEditor({
                         bracketPairColorization: { enabled: true },
                         guides: { bracketPairs: true },
                         glyphMargin: true,
-                        fixedOverflowWidgets: true,
+                        fixedOverflowWidgets: false,
                         selectOnLineNumbers: true,
                         lightbulb: { enabled: true },
                         colorDecorators: true,
