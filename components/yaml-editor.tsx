@@ -1505,7 +1505,10 @@ export default function YamlEditor({
                     </TooltipProvider>
                   )}
                   {level === 0 && editId !== id && !isViewOnly && (
-                    <div className="hover:bg-transparent flex gap-2 items-center shrink-0">
+                    <div
+                      data-testid={id}
+                      className="hover:bg-transparent flex gap-2 items-center shrink-0"
+                    >
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
