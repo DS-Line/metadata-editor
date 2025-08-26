@@ -1309,7 +1309,7 @@ export default function YamlEditor({
     ) => {
       if (!data || typeof data !== "object") return null
 
-      return Object.entries(data).map(([key, value]) => {
+      return Object.entries(data).map(([key, value],index) => {
         const currentPath = path ? `${path}.${key}` : key
         const isExpanded = expandedSections.has(currentPath)
         const isActive = selectedSection === currentPath
@@ -1447,7 +1447,10 @@ export default function YamlEditor({
                   )}
                 </div>
                 {getNodeIcon(key, level)}
-                <div className={cn("flex justify-between w-full gap-2")}>
+                <div
+                  data-testid={`metadata-${metadataType}-${index}`}
+                  className={cn("flex justify-between w-full gap-2")}
+                >
                   {level === 0 && isEditing && editId === id ? (
                     <div
                       onClick={(e) => {
@@ -1505,10 +1508,7 @@ export default function YamlEditor({
                     </TooltipProvider>
                   )}
                   {level === 0 && editId !== id && !isViewOnly && (
-                    <div
-                      data-testid={id}
-                      className="hover:bg-transparent flex gap-2 items-center shrink-0"
-                    >
+                    <div className="hover:bg-transparent flex gap-2 items-center shrink-0">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
