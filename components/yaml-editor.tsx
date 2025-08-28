@@ -420,28 +420,38 @@ export default function YamlEditor({
       setDeleteId("-1")
     }
   }, [isDeletedFlag])
-  useEffect(() => {
-    if (metaYamlData && metaYamlData.length) {
-      const yamlFolders = metaYamlData.map(
-        (data) =>
-          `${data?.metadata_name}:\n  ${
-            data?.content?.replaceAll("\n", "\n  ") || ""
-          }`
-      )
-      const parsed = yamlFolders.map((el) => parse(el)) as Array<
-        Record<string, any>
-      >
-      const requiredObject = {}
-      parsed.forEach((el, index) => {
-        requiredObject[metaYamlData[index].id] = el
-      })
-      setMyListOfYamlData(requiredObject)
-    } else {
-      setMyListOfYamlData({})
-      setYamlData("")
-      setSelectedSection(null)
-    }
-  }, [metaYamlData])
+ useEffect(() => {
+  if (metaYamlData && metaYamlData.length) {
+    const yamlFolders = metaYamlData.map((data) => {
+      const safeContent = (data?.content || "")
+        .replace(/^---\s*/gm, "") // remove doc start
+        .replace(/^\.\.\.\s*/gm, ""); // remove doc end
+
+      return `${data?.metadata_name}:\n  ${safeContent.replaceAll("\n", "\n  ")}`;
+    });
+
+    const parsed = yamlFolders.map((el) => {
+      try {
+        return parse(el);
+      } catch (err) {
+        console.error("YAML parse error", err);
+        return {};
+      }
+    });
+
+    const requiredObject: Record<string, any> = {};
+    parsed.forEach((el, index) => {
+      requiredObject[metaYamlData[index].id] = el;
+    });
+
+    setMyListOfYamlData(requiredObject);
+  } else {
+    setMyListOfYamlData({});
+    setYamlData("");
+    setSelectedSection(null);
+  }
+}, [metaYamlData]);
+
 
   // Add effect to handle initial file selection
   useEffect(() => {
