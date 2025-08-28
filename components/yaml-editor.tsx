@@ -1309,7 +1309,7 @@ export default function YamlEditor({
     ) => {
       if (!data || typeof data !== "object") return null
 
-      return Object.entries(data).map(([key, value],index) => {
+      return Object.entries(data).map(([key, value], index) => {
         const currentPath = path ? `${path}.${key}` : key
         const isExpanded = expandedSections.has(currentPath)
         const isActive = selectedSection === currentPath
@@ -1420,7 +1420,7 @@ export default function YamlEditor({
             <div key={currentPath} className="mb-1 text-sm leading-3">
               <div
                 className={cn(
-                  "flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ",
+                  "flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md",
                   isActive
                     ? "bg-primary/15 text-primary font-semibold px-1"
                     : "font-medium text-txt-color-300 px-1"
@@ -1659,7 +1659,7 @@ export default function YamlEditor({
             >
               {getNodeIcon(key, level)}
               <span
-                className={`${
+                className={` ${
                   selectedSection === `${path}.${key}`
                     ? "font-semibold text-primary"
                     : "font-medium text-txt-color-300"
@@ -1668,7 +1668,7 @@ export default function YamlEditor({
                 {key}:
               </span>
               <span
-                className={`truncate ${
+                className={`truncate max-w-[20dvw] ${
                   selectedSection === `${path}.${key}`
                     ? "text-primary"
                     : "text-muted-foreground"
