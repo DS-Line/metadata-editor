@@ -1309,7 +1309,7 @@ export default function YamlEditor({
     ) => {
       if (!data || typeof data !== "object") return null
 
-      return Object.entries(data).map(([key, value],index) => {
+      return Object.entries(data).map(([key, value], index) => {
         const currentPath = path ? `${path}.${key}` : key
         const isExpanded = expandedSections.has(currentPath)
         const isActive = selectedSection === currentPath
@@ -1420,7 +1420,7 @@ export default function YamlEditor({
             <div key={currentPath} className="mb-1 text-sm leading-3">
               <div
                 className={cn(
-                  "flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ",
+                  "flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md",
                   isActive
                     ? "bg-primary/15 text-primary font-semibold px-1"
                     : "font-medium text-txt-color-300 px-1"
@@ -1577,9 +1577,12 @@ export default function YamlEditor({
                             onClick={(e) => e.stopPropagation()}
                             className="py-5 text-txt-color-200"
                           >
-                            <AlertDialogHeader>
+                            <AlertDialogHeader
+                              className="flex flex-col items-center p-0 gap-4 w-full self-stretch
+                "
+                            >
                               <AlertDialogTitle className="flex flex-col">
-                                <p className="text-lg font-semibold pb-4 m-0 ">
+                                <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
                                   {` Delete ${
                                     metadataType
                                       .slice(0, 1)
@@ -1588,23 +1591,26 @@ export default function YamlEditor({
                                     "Metadata"
                                   }`}
                                 </p>
-                                <div className="relative">
-                                  <hr className="absolute -left-5 -right-5" />
-                                </div>
                               </AlertDialogTitle>
-                              <AlertDialogDescription className="m-0">
-                                <p className="py-4 text-base">
+                              <AlertDialogDescription className="m-0 flex flex-col items-center justify-center gap-1 !-mb-4">
+                                <p className="text-body-lg text-center text-black-100 self-stretch">
                                   {`Are you sure you want to delete the ${
                                     metadataType || "metadata"
                                   }?`}
                                 </p>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter className="flex !justify-between">
-                              <div className="flex !justify-start sm:space-x-2">
+                            <AlertDialogFooter className="w-full">
+                              <div
+                                className="flex flex-row p-2 self-stretch w-full items-center justify-center
+                 sm:space-x-2"
+                              >
+                                {" "}
                                 <div className="flex flex-row items-center gap-2">
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+
                                   <Button
-                                    variant="destructive"
+                                    variant="default"
                                     onClick={(e) => {
                                       e.preventDefault()
                                       e.stopPropagation()
@@ -1623,9 +1629,8 @@ export default function YamlEditor({
                                   >
                                     Delete
                                   </AlertDialogAction> */}
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 </div>
-                                <AlertDialogCancel className="absolute right-2 top-2 mt-1 border-none">
+                                <AlertDialogCancel className="absolute right-2 top-4 border-none">
                                   <X className="h-5 w-5" />
                                 </AlertDialogCancel>
                               </div>
@@ -1659,7 +1664,7 @@ export default function YamlEditor({
             >
               {getNodeIcon(key, level)}
               <span
-                className={`${
+                className={` ${
                   selectedSection === `${path}.${key}`
                     ? "font-semibold text-primary"
                     : "font-medium text-txt-color-300"
@@ -1668,7 +1673,7 @@ export default function YamlEditor({
                 {key}:
               </span>
               <span
-                className={`truncate ${
+                className={`truncate max-w-[20dvw] ${
                   selectedSection === `${path}.${key}`
                     ? "text-primary"
                     : "text-muted-foreground"
@@ -3228,10 +3233,10 @@ export default function YamlEditor({
           <DialogHeader>
             <DialogTitle>
               {metadataType === "schema"
-                ? "Regenerate schema"
+                ? "Regenerate schema?"
                 : metadataType === "semantic"
-                ? "Regenerate semantic"
-                : "Regenerate metadata"}
+                ? "Regenerate semantic?"
+                : "Regenerate metadata?"}
             </DialogTitle>
           </DialogHeader>
 
@@ -3245,7 +3250,7 @@ export default function YamlEditor({
           <DialogFooter className="gap-4">
             <Button
               className="self-center flex justify-center items-center"
-              variant="destructive"
+              variant="outline"
               onClick={() => {
                 setIsDialogOpen(false)
               }}
@@ -3254,8 +3259,8 @@ export default function YamlEditor({
             </Button>
 
             <Button
-              className="self-center flex justify-center items-center"
-              variant="outline"
+              className="self-center flex justify-center items-center hover:bg-primaryhover"
+              variant="default"
               onClick={() => {
                 idData.current = ""
                 nameData.current = ""
