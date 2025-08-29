@@ -80,7 +80,7 @@ export default function MetadataOptions({
                 size={18}
                 className="cursor-pointer text-txt-color-300 hover:text-primary"
               />
-              <span className="capitalize">
+              <span>
                 {menuItems.regenerateFlag
                   ? t("regenerateMetadata", {
                       type: metadataType.toLowerCase(),
@@ -98,7 +98,7 @@ export default function MetadataOptions({
               size={18}
               className="cursor-pointer text-txt-color-300 hover:text-primary"
             />
-            <span className="capitalize">
+            <span>
               {t("uploadMetadata", { type: metadataType.toLowerCase() })}
             </span>
           </DropdownMenuItem>
