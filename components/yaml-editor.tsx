@@ -3258,7 +3258,7 @@ export default function YamlEditor({
             </DialogTitle>
           </DialogHeader>
 
-          <p>
+          <p className="text-body-lg text-center text-black-100 self-stretch">
             {metadataType === "schema"
               ? "Do you want to regenerate schema? This will delete all your existing schema and semantic"
               : metadataType === "semantic"
