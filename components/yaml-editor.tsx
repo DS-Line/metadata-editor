@@ -420,38 +420,40 @@ export default function YamlEditor({
       setDeleteId("-1")
     }
   }, [isDeletedFlag])
- useEffect(() => {
-  if (metaYamlData && metaYamlData.length) {
-    const yamlFolders = metaYamlData.map((data) => {
-      const safeContent = (data?.content || "")
-        .replace(/^---\s*/gm, "") // remove doc start
-        .replace(/^\.\.\.\s*/gm, ""); // remove doc end
+  useEffect(() => {
+    if (metaYamlData && metaYamlData.length) {
+      const yamlFolders = metaYamlData.map((data) => {
+        const safeContent = (data?.content || "")
+          .replace(/^---\s*/gm, "") // remove doc start
+          .replace(/^\.\.\.\s*/gm, "") // remove doc end
 
-      return `${data?.metadata_name}:\n  ${safeContent.replaceAll("\n", "\n  ")}`;
-    });
+        return `${data?.metadata_name}:\n  ${safeContent.replaceAll(
+          "\n",
+          "\n  "
+        )}`
+      })
 
-    const parsed = yamlFolders.map((el) => {
-      try {
-        return parse(el);
-      } catch (err) {
-        console.error("YAML parse error", err);
-        return {};
-      }
-    });
+      const parsed = yamlFolders.map((el) => {
+        try {
+          return parse(el)
+        } catch (err) {
+          console.error("YAML parse error", err)
+          return {}
+        }
+      })
 
-    const requiredObject: Record<string, any> = {};
-    parsed.forEach((el, index) => {
-      requiredObject[metaYamlData[index].id] = el;
-    });
+      const requiredObject: Record<string, any> = {}
+      parsed.forEach((el, index) => {
+        requiredObject[metaYamlData[index].id] = el
+      })
 
-    setMyListOfYamlData(requiredObject);
-  } else {
-    setMyListOfYamlData({});
-    setYamlData("");
-    setSelectedSection(null);
-  }
-}, [metaYamlData]);
-
+      setMyListOfYamlData(requiredObject)
+    } else {
+      setMyListOfYamlData({})
+      setYamlData("")
+      setSelectedSection(null)
+    }
+  }, [metaYamlData])
 
   // Add effect to handle initial file selection
   useEffect(() => {
@@ -686,7 +688,7 @@ export default function YamlEditor({
 
   // Toggle full screen mode
   const toggleFullScreen = useCallback(() => {
-    if (!idData.current) return
+    // if (!idData.current) return
     setIsFullScreen((prev) => !prev)
 
     // Add a small delay to allow the UI to update before focusing the editor
@@ -2350,11 +2352,11 @@ export default function YamlEditor({
 
     setIsEditorReady(true)
   }
-  useEffect(() => {
-    if (!idData.current) {
-      setIsFullScreen(false)
-    }
-  }, [idData.current])
+  // useEffect(() => {
+  //   if (!idData.current) {
+  //     setIsFullScreen(false)
+  //   }
+  // }, [idData.current])
   // useEffect(() => {
   //   if (metaYamlData && metaYamlData.length > 0) {
   //     idData.current = metaYamlData[0].id
@@ -3112,10 +3114,13 @@ export default function YamlEditor({
                 {parseError && (
                   <Alert
                     variant="destructive"
-                    className="w-60 absolute top-4 right-2 z-10 max-h-20 flex flex-wrap"
+                    className="w-60 absolute top-4 right-2 z-10 flex flex-wrap"
                   >
                     <AlertCircle height={20} width={20} className="pb-1" />
-                    <AlertDescription className=" pt-1 font-bold max-w-56 break-words">
+                    <AlertDescription
+                      className="font-bold hyphens-auto min-w-0"
+                      style={{ wordBreak: "break-word" }}
+                    >
                       {parseError}
                     </AlertDescription>
                   </Alert>
@@ -3218,19 +3223,22 @@ export default function YamlEditor({
                 )}
               </div>
             ) : (
-              <div className="grow flex flex-col justify-center items-center">
-                <Image
-                  key="metrics-editor-empty-state"
-                  src="/images/empty-file-state.svg"
-                  width={150}
-                  height={150}
-                  alt="Empty"
-                />
-                <p>
-                  {metaYamlData && metaYamlData.length === 0
-                    ? "No metrics available at this moment"
-                    : "No metrics selected at this moment"}
-                </p>
+              <div className="flex-1 relative flex flex-col bg-white">
+                {isFullScreen && renderEditorToolbar()}
+                <div className="grow flex flex-col justify-center items-center">
+                  <Image
+                    key="metrics-editor-empty-state"
+                    src="/images/empty-file-state.svg"
+                    width={150}
+                    height={150}
+                    alt="Empty"
+                  />
+                  <p>
+                    {metaYamlData && metaYamlData.length === 0
+                      ? "No metrics available at this moment"
+                      : "No metrics selected at this moment"}
+                  </p>
+                </div>
               </div>
             )}
           </div>
