@@ -2832,14 +2832,13 @@ export default function YamlEditor({
                 {isFetchingList && (
                   <div className="relative flex items-center justify-center z-50">
                     <div className="flex flex-col items-center gap-2">
-                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
                       {customLoader ? (
                         <Image
-                          id="deleting-loader"
+                          id="fetching-loader"
                           src={customLoader}
                           width={35}
                           height={35}
-                          alt="deleting"
+                          alt="fetching"
                         />
                       ) : (
                         <Loader2
@@ -3045,7 +3044,7 @@ export default function YamlEditor({
                           size="sm"
                           className="h-7 text-xs font-normal"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-4 w-4 mr-1" />
                           <span className="hidden sm:inline">Settings</span>
                         </Button>
                       </DropdownMenuTrigger>
