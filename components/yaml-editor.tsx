@@ -2750,8 +2750,8 @@ export default function YamlEditor({
         {!sidebarCollapsed && (
           <ResizablePanel
             defaultSize={sidebarSize}
-            minSize={15}
-            maxSize={40}
+            minSize={10}
+            maxSize={16}
             onResize={(size) => setSidebarSize(size)}
             className={sidebarCollapsed ? "yaml-structure-collapsed" : ""}
           >
@@ -3139,6 +3139,7 @@ export default function YamlEditor({
                       theme={themeData === "dark" ? "vs-dark" : "vs-light"}
                       onMount={handleEditorDidMount}
                       options={{
+                        hover: false,
                         isViewOnly: isViewOnly,
                         minimap: { enabled: showMinimap },
                         readOnly: isViewOnly,
@@ -3172,8 +3173,7 @@ export default function YamlEditor({
                         linkedEditing: true,
                         codeLens: true,
                         fontLigatures: true,
-                        fontFamily:
-                          "'Fira Code', 'Droid Sans Mono', 'monospace'",
+                        fontFamily: "'Poppins'",
                         fontSize: 14,
                         lineHeight: 22,
                         padding: { top: 10, bottom: 10 },
