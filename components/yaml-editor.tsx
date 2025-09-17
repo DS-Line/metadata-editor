@@ -1587,10 +1587,10 @@ export default function YamlEditor({
 
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
-                            className="py-5 text-txt-color-200"
+                            className="gap-4 text-txt-color-200"
                           >
                             <AlertDialogHeader
-                              className="flex flex-col items-center p-0 gap-4 w-full self-stretch
+                              className="flex flex-col items-center p-0 gap-4 w-full self-stretch 
                 "
                             >
                               <AlertDialogTitle className="flex flex-col">
@@ -1604,7 +1604,7 @@ export default function YamlEditor({
                                   }`}
                                 </p>
                               </AlertDialogTitle>
-                              <AlertDialogDescription className="m-0 flex flex-col items-center justify-center gap-1 !-mb-4">
+                              <AlertDialogDescription className="m-0 flex flex-col items-center justify-center gap-1 ">
                                 <p className="text-body-lg text-center text-black-100 self-stretch">
                                   {`Are you sure you want to delete the ${
                                     metadataType || "metadata"
@@ -1618,7 +1618,7 @@ export default function YamlEditor({
                  sm:space-x-2"
                               >
                                 {" "}
-                                <div className="flex flex-row items-center gap-2">
+                                <div className="flex flex-row items-center gap-3">
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
 
                                   <Button
@@ -1629,7 +1629,7 @@ export default function YamlEditor({
                                       getidData(id)
                                     }}
                                   >
-                                    Delete
+                                    Continue
                                   </Button>
                                   {/* <AlertDialogAction
                                     className="bg-destructive text-white hover:bg-destructive-foreground"
@@ -3250,10 +3250,10 @@ export default function YamlEditor({
           <DialogHeader>
             <DialogTitle>
               {metadataType === "schema"
-                ? "Regenerate schema?"
+                ? "Regenerate schema"
                 : metadataType === "semantic"
-                ? "Regenerate semantic?"
-                : "Regenerate metadata?"}
+                ? "Regenerate semantic"
+                : "Regenerate metadata"}
             </DialogTitle>
           </DialogHeader>
 
