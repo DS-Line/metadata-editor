@@ -2026,6 +2026,15 @@ export default function YamlEditor({
   height:40px;
   border-bottom: 1px solid #ddd; /* Optional for separation */
 }
+.yaml-structure-header-fullscreen {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white; /* Ensure background is set to avoid transparency */
+  padding: 8px 4px;
+  height:55.5px;
+  border-bottom: 1px solid #ddd; /* Optional for separation */
+}
 
 .yaml-structure-content {
   // flex-grow: 1;
@@ -2454,8 +2463,10 @@ export default function YamlEditor({
   const renderEditorToolbar = () => {
     return (
       <div className="editor-toolbar">
-        <div className="toolbar-group">
-          {/* <TooltipProvider>
+        {metaYamlData.length > 0 && (
+          <div className="flex">
+            <div className="toolbar-group">
+              {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -2477,146 +2488,149 @@ export default function YamlEditor({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider> */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  aria-label="save-button-full-screen"
-                  disabled={
-                    isSaving ||
-                    (editorRef &&
-                      editorRef.current &&
-                      !editorRef.current.getValue().trim()) ||
-                    parseError
-                  }
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs font-normal"
-                  onClick={editorData}
-                >
-                  {isSaving ? (
-                    customLoader ? (
-                      <Image
-                        id="saving-loader"
-                        src={customLoader}
-                        width={14}
-                        height={14}
-                        alt="deleting"
-                        className="mr-1 "
-                      />
-                    ) : (
-                      <Loader2 size={14} className="mr-1 animate-spin" />
-                    )
-                  ) : (
-                    <Save className="h-4 w-4 mr-1" />
-                  )}{" "}
-                  Save
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Save YAML document</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  disabled={
-                    editorRef &&
-                    editorRef.current &&
-                    !editorRef.current.getValue().trim()
-                  }
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs font-normal"
-                  onClick={copyToClipboard}
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copy
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                Copy YAML to clipboard (Ctrl + Shift + C)
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      aria-label="save-button-full-screen"
+                      disabled={
+                        isSaving ||
+                        (editorRef &&
+                          editorRef.current &&
+                          !editorRef.current.getValue().trim()) ||
+                        parseError
+                      }
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs font-normal"
+                      onClick={editorData}
+                    >
+                      {isSaving ? (
+                        customLoader ? (
+                          <Image
+                            id="saving-loader"
+                            src={customLoader}
+                            width={14}
+                            height={14}
+                            alt="deleting"
+                            className="mr-1 "
+                          />
+                        ) : (
+                          <Loader2 size={14} className="mr-1 animate-spin" />
+                        )
+                      ) : (
+                        <Save className="h-4 w-4 mr-1" />
+                      )}{" "}
+                      Save
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Save YAML document</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      disabled={
+                        editorRef &&
+                        editorRef.current &&
+                        !editorRef.current.getValue().trim()
+                      }
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs font-normal"
+                      onClick={copyToClipboard}
+                    >
+                      <Copy className="h-4 w-4 mr-1" />
+                      Copy
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Copy YAML to clipboard (Ctrl + Shift + C)
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={downloadYaml}
-                  className="h-7 text-xs font-normal"
-                >
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Download YAML file (Ctrl + S)</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={downloadYaml}
+                      className="h-7 text-xs font-normal"
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Download YAML file (Ctrl + S)</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
 
-        <div className="toolbar-group">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs font-normal"
-                  onClick={exportToJson}
-                >
-                  <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
-                  Export to JSON
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Export YAML as JSON</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+            <div className="toolbar-group">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs font-normal"
+                      onClick={exportToJson}
+                    >
+                      <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
+                      Export to JSON
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Export YAML as JSON</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
 
-        <div className="toolbar-group">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleMinimap}
-                  className="h-7 text-xs font-normal"
-                >
-                  <Map className="h-4 w-4 mr-1 flex-shrink-0" />
-                  {showMinimap ? "Hide minimap" : "Show minimap"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {showMinimap ? "Hide code minimap" : "Show code minimap"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            <div className="toolbar-group">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleMinimap}
+                      className="h-7 text-xs font-normal"
+                    >
+                      <Map className="h-4 w-4 mr-1 flex-shrink-0" />
+                      {showMinimap ? "Hide minimap" : "Show minimap"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {showMinimap ? "Hide code minimap" : "Show code minimap"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleWordWrap}
-                  className="h-7 text-xs font-normal"
-                >
-                  <Wrap className="h-4 w-4 mr-1 flex-shrink-0" />
-                  {wordWrap === "on" ? "Disable wrap" : "Enable wrap"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {wordWrap === "on" ? "Disable word wrap" : "Enable word wrap"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleWordWrap}
+                      className="h-7 text-xs font-normal"
+                    >
+                      <Wrap className="h-4 w-4 mr-1 flex-shrink-0" />
+                      {wordWrap === "on" ? "Disable wrap" : "Enable wrap"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {wordWrap === "on"
+                      ? "Disable word wrap"
+                      : "Enable word wrap"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
+        )}
         {/* <div className="toolbar-group">
           <TooltipProvider>
             <Tooltip>
@@ -2764,7 +2778,13 @@ export default function YamlEditor({
               )}
               ref={sidebarTreeRef}
             >
-              <div className="yaml-structure-header">
+              <div
+                className={cn(
+                  isFullScreen
+                    ? "yaml-structure-header-fullscreen"
+                    : "yaml-structure-header"
+                )}
+              >
                 <div className="flex flex-row items-center justify-between h-full">
                   <h2 className="text-lg font-medium text-primary">
                     YAML structure
@@ -3113,7 +3133,10 @@ export default function YamlEditor({
                 {parseError && (
                   <Alert
                     variant="destructive"
-                    className="w-60 absolute top-4 right-2 z-10 flex flex-wrap"
+                    className={cn(
+                      "w-60 absolute top-4 right-2 z-10 flex flex-wrap",
+                      isFullScreen && "mt-12"
+                    )}
                   >
                     <AlertCircle height={20} width={20} className="pb-1" />
                     <AlertDescription
