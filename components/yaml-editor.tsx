@@ -3269,7 +3269,10 @@ export default function YamlEditor({
 
       {showKeyboardShortcuts && renderKeyboardShortcuts()}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>
               {metadataType === "schema"
