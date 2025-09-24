@@ -240,7 +240,6 @@ export default function YamlEditor({
     selectionLength: 0,
   })
 
-  const [alertDialogTrig, setAlertDialogTrig] = useState<boolean>(false)
   const [value, setValue] = useState("")
   const [isEditing, setisEditing] = useState(true)
   const [editId, setEditId] = useState("")
