@@ -594,8 +594,7 @@ export default function YamlEditor({
       validateYaml(formatted)
     } catch (error) {
       setParseError(
-        `Error formatting YAML: ${
-          error instanceof Error ? error.message : String(error)
+        `Error formatting YAML: ${error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -679,8 +678,7 @@ export default function YamlEditor({
       }, 0)
     } catch (error) {
       setParseError(
-        `Error exporting to JSON: ${
-          error instanceof Error ? error.message : String(error)
+        `Error exporting to JSON: ${error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -1342,9 +1340,8 @@ export default function YamlEditor({
             idData.current = id
             const requiredMeta = metaYamlData.filter((el) => el.id === id)
             nameData.current = requiredMeta[0].metadata_name
-            const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
-              requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
-            }`
+            const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
+              }`
             setYamlData(requiredValue)
             editorRef.current && editorRef.current.setValue(requiredValue)
             validateYaml(requiredValue)
@@ -1355,11 +1352,10 @@ export default function YamlEditor({
           return (
             <div key={currentPath} className="mb-1">
               <div
-                className={`flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
-                  isActive
-                    ? "bg-primary/15 text-primary font-medium"
-                    : "font-semibold text-txt-color-300"
-                }`}
+                className={`flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${isActive
+                  ? "bg-primary/15 text-primary font-medium"
+                  : "font-semibold text-txt-color-300"
+                  }`}
                 onClick={handleSectionClick}
                 data-active={isActive}
                 data-path={currentPath}
@@ -1395,11 +1391,10 @@ export default function YamlEditor({
                     {value.map((item: any, index: number) => (
                       <li key={`${currentPath}-${index}`}>
                         <div
-                          className={`flex items-center gap-2 pl-2 py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${
-                            selectedSection === `${currentPath}[${index}]`
-                              ? "bg-primary/15 text-primary font-semibold"
-                              : "font-medium text-txt-color-300"
-                          }`}
+                          className={`flex items-center gap-2 pl-2 py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${selectedSection === `${currentPath}[${index}]`
+                            ? "bg-primary/15 text-primary font-semibold"
+                            : "font-medium text-txt-color-300"
+                            }`}
                           data-active={
                             selectedSection === `${currentPath}[${index}]`
                           }
@@ -1408,11 +1403,10 @@ export default function YamlEditor({
                         >
                           {getNodeIcon("item", level + 1)}
                           <span
-                            className={`truncate ${
-                              selectedSection === `${currentPath}[${index}]`
-                                ? "text-primary font-semibold"
-                                : " font-medium text-txt-color-300"
-                            }`}
+                            className={`truncate ${selectedSection === `${currentPath}[${index}]`
+                              ? "text-primary font-semibold"
+                              : " font-medium text-txt-color-300"
+                              }`}
                           >
                             {typeof item === "string"
                               ? item
@@ -1595,20 +1589,16 @@ export default function YamlEditor({
                             >
                               <AlertDialogTitle className="flex flex-col">
                                 <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
-                                  {` Delete ${
-                                    metadataType
-                                      .slice(0, 1)
-                                      .toUpperCase()
-                                      .concat(metadataType.substring(1)) ||
+                                  {` Delete ${metadataType
+                                    ||
                                     "Metadata"
-                                  }`}
+                                    }`}
                                 </p>
                               </AlertDialogTitle>
                               <AlertDialogDescription className="m-0 flex flex-col items-center justify-center gap-1 ">
                                 <p className="text-body-lg text-center text-black-100 self-stretch">
-                                  {`Are you sure you want to delete the ${
-                                    metadataType || "metadata"
-                                  }?`}
+                                  {`Are you sure you want to delete the ${metadataType || "metadata"
+                                    }?`}
                                 </p>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
@@ -1618,7 +1608,7 @@ export default function YamlEditor({
                  sm:space-x-2"
                               >
                                 {" "}
-                                <div className="flex flex-row items-center gap-3">
+                                <div className="flex flex-row items-center gap-2">
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
 
                                   <Button
@@ -1642,8 +1632,8 @@ export default function YamlEditor({
                                     Delete
                                   </AlertDialogAction> */}
                                 </div>
-                                <AlertDialogCancel className="absolute right-2 top-4 border-none">
-                                  <X className="h-5 w-5" />
+                                <AlertDialogCancel className="absolute right-2 top-4 border-none opacity-70 hover:bg-transparent hover:opacity-100">
+                                  <X className="h-6 w-6" />
                                 </AlertDialogCancel>
                               </div>
                             </AlertDialogFooter>
@@ -1667,29 +1657,26 @@ export default function YamlEditor({
         return (
           <div key={currentPath} className="mb-0 text-sm leading-4">
             <div
-              className={`flex items-center gap-2 ${
-                level > 0 ? "pl-" + level * 1 : ""
-              } py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer text-md pl-2`}
+              className={`flex items-center gap-2 ${level > 0 ? "pl-" + level * 1 : ""
+                } py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer text-md pl-2`}
               data-active={selectedSection === `${path}.${key}`}
               data-path={`${path}.${key}`}
               onClick={handleSectionClick}
             >
               {getNodeIcon(key, level)}
               <span
-                className={` ${
-                  selectedSection === `${path}.${key}`
-                    ? "font-semibold text-primary"
-                    : "font-medium text-txt-color-300"
-                }`}
+                className={` ${selectedSection === `${path}.${key}`
+                  ? "font-semibold text-primary"
+                  : "font-medium text-txt-color-300"
+                  }`}
               >
                 {key}:
               </span>
               <span
-                className={`truncate max-w-[20dvw] ${
-                  selectedSection === `${path}.${key}`
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                }`}
+                className={`truncate max-w-[20dvw] ${selectedSection === `${path}.${key}`
+                  ? "text-primary"
+                  : "text-muted-foreground"
+                  }`}
               >
                 {String(value)}
               </span>
@@ -2756,7 +2743,7 @@ export default function YamlEditor({
   return (
     <div
       className={cn(
-        isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full",
+        isFullScreen ? "fullscreen-editor" : "h-[60dvh] w-full",
         className
       )}
     >
@@ -2832,11 +2819,10 @@ export default function YamlEditor({
               </div>
 
               <div
-                className={`${
-                  isFullScreen
-                    ? "h-full overflow-auto"
-                    : "yaml-structure-content"
-                } h-full overflow-auto`}
+                className={`${isFullScreen
+                  ? "h-full overflow-auto"
+                  : "yaml-structure-content"
+                  } h-full overflow-auto`}
               >
                 {Object.keys(myListOfYamlData).map((id, index) => {
                   return renderYamlTree(
@@ -2894,9 +2880,8 @@ export default function YamlEditor({
                           <ChevronRight
                             height={18}
                             width={18}
-                            className={`transition-transform ${
-                              !sidebarCollapsed ? "rotate-180" : ""
-                            }`}
+                            className={`transition-transform ${!sidebarCollapsed ? "rotate-180" : ""
+                              }`}
                           />
                           <span className="sr-only">Toggle sidebar</span>
                         </Button>
@@ -3268,29 +3253,29 @@ export default function YamlEditor({
       </ResizablePanelGroup>
 
       {showKeyboardShortcuts && renderKeyboardShortcuts()}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <DialogHeader>
-            <DialogTitle>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
               {metadataType === "schema"
                 ? "Regenerate schema"
                 : metadataType === "semantic"
-                ? "Regenerate semantic"
-                : "Regenerate metadata"}
-            </DialogTitle>
-          </DialogHeader>
+                  ? "Regenerate semantic"
+                  : "Regenerate metadata"}
+            </AlertDialogTitle>
+          </AlertDialogHeader>
 
           <p className="text-body-lg text-center text-black-100 self-stretch">
             {metadataType === "schema"
               ? "Do you want to regenerate schema? This will delete all your existing schema and semantic"
               : metadataType === "semantic"
-              ? "Do you want to regenerate semantic? This will delete all your existing semantic"
-              : "Do you want to regenerate metadata? This will delete all your existing metadata"}
+                ? "Do you want to regenerate semantic? This will delete all your existing semantic"
+                : "Do you want to regenerate metadata? This will delete all your existing metadata"}
           </p>
-          <DialogFooter className="gap-4">
+          <AlertDialogFooter className="">
             <Button
               className="self-center flex justify-center items-center"
               variant="outline"
@@ -3313,9 +3298,12 @@ export default function YamlEditor({
             >
               Continue
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <AlertDialogCancel className="absolute right-2 top-4 border-none opacity-70 hover:bg-transparent hover:opacity-100">
+              <X className="h-6 w-6" />
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
