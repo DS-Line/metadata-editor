@@ -239,6 +239,7 @@ export default function YamlEditor({
     fileSize: "0 KB",
     selectionLength: 0,
   })
+
   const [value, setValue] = useState("")
   const [isEditing, setisEditing] = useState(true)
   const [editId, setEditId] = useState("")
@@ -1563,7 +1564,10 @@ export default function YamlEditor({
                           />
                         )
                       ) : (
-                        <AlertDialog>
+                        <AlertDialog
+                          open={isDialogOpen}
+                          onOpenChange={setIsDialogOpen}
+                        >
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -1587,6 +1591,7 @@ export default function YamlEditor({
 
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
+                            onInteractOutside={(e) => e.preventDefault()}
                             className="gap-4 text-txt-color-200"
                           >
                             <AlertDialogHeader
@@ -2756,7 +2761,7 @@ export default function YamlEditor({
   return (
     <div
       className={cn(
-        isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full",
+        isFullScreen ? "fullscreen-editor" : "h-[60dvh] w-full",
         className
       )}
     >
