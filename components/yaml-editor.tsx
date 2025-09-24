@@ -2761,7 +2761,7 @@ export default function YamlEditor({
   return (
     <div
       className={cn(
-        isFullScreen ? "fullscreen-editor" : "h-[70dvh] w-full",
+        isFullScreen ? "fullscreen-editor" : "h-[60dvh] w-full",
         className
       )}
     >
