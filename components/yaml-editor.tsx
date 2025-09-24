@@ -239,6 +239,8 @@ export default function YamlEditor({
     fileSize: "0 KB",
     selectionLength: 0,
   })
+
+  const [alertDialogTrig, setAlertDialogTrig] = useState<boolean>(false)
   const [value, setValue] = useState("")
   const [isEditing, setisEditing] = useState(true)
   const [editId, setEditId] = useState("")
@@ -1563,13 +1565,17 @@ export default function YamlEditor({
                           />
                         )
                       ) : (
-                        <AlertDialog>
+                        <AlertDialog
+                          open={isDialogOpen}
+                          onOpenChange={setIsDialogOpen}
+                        >
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <AlertDialogTrigger
                                   asChild
                                   onClick={(e) => {
+                                    setAlertDialogTrig(true)
                                     e?.stopPropagation()
                                   }}
                                 >
@@ -1587,7 +1593,8 @@ export default function YamlEditor({
 
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
-                            className="gap-4 text-txt-color-200"
+                            onInteractOutside={(e) => e.preventDefault()}
+                            className="gap-4 text-txt-color-200 border"
                           >
                             <AlertDialogHeader
                               className="flex flex-col items-center p-0 gap-4 w-full self-stretch 
