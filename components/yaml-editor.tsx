@@ -1593,7 +1593,7 @@ export default function YamlEditor({
                           <AlertDialogContent
                             onClick={(e) => e.stopPropagation()}
                             onInteractOutside={(e) => e.preventDefault()}
-                            className="gap-4 text-txt-color-200 border"
+                            className="gap-4 text-txt-color-200"
                           >
                             <AlertDialogHeader
                               className="flex flex-col items-center p-0 gap-4 w-full self-stretch 
