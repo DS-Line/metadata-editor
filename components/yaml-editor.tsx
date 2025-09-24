@@ -1574,7 +1574,6 @@ export default function YamlEditor({
                                 <AlertDialogTrigger
                                   asChild
                                   onClick={(e) => {
-                                    setAlertDialogTrig(true)
                                     e?.stopPropagation()
                                   }}
                                 >
