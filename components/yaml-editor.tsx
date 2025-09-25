@@ -2791,7 +2791,7 @@ export default function YamlEditor({
                 )}
               >
                 <div className="flex flex-row items-center justify-between h-full">
-                  <h2 className="text-lg font-medium text-primary">
+                  <h2 className="text-black font-medium text-[12px] pl-2">
                     YAML structure
                   </h2>
                   {!isViewOnly && (
@@ -2911,7 +2911,7 @@ export default function YamlEditor({
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                  <h2 className="ml-2 text-lg font-medium text-primary">
+                  <h2 className="ml-2 text-[12px] font-medium text-black">
                     YAML Editor
                   </h2>
                 </div>
