@@ -232,6 +232,9 @@ export default function YamlEditor({
   const [wordWrap, setWordWrap] = useState<"on" | "off">("on")
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteFileId, setDeleteFileId] = useState<string>("")
+
   const [editorStats, setEditorStats] = useState<EditorStats>({
     lineCount: 0,
     currentLine: 1,
@@ -1564,96 +1567,119 @@ export default function YamlEditor({
                           />
                         )
                       ) : (
-                        <AlertDialog
-                          open={isDialogOpen}
-                          onOpenChange={setIsDialogOpen}
-                        >
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <AlertDialogTrigger
-                                  asChild
-                                  onClick={(e) => {
-                                    e?.stopPropagation()
-                                  }}
-                                >
-                                  {editId !== id && (
-                                    <Trash2
-                                      size={16}
-                                      className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
-                                    />
-                                  )}
-                                </AlertDialogTrigger>
-                              </TooltipTrigger>
-                              <TooltipContent>Delete</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-
-                          <AlertDialogContent
-                            onClick={(e) => e.stopPropagation()}
-                            onInteractOutside={(e) => e.preventDefault()}
-                            className="gap-4 text-txt-color-200"
-                          >
-                            <AlertDialogHeader
-                              className="flex flex-col items-center p-0 gap-4 w-full self-stretch 
-                "
-                            >
-                              <AlertDialogTitle className="flex flex-col">
-                                <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
-                                  {` Delete ${
-                                    metadataType
-                                      .slice(0, 1)
-                                      .toUpperCase()
-                                      .concat(metadataType.substring(1)) ||
-                                    "Metadata"
-                                  }`}
-                                </p>
-                              </AlertDialogTitle>
-                              <AlertDialogDescription className="m-0 flex flex-col items-center justify-center gap-1 ">
-                                <p className="text-body-lg text-center text-black-100 self-stretch">
-                                  {`Are you sure you want to delete the ${
-                                    metadataType || "metadata"
-                                  }?`}
-                                </p>
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="w-full">
-                              <div
-                                className="flex flex-row p-2 self-stretch w-full items-center justify-center
-                 sm:space-x-2"
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setIsDeleteDialogOpen(true)
+                                  setDeleteFileId(id)
+                                }}
+                                className="flex items-center"
                               >
-                                {" "}
-                                <div className="flex flex-row items-center gap-3">
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                {editId !== id && (
+                                  <Trash2
+                                    size={16}
+                                    className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
+                                  />
+                                )}
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
 
-                                  <Button
-                                    variant="default"
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      e.stopPropagation()
-                                      getidData(id)
-                                    }}
-                                  >
-                                    Continue
-                                  </Button>
-                                  {/* <AlertDialogAction
-                                    className="bg-destructive text-white hover:bg-destructive-foreground"
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      e.stopPropagation()
-                                      getidData(id)
-                                    }}
-                                  >
-                                    Delete
-                                  </AlertDialogAction> */}
-                                </div>
-                                <AlertDialogCancel className="absolute right-2 top-4 border-none">
-                                  <X className="h-5 w-5" />
-                                </AlertDialogCancel>
-                              </div>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        //         <AlertDialog
+                        //           open={isDialogOpen}
+                        //           onOpenChange={setIsDialogOpen}
+                        //         >
+                        //           <TooltipProvider>
+                        //             <Tooltip>
+                        //               <TooltipTrigger asChild>
+                        //                 <AlertDialogTrigger
+                        //                   asChild
+                        //                   onClick={(e) => {
+                        //                     e?.stopPropagation()
+                        //                   }}
+                        //                 >
+                        //                   {editId !== id && (
+                        //                     <Trash2
+                        //                       size={16}
+                        //                       className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
+                        //                     />
+                        //                   )}
+                        //                 </AlertDialogTrigger>
+                        //               </TooltipTrigger>
+                        //               <TooltipContent>Delete</TooltipContent>
+                        //             </Tooltip>
+                        //           </TooltipProvider>
+
+                        //           <AlertDialogContent
+                        //             onClick={(e) => e.stopPropagation()}
+                        //             onInteractOutside={(e) => e.preventDefault()}
+                        //             className="gap-4 text-txt-color-200"
+                        //           >
+                        //             <AlertDialogHeader
+                        //               className="flex flex-col items-center p-0 gap-4 w-full self-stretch
+                        // "
+                        //             >
+                        //               <AlertDialogTitle className="flex flex-col">
+                        //                 <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
+                        //                   {` Delete ${
+                        //                     metadataType
+                        //                       .slice(0, 1)
+                        //                       .toUpperCase()
+                        //                       .concat(metadataType.substring(1)) ||
+                        //                     "Metadata"
+                        //                   }`}
+                        //                 </p>
+                        //               </AlertDialogTitle>
+                        //               <AlertDialogDescription className="m-0 flex flex-col items-center justify-center gap-1 ">
+                        //                 <p className="text-body-lg text-center text-black-100 self-stretch">
+                        //                   {`Are you sure you want to delete the ${
+                        //                     metadataType || "metadata"
+                        //                   }?`}
+                        //                 </p>
+                        //               </AlertDialogDescription>
+                        //             </AlertDialogHeader>
+                        //             <AlertDialogFooter className="w-full">
+                        //               <div
+                        //                 className="flex flex-row p-2 self-stretch w-full items-center justify-center
+                        //  sm:space-x-2"
+                        //               >
+                        //                 {" "}
+                        //                 <div className="flex flex-row items-center gap-3">
+                        //                   <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                        //                   <Button
+                        //                     variant="default"
+                        //                     onClick={(e) => {
+                        //                       e.preventDefault()
+                        //                       e.stopPropagation()
+                        //                       getidData(id)
+                        //                     }}
+                        //                   >
+                        //                     Continue
+                        //                   </Button>
+                        //                   {/* <AlertDialogAction
+                        //                     className="bg-destructive text-white hover:bg-destructive-foreground"
+                        //                     onClick={(e) => {
+                        //                       e.preventDefault()
+                        //                       e.stopPropagation()
+                        //                       getidData(id)
+                        //                     }}
+                        //                   >
+                        //                     Delete
+                        //                   </AlertDialogAction> */}
+                        //                 </div>
+                        //                 <AlertDialogCancel className="absolute right-2 top-4 border-none">
+                        //                   <X className="h-5 w-5" />
+                        //                 </AlertDialogCancel>
+                        //               </div>
+                        //             </AlertDialogFooter>
+                        //           </AlertDialogContent>
+                        //         </AlertDialog>
                       )}
                     </div>
                   )}
@@ -3318,6 +3344,65 @@ export default function YamlEditor({
             >
               Continue
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          className="gap-4 text-txt-color-200"
+        >
+          <DialogHeader className="flex flex-col items-center p-0 gap-4 w-full self-stretch">
+            <DialogTitle className="flex flex-col">
+              <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
+                {` Delete ${
+                  metadataType
+                    .slice(0, 1)
+                    .toUpperCase()
+                    .concat(metadataType.substring(1)) || "Metadata"
+                }`}
+              </p>
+            </DialogTitle>
+
+            <div className="m-0 flex flex-col items-center justify-center gap-1">
+              <p className="text-body-lg text-center text-black-100 self-stretch">
+                {`Are you sure you want to delete the ${
+                  metadataType || "metadata"
+                }?`}
+              </p>
+            </div>
+          </DialogHeader>
+
+          <DialogFooter className="w-full">
+            <div
+              className="flex flex-row p-2 self-stretch w-full items-center justify-center
+                         sm:space-x-2"
+            >
+              {" "}
+              <div className="flex flex-row items-center gap-3">
+                <Button
+                  variant="outline"
+                  className="self-center flex justify-center items-center"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  variant="default"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setIsDeleteDialogOpen(false)
+                    getidData(deleteFileId)
+                  }}
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
