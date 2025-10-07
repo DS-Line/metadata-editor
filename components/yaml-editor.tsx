@@ -411,7 +411,7 @@ export default function YamlEditor({
 
         if (itemNameMeta) {
           idData.current = itemNameMeta.id
-          nameData.current = itemNameMeta.metadata_name
+          nameData.current = itemNameMeta.id
         }
       }
     }
@@ -631,7 +631,7 @@ export default function YamlEditor({
   const editorData = () => {
     if (!editorRef.current) return
     getEditorData(editorRef.current.getValue(), idData.current)
-    if (!metaYamlData.some((el) => el.metadata_name === nameData.current)) {
+    if (!metaYamlData.some((el) => el.id === nameData.current)) {
       idData.current = ""
       nameData.current = ""
       editorRef.current = null
@@ -1343,9 +1343,10 @@ export default function YamlEditor({
             // Set ID if applicable
             idData.current = id
             const requiredMeta = metaYamlData.filter((el) => el.id === id)
-            nameData.current = requiredMeta[0].metadata_name
-            const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
-              }`
+            nameData.current = requiredMeta[0].id
+            const requiredValue = `${requiredMeta[0].metadata_name}:\n  ${
+              requiredMeta[0]?.content?.replaceAll("\n", "\n  ") || ""
+            }`
             setYamlData(requiredValue)
             editorRef.current && editorRef.current.setValue(requiredValue)
             validateYaml(requiredValue)
