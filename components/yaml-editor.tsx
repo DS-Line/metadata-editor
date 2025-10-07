@@ -3202,9 +3202,9 @@ export default function YamlEditor({
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
-          className="p-0"
+          
         >
-          <DialogHeader className="flex flex-row p-4 items-center justify-between font-medium w-full border-b border-b-black-10">
+          <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle>
               {metadataType === "schema"
                 ? "Regenerate schema"
@@ -3212,7 +3212,8 @@ export default function YamlEditor({
                   ? "Regenerate semantic"
                   : "Regenerate metadata"}
             </DialogTitle>
-            <DialogClose className="opacity-70 hover:bg-transparent hover:opacity-100"><X /></DialogClose>
+            
+            <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100"><X /></DialogClose>
           </DialogHeader>
 
           <p className="text-body-lg text-center text-black-100 self-stretch px-4">
@@ -3222,7 +3223,7 @@ export default function YamlEditor({
                 ? "Do you want to regenerate semantic? This will delete all your existing semantic"
                 : "Do you want to regenerate metadata? This will delete all your existing metadata"}
           </p>
-          <DialogFooter className="gap-4 pb-4">
+          <DialogFooter className="gap-4 ">
             <Button
               className="self-center flex justify-center items-center"
               variant="outline"
@@ -3246,6 +3247,7 @@ export default function YamlEditor({
               Continue
             </Button>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
 
@@ -3253,9 +3255,9 @@ export default function YamlEditor({
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
-          className="p-0 text-txt-color-200"
+          className=" text-txt-color-200"
         >
-          <DialogHeader className="flex flex-row p-4 items-center justify-between font-medium w-full border-b border-b-black-10">
+          <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle className="flex flex-col">
               <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
                 {` Delete ${metadataType
@@ -3265,7 +3267,8 @@ export default function YamlEditor({
                   }`}
               </p>
             </DialogTitle>
-            <DialogClose className="opacity-70 hover:bg-transparent hover:opacity-100"><X /></DialogClose>
+            
+            <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100"><X /></DialogClose>
           </DialogHeader>
 
           <div className="m-0 flex flex-col items-center justify-center gap-1">
@@ -3274,9 +3277,9 @@ export default function YamlEditor({
                 }?`}
             </p>
           </div>
-          <DialogFooter className="w-full pb-4">
+          <DialogFooter className="w-full">
             <div
-              className="flex flex-row p-2 self-stretch w-full items-center justify-center
+              className="flex flex-row self-stretch w-full items-center justify-center
                          sm:space-x-2"
             >
               {" "}
