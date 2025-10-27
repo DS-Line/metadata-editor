@@ -598,7 +598,8 @@ export default function YamlEditor({
       validateYaml(formatted)
     } catch (error) {
       setParseError(
-        `Error formatting YAML: ${error instanceof Error ? error.message : String(error)
+        `Error formatting YAML: ${
+          error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -682,7 +683,8 @@ export default function YamlEditor({
       }, 0)
     } catch (error) {
       setParseError(
-        `Error exporting to JSON: ${error instanceof Error ? error.message : String(error)
+        `Error exporting to JSON: ${
+          error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -1323,7 +1325,7 @@ export default function YamlEditor({
     ) => {
       if (!data || typeof data !== "object") return null
 
-      return Object.entries(data).map(([key, value], index) => {
+      return Object.entries(data).map(([key, value], ind) => {
         const currentPath = path ? `${path}.${key}` : key
         const isExpanded = expandedSections.has(currentPath)
         const isActive = selectedSection === currentPath
@@ -1357,10 +1359,11 @@ export default function YamlEditor({
           return (
             <div key={currentPath} className="mb-1">
               <div
-                className={`flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${isActive
-                  ? "bg-primary/15 text-primary font-medium"
-                  : "font-semibold text-txt-color-300"
-                  }`}
+                className={`flex items-center gap-1 cursor-pointer p-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md ${
+                  isActive
+                    ? "bg-primary/15 text-primary font-medium"
+                    : "font-semibold text-txt-color-300"
+                }`}
                 onClick={handleSectionClick}
                 data-active={isActive}
                 data-path={currentPath}
@@ -1393,13 +1396,14 @@ export default function YamlEditor({
               {isExpanded && (
                 <div className="pl-4">
                   <ul className="space-y-1">
-                    {value.map((item: any, index: number) => (
+                    {value.map((item: any) => (
                       <li key={`${currentPath}-${index}`}>
                         <div
-                          className={`flex items-center gap-2 pl-2 py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${selectedSection === `${currentPath}[${index}]`
-                            ? "bg-primary/15 text-primary font-semibold"
-                            : "font-medium text-txt-color-300"
-                            }`}
+                          className={`flex items-center gap-2 pl-2 py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer ${
+                            selectedSection === `${currentPath}[${index}]`
+                              ? "bg-primary/15 text-primary font-semibold"
+                              : "font-medium text-txt-color-300"
+                          }`}
                           data-active={
                             selectedSection === `${currentPath}[${index}]`
                           }
@@ -1408,10 +1412,11 @@ export default function YamlEditor({
                         >
                           {getNodeIcon("item", level + 1)}
                           <span
-                            className={`truncate ${selectedSection === `${currentPath}[${index}]`
-                              ? "text-primary font-semibold"
-                              : " font-medium text-txt-color-300"
-                              }`}
+                            className={`truncate ${
+                              selectedSection === `${currentPath}[${index}]`
+                                ? "text-primary font-semibold"
+                                : " font-medium text-txt-color-300"
+                            }`}
                           >
                             {typeof item === "string"
                               ? item
@@ -1524,6 +1529,7 @@ export default function YamlEditor({
                         <Tooltip>
                           <TooltipTrigger>
                             <SquarePen
+                              data-testid={`metadata-edit-${metadataType}-${index}`}
                               size={16}
                               onClick={(e) => {
                                 // e.stopPropagation()
@@ -1566,6 +1572,7 @@ export default function YamlEditor({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button
+                                data-testid={`metadata-delete-${metadataType}-${index}`}
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   setIsDeleteDialogOpen(true)
@@ -1602,26 +1609,29 @@ export default function YamlEditor({
         return (
           <div key={currentPath} className="mb-0 text-sm leading-4">
             <div
-              className={`flex items-center gap-2 ${level > 0 ? "pl-" + level * 1 : ""
-                } py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer text-md pl-2`}
+              className={`flex items-center gap-2 ${
+                level > 0 ? "pl-" + level * 1 : ""
+              } py-1 transition-all hover:bg-accent/70 hover:text-accent-foreground rounded-md cursor-pointer text-md pl-2`}
               data-active={selectedSection === `${path}.${key}`}
               data-path={`${path}.${key}`}
               onClick={handleSectionClick}
             >
               {getNodeIcon(key, level)}
               <span
-                className={` ${selectedSection === `${path}.${key}`
-                  ? "font-semibold text-primary"
-                  : "font-medium text-txt-color-300"
-                  }`}
+                className={` ${
+                  selectedSection === `${path}.${key}`
+                    ? "font-semibold text-primary"
+                    : "font-medium text-txt-color-300"
+                }`}
               >
                 {key}:
               </span>
               <span
-                className={`truncate max-w-[20dvw] ${selectedSection === `${path}.${key}`
-                  ? "text-primary"
-                  : "text-muted-foreground"
-                  }`}
+                className={`truncate max-w-[20dvw] ${
+                  selectedSection === `${path}.${key}`
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
               >
                 {String(value)}
               </span>
@@ -2764,10 +2774,11 @@ export default function YamlEditor({
               </div>
 
               <div
-                className={`${isFullScreen
-                  ? "h-full overflow-auto"
-                  : "yaml-structure-content"
-                  } h-full overflow-auto`}
+                className={`${
+                  isFullScreen
+                    ? "h-full overflow-auto"
+                    : "yaml-structure-content"
+                } h-full overflow-auto`}
               >
                 {Object.keys(myListOfYamlData).map((id, index) => {
                   return renderYamlTree(
@@ -2825,8 +2836,9 @@ export default function YamlEditor({
                           <ChevronRight
                             height={18}
                             width={18}
-                            className={`transition-transform ${!sidebarCollapsed ? "rotate-180" : ""
-                              }`}
+                            className={`transition-transform ${
+                              !sidebarCollapsed ? "rotate-180" : ""
+                            }`}
                           />
                           <span className="sr-only">Toggle sidebar</span>
                         </Button>
@@ -3202,26 +3214,27 @@ export default function YamlEditor({
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
-          
         >
           <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle>
               {metadataType === "schema"
                 ? "Regenerate schema"
                 : metadataType === "semantic"
-                  ? "Regenerate semantic"
-                  : "Regenerate metadata"}
+                ? "Regenerate semantic"
+                : "Regenerate metadata"}
             </DialogTitle>
-            
-            <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100"><X /></DialogClose>
+
+            <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100">
+              <X />
+            </DialogClose>
           </DialogHeader>
 
           <p className="text-body-lg text-center text-black-100 self-stretch px-4">
             {metadataType === "schema"
               ? "Do you want to regenerate schema? This will delete all your existing schema and semantic"
               : metadataType === "semantic"
-                ? "Do you want to regenerate semantic? This will delete all your existing semantic"
-                : "Do you want to regenerate metadata? This will delete all your existing metadata"}
+              ? "Do you want to regenerate semantic? This will delete all your existing semantic"
+              : "Do you want to regenerate metadata? This will delete all your existing metadata"}
           </p>
           <DialogFooter className="gap-4 ">
             <Button
@@ -3247,7 +3260,6 @@ export default function YamlEditor({
               Continue
             </Button>
           </DialogFooter>
-
         </DialogContent>
       </Dialog>
 
@@ -3260,21 +3272,25 @@ export default function YamlEditor({
           <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle className="flex flex-col">
               <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
-                {` Delete ${metadataType
-                  .slice(0, 1)
-                  .toUpperCase()
-                  .concat(metadataType.substring(1)) || "Metadata"
-                  }`}
+                {` Delete ${
+                  metadataType
+                    .slice(0, 1)
+                    .toUpperCase()
+                    .concat(metadataType.substring(1)) || "Metadata"
+                }`}
               </p>
             </DialogTitle>
-            
-            <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100"><X /></DialogClose>
+
+            <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100">
+              <X />
+            </DialogClose>
           </DialogHeader>
 
           <div className="m-0 flex flex-col items-center justify-center gap-1">
             <p className="text-body-lg text-center text-black-100 self-stretch">
-              {`Are you sure you want to delete the ${metadataType || "metadata"
-                }?`}
+              {`Are you sure you want to delete the ${
+                metadataType || "metadata"
+              }?`}
             </p>
           </div>
           <DialogFooter className="w-full">
