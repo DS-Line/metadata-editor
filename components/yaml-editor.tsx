@@ -3076,11 +3076,10 @@ export default function YamlEditor({
                   <Alert
                     variant="destructive"
                     className={cn(
-                      "w-60 absolute top-4 right-2 z-10 flex flex-wrap",
+                      "w-60 absolute top-4 right-2 z-10 flex flex-wrap rounded-none border-none",
                       isFullScreen && "mt-12"
                     )}
                   >
-                    <AlertCircle height={20} width={20} className="pb-1" />
                     <AlertDescription
                       className="font-bold hyphens-auto min-w-0"
                       style={{ wordBreak: "break-word" }}
@@ -3101,9 +3100,11 @@ export default function YamlEditor({
                       height="100%" // Let the parent handle height
                       defaultLanguage="yaml"
                       defaultValue={yamlData}
-                      theme={themeData === "dark" ? "vs-dark" : "vs-light"}
+                      theme="vs-light"
                       onMount={handleEditorDidMount}
                       options={{
+                        tabSize: 4, // 👈 Increase indentation width to 4 spaces
+                        insertSpaces: true,
                         hover: false,
                         isViewOnly: isViewOnly,
                         minimap: { enabled: showMinimap },

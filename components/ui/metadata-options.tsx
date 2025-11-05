@@ -50,7 +50,10 @@ export default function MetadataOptions({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger data-testid="metadata-editor-options" className="flex items-center cursor-pointer">
+      <DropdownMenuTrigger
+        data-testid="metadata-editor-options"
+        className="flex items-center cursor-pointer"
+      >
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
