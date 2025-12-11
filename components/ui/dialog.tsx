@@ -33,6 +33,7 @@ const DialogTrigger = React.forwardRef<
     {...props}
   />
 ))
+DialogTrigger.displayName = DialogPrimitive.Trigger.displayName
 
 const DialogPortal = ({ ...props }: DialogPrimitive.DialogPortalProps) => (
   <DialogPrimitive.Portal {...props} />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
 "use client"
@@ -3220,8 +3221,8 @@ export default function YamlEditor({
               {metadataType === "schema"
                 ? "Regenerate schema"
                 : metadataType === "semantic"
-                ? "Regenerate semantic"
-                : "Regenerate metadata"}
+                  ? "Regenerate semantic"
+                  : "Regenerate metadata"}
             </DialogTitle>
 
             <DialogClose className="absolute right-0 top-1/2 -translate-y-1/2 opacity-70 hover:bg-transparent hover:opacity-100">
@@ -3233,8 +3234,8 @@ export default function YamlEditor({
             {metadataType === "schema"
               ? "Do you want to regenerate schema? This will delete all your existing schema and semantic"
               : metadataType === "semantic"
-              ? "Do you want to regenerate semantic? This will delete all your existing semantic"
-              : "Do you want to regenerate metadata? This will delete all your existing metadata"}
+                ? "Do you want to regenerate semantic? This will delete all your existing semantic"
+                : "Do you want to regenerate metadata? This will delete all your existing metadata"}
           </p>
           <DialogFooter className="gap-4 ">
             <Button
