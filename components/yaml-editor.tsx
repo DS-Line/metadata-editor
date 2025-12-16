@@ -3215,6 +3215,7 @@ export default function YamlEditor({
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
+          className="w-[420px]"
         >
           <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle>
@@ -3268,7 +3269,7 @@ export default function YamlEditor({
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
-          className=" text-txt-color-200"
+          className=" w-[420px] text-txt-color-200"
         >
           <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle className="flex flex-col">
