@@ -1478,7 +1478,7 @@ export default function YamlEditor({
                     >
                       {" "}
                       <input
-                        className="flex h-6 mt-[1px] w-full rounded-sm bg-transparent px-2 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-txt-color-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-6 mt-px w-full rounded-sm bg-transparent px-2 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-txt-color-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         ref={inputRef}
                         autoFocus={true}
                         defaultValue={key}
@@ -1545,7 +1545,7 @@ export default function YamlEditor({
                                   setTimeout(() => setEditId(id), 500)
                                 }
                               }}
-                              className="hover:text-primary text-txt-color-300 outline-none scale-x-[-1]"
+                              className="hover:text-primary text-txt-color-300 outline-hidden scale-x-[-1]"
                             />
                           </TooltipTrigger>
                           <TooltipContent>Edit Name</TooltipContent>
@@ -1584,7 +1584,7 @@ export default function YamlEditor({
                                 {editId !== id && (
                                   <Trash2
                                     size={16}
-                                    className="mr-2 hover:text-destructive text-txt-color-300 outline-none"
+                                    className="mr-2 hover:text-destructive text-txt-color-300 outline-hidden"
                                   />
                                 )}
                               </button>
@@ -1980,7 +1980,7 @@ export default function YamlEditor({
 }
 
 .yaml-structure-content {
-  // flex-grow: 1;
+  // grow: 1;
     // max-height: calc(100dvh - 256px); /* Adjust height dynamically */
   max-width: 100%;
   overflow-y: auto;
@@ -1999,7 +1999,7 @@ export default function YamlEditor({
 
 .status-bar {
   height: 32px; /* Fixed height */
-  flex-shrink: 0; /* Prevents collapsing */
+  shrink: 0; /* Prevents collapsing */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2522,7 +2522,7 @@ export default function YamlEditor({
                       className="h-7 text-xs font-normal"
                       onClick={exportToJson}
                     >
-                      <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
+                      <FileJson className="h-4 w-4 mr-1 shrink-0" />
                       Export to JSON
                     </Button>
                   </TooltipTrigger>
@@ -2541,7 +2541,7 @@ export default function YamlEditor({
                       onClick={toggleMinimap}
                       className="h-7 text-xs font-normal"
                     >
-                      <Map className="h-4 w-4 mr-1 flex-shrink-0" />
+                      <Map className="h-4 w-4 mr-1 shrink-0" />
                       {showMinimap ? "Hide minimap" : "Show minimap"}
                     </Button>
                   </TooltipTrigger>
@@ -2560,7 +2560,7 @@ export default function YamlEditor({
                       onClick={toggleWordWrap}
                       className="h-7 text-xs font-normal"
                     >
-                      <Wrap className="h-4 w-4 mr-1 flex-shrink-0" />
+                      <Wrap className="h-4 w-4 mr-1 shrink-0" />
                       {wordWrap === "on" ? "Disable wrap" : "Enable wrap"}
                     </Button>
                   </TooltipTrigger>
@@ -2864,7 +2864,7 @@ export default function YamlEditor({
                             onClick={exportToJson}
                             className="h-7 text-xs font-normal"
                           >
-                            <FileJson className="h-4 w-4 mr-1 flex-shrink-0" />
+                            <FileJson className="h-4 w-4 mr-1 shrink-0" />
                             Export to JSON
                           </Button>
                         </TooltipTrigger>
@@ -3273,7 +3273,7 @@ export default function YamlEditor({
         >
           <DialogHeader className="relative flex items-center justify-center font-medium">
             <DialogTitle className="flex flex-col">
-              <p className="font-poppins text-headline-xs text-center text-black-100 !-mb-2">
+              <p className="font-poppins text-headline-xs text-center text-black-100 -mb-2!">
                 {` Delete ${
                   metadataType
                     .slice(0, 1)

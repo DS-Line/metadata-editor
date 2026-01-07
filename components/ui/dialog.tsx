@@ -12,7 +12,7 @@ const dialogVariants = cva("", {
   variants: {
     variant: {
       default: "",
-      transparentForeground: "!backdrop-blur-none bg-foreground/40",
+      transparentForeground: "backdrop-blur-none! bg-foreground/40",
     },
   },
   defaultVariants: {
@@ -47,7 +47,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      `fixed inset-0 z-50 bg-black-20 backdrop-blur-sm 
+      `fixed inset-0 z-50 bg-black-20 backdrop-blur-xs 
       data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
      `,
       className
@@ -90,8 +90,8 @@ const DialogContent = React.forwardRef<
         <DialogPrimitive.Close
           onClick={() => document.getElementById("dialog-close")?.click()}
           className={cn(
-            "absolute right-4 top-2 rounded-sm opacity-100 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-txt-color-200 z-50",
-            "absolute py-2 px-4 right-4 top-2 border border-input hover:bg-accent hover:text-txt-color-500 border-none inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+            "absolute right-4 top-2 rounded-sm opacity-100 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-txt-color-200 z-50",
+            "absolute py-2 px-4 right-4 top-2 border border-input hover:bg-accent hover:text-txt-color-500 border-none inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
             closeButtonstyle
           )}
         >

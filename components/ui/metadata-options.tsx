@@ -57,14 +57,14 @@ export default function MetadataOptions({
             <TooltipTrigger>
               <EllipsisVertical
                 size={18}
-                className="cursor-pointer text-txt-color-300 hover:text-primary outline-none"
+                className="cursor-pointer text-txt-color-300 hover:text-primary outline-hidden"
               />
             </TooltipTrigger>
             <TooltipContent>{t("moreOptions")}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="p-2 [&>*]:px-2 [&>*]:cursor-pointer [&>*]:hover:rounded-none">
+      <DropdownMenuContent className="p-2 *:px-2 *:cursor-pointer hover:*:rounded-none">
         {menuItems.generate &&
           metadataType.toLowerCase() !== "presentation" && (
             <DropdownMenuItem
